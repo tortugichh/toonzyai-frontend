@@ -1,0 +1,1 @@
+export { CreateAvatarForm } from './CreateAvatarForm'; 
