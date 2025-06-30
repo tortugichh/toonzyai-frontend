@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card';
-import type { AnimationSegment } from '@/types/api';
+import type { AnimationSegment } from '@/services/api';
 import VideoPreview from '@/components/common/VideoPreview';
 
 interface AnimationSegmentsProps {
@@ -16,12 +16,13 @@ type SegmentOrPlaceholder = AnimationSegment | PlaceholderSegment;
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'COMPLETED':
+    case 'completed':
       return 'bg-green-500';
-    case 'IN_PROGRESS':
+    case 'in_progress':
       return 'bg-yellow-500';
-    case 'FAILED':
+    case 'failed':
       return 'bg-red-500';
+    case 'pending':
     case 'PENDING':
       return 'bg-gray-300';
     default:
@@ -31,12 +32,13 @@ const getStatusColor = (status: string) => {
 
 const getStatusText = (status: string) => {
   switch (status) {
-    case 'COMPLETED':
+    case 'completed':
       return 'Готов';
-    case 'IN_PROGRESS':
+    case 'in_progress':
       return 'Обработка';
-    case 'FAILED':
+    case 'failed':
       return 'Ошибка';
+    case 'pending':
     case 'PENDING':
       return 'Ожидание';
     default:
@@ -93,7 +95,7 @@ export default function AnimationSegments({ segments, totalSegments }: Animation
                 </div>
               )}
               
-              {isAnimationSegment(segment) && segment.status === 'COMPLETED' && segment.video_url && (
+              {isAnimationSegment(segment) && segment.status === 'completed' && segment.video_url && (
                 <div className="mt-2">
                   <VideoPreview 
                     videoUrl={segment.video_url}
@@ -106,14 +108,14 @@ export default function AnimationSegments({ segments, totalSegments }: Animation
                 </div>
               )}
               
-              {segment.status === 'IN_PROGRESS' && (
+              {segment.status === 'in_progress' && (
                 <div className="mt-2 flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-500"></div>
                   <span className="text-xs text-yellow-600">Генерация...</span>
                 </div>
               )}
               
-              {segment.status === 'FAILED' && (
+              {segment.status === 'failed' && (
                 <div className="mt-2 flex items-center gap-2">
                   <div className="w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-xs">!</span>
@@ -140,11 +142,11 @@ export default function AnimationSegments({ segments, totalSegments }: Animation
                   Сегмент {segment.segment_number}
                 </span>
                 <span className={`px-2 py-1 rounded-full font-medium ${
-                  segment.status === 'COMPLETED'
+                  segment.status === 'completed'
                     ? 'bg-green-100 text-green-700'
-                    : segment.status === 'IN_PROGRESS'
+                    : segment.status === 'in_progress'
                     ? 'bg-yellow-100 text-yellow-700'
-                    : segment.status === 'FAILED'
+                    : segment.status === 'failed'
                     ? 'bg-red-100 text-red-700'
                     : 'bg-gray-100 text-gray-700'
                 }`}>

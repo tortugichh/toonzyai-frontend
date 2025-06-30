@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AvatarImage from './AvatarImage';
-import type { Avatar } from '@/types/api';
+import type { Avatar } from '@/services/api';
 
 interface AvatarSelectorProps {
   avatars: Avatar[];

@@ -17,7 +17,7 @@ import {
 import { useAvatars } from '@/hooks/useAvatars';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
-import type { Avatar, AnimationProject } from '@/types/api';
+import type { AnimationProject } from '@/services/api';
 
 const createAnimationSchema = z.object({
   source_avatar_id: z.string().min(1, 'Выберите аватар'),
@@ -423,14 +423,14 @@ function AnimationPage() {
                       У вас есть {avatars.avatars.length} аватаров, но они ещё не готовы:
                     </p>
                     <div className="mt-2 space-y-1">
-                      {avatars.avatars.map((avatar) => (
+                      {avatars.avatars.map((avatar: any) => (
                         <div key={avatar.avatar_id} className="flex items-center justify-between bg-yellow-100 rounded px-3 py-2 text-sm">
                           <span className="text-yellow-800 flex-1 mr-2">
                             {avatar.prompt.slice(0, 40)}...
                           </span>
                           <div
                             className={`h-6 w-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                              avatar.status === 'generating'
+                              avatar.status === 'pending'
                                 ? 'bg-yellow-500 animate-pulse'
                                 : avatar.status === 'failed'
                                 ? 'bg-red-500'
@@ -439,7 +439,8 @@ function AnimationPage() {
                           >
                             {avatar.status === 'generating' ? 'Генерируется' :
                             avatar.status === 'failed' ? 'Ошибка' :
-                            avatar.status === 'pending' ? 'В очереди' : avatar.status}
+                            avatar.status === 'pending' ? 'В очереди' : 
+                            avatar.status === 'completed' ? 'Готов' : avatar.status}
                           </div>
                         </div>
                       ))}
@@ -691,7 +692,7 @@ function AnimationPage() {
               </div>
               <p className="text-3xl font-bold">
                 {animations?.filter((a: AnimationProject) => 
-                  a.status === 'COMPLETED'
+                  a.status === 'completed'
                 ).length || 0}
               </p>
               <p className="text-gray-600">Завершено</p>
@@ -703,7 +704,7 @@ function AnimationPage() {
               </div>
               <p className="text-3xl font-bold">
                 {animations?.filter((a: AnimationProject) => {
-                  return a.status === 'IN_PROGRESS' || a.status === 'ASSEMBLING';
+                  return a.status === 'in_progress' || a.status === 'assembling';
                 }).length || 0}
               </p>
               <p className="text-gray-600">В обработке</p>
@@ -729,12 +730,12 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
   
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'COMPLETED':
+      case 'completed':
         return 'bg-green-100 text-green-800';
-      case 'IN_PROGRESS':
-      case 'ASSEMBLING':
+      case 'in_progress':
+      case 'assembling':
         return 'bg-yellow-100 text-yellow-800';
-      case 'FAILED':
+      case 'failed':
         return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -743,13 +744,13 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'COMPLETED':
+      case 'completed':
         return 'Завершено';
-      case 'IN_PROGRESS':
+      case 'in_progress':
         return 'Генерация';
-      case 'ASSEMBLING':
+      case 'assembling':
         return 'Сборка видео';
-      case 'FAILED':
+      case 'failed':
         return 'Ошибка';
       default:
         return status;
@@ -757,7 +758,7 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
   };
 
   const completedSegments = animation.segments?.filter(s => 
-    s.status === 'COMPLETED'
+    s.status === 'completed'
   ).length || 0;
   const progressPercentage = Math.round((completedSegments / animation.total_segments) * 100);
   const allSegmentsCompleted = completedSegments === animation.total_segments;
@@ -797,7 +798,7 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
           <CompactAnimationMonitor 
             animation={animation}
             onRefresh={() => window.location.reload()}
-            isRefreshing={false}
+
           />
 
           {/* Segments visualization */}
@@ -812,7 +813,7 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
           {/* Final Video Section */}
           {allSegmentsCompleted && (
             <div className="mb-4">
-              {animation.status === 'COMPLETED' && animation.final_video_url ? (
+              {animation.status === 'completed' && animation.final_video_url ? (
                 <div className="space-y-4">
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <div className="flex items-center space-x-3">
@@ -828,7 +829,7 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
                     title="Финальное видео"
                   />
                 </div>
-              ) : animation.status === 'ASSEMBLING' ? (
+              ) : animation.status === 'assembling' ? (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <div className="flex items-center space-x-3">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-600"></div>

@@ -58,17 +58,17 @@ export default function AnimationMonitor({
     }
   };
 
-  const completedSegments = animation.segments?.filter(s => s.status === 'COMPLETED').length || 0;
-  const inProgressSegments = animation.segments?.filter(s => s.status === 'IN_PROGRESS').length || 0;
-  const failedSegments = animation.segments?.filter(s => s.status === 'FAILED').length || 0;
+  const completedSegments = animation.segments?.filter(s => s.status === 'completed').length || 0;
+  const inProgressSegments = animation.segments?.filter(s => s.status === 'in_progress').length || 0;
+  const failedSegments = animation.segments?.filter(s => s.status === 'failed').length || 0;
   const pendingSegments = animation.total_segments - completedSegments - inProgressSegments - failedSegments;
   
   const progressPercentage = Math.round((completedSegments / animation.total_segments) * 100);
-  const isProcessing = ['PENDING', 'IN_PROGRESS', 'ASSEMBLING'].includes(animation.status);
+  const isProcessing = ['pending', 'in_progress', 'assembling'].includes(animation.status);
 
   const getEstimatedTimeRemaining = () => {
-    if (animation.status === 'COMPLETED') return 'Завершено';
-    if (animation.status === 'FAILED') return 'Ошибка';
+    if (animation.status === 'completed') return 'Завершено';
+    if (animation.status === 'failed') return 'Ошибка';
     
     const remainingSegments = animation.total_segments - completedSegments;
     if (remainingSegments <= 0) return 'Сборка видео...';
@@ -107,11 +107,11 @@ export default function AnimationMonitor({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-900">
-                Статус: {animation.status === 'PENDING' ? 'Ожидание' : 
-                        animation.status === 'IN_PROGRESS' ? 'Генерация' :
-                        animation.status === 'ASSEMBLING' ? 'Сборка видео' :
-                        animation.status === 'COMPLETED' ? 'Завершено' :
-                        animation.status === 'FAILED' ? 'Ошибка' : animation.status}
+                Статус: {animation.status === 'pending' ? 'Ожидание' : 
+                        animation.status === 'in_progress' ? 'Генерация' :
+                        animation.status === 'assembling' ? 'Сборка видео' :
+                        animation.status === 'completed' ? 'Завершено' :
+                        animation.status === 'failed' ? 'Ошибка' : animation.status}
               </h2>
               <p className="text-gray-600">
                 Осталось времени: {getEstimatedTimeRemaining()}
@@ -232,9 +232,9 @@ export default function AnimationMonitor({
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
             <div>
               <h4 className="font-medium text-blue-800">
-                {animation.status === 'PENDING' && 'Анимация добавлена в очередь обработки'}
-                {animation.status === 'IN_PROGRESS' && 'Генерируем сегменты с помощью ИИ...'}
-                {animation.status === 'ASSEMBLING' && 'Собираем финальное видео...'}
+                {animation.status === 'pending' && 'Анимация добавлена в очередь обработки'}
+                {animation.status === 'in_progress' && 'Генерируем сегменты с помощью ИИ...'}
+                {animation.status === 'assembling' && 'Собираем финальное видео...'}
               </h4>
               <p className="text-blue-600 text-sm">
                 Система автоматически обрабатывает анимацию. Вы можете закрыть страницу и вернуться позже.
@@ -245,7 +245,7 @@ export default function AnimationMonitor({
       )}
 
       {/* Success Message */}
-      {animation.status === 'COMPLETED' && (
+      {animation.status === 'completed' && (
         <Card className="p-4 bg-green-50 border border-green-200">
           <div className="flex items-center space-x-3">
             <span className="text-2xl">🎉</span>
@@ -260,7 +260,7 @@ export default function AnimationMonitor({
       )}
 
       {/* Error Message */}
-      {animation.status === 'FAILED' && (
+      {animation.status === 'failed' && (
         <Card className="p-4 bg-red-50 border border-red-200">
           <div className="flex items-center space-x-3">
             <span className="text-2xl">❌</span>

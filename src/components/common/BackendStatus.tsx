@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
-import { apiClient } from '../../services/api';
 
 interface BackendStatusProps {
   onStatusChange?: (isOnline: boolean) => void;

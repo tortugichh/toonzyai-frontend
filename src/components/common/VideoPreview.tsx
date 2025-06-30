@@ -4,7 +4,7 @@ import {
   createAuthenticatedVideoUrl, 
   findWorkingVideoUrl 
 } from '../../utils/videoUtils';
-import type { AnimationSegment } from '../../types/api';
+import type { AnimationSegment } from '../../services/api';
 
 interface VideoPreviewProps {
   videoUrl?: string | null;

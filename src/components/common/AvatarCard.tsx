@@ -1,4 +1,4 @@
-import type { Avatar } from '../../types/api';
+import type { Avatar } from '../../services/api';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';

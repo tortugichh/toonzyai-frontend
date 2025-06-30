@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import type { AnimationProject } from '@/types/api';
+import type { AnimationProject } from '@/services/api';
 
 interface CompactAnimationMonitorProps {
   animation: AnimationProject;
@@ -19,7 +19,7 @@ export default function CompactAnimationMonitor({
   useEffect(() => {
     if (!autoRefresh) return;
     
-    const isActive = ['PENDING', 'IN_PROGRESS', 'ASSEMBLING'].includes(animation.status);
+    const isActive = ['pending', 'in_progress', 'assembling'].includes(animation.status);
     if (!isActive) return;
 
     const interval = setInterval(() => {
@@ -41,10 +41,10 @@ export default function CompactAnimationMonitor({
     }
   };
 
-  const completedSegments = animation.segments?.filter(s => s.status === 'COMPLETED').length || 0;
-  const inProgressSegments = animation.segments?.filter(s => s.status === 'IN_PROGRESS').length || 0;
+  const completedSegments = animation.segments?.filter(s => s.status === 'completed').length || 0;
+  const inProgressSegments = animation.segments?.filter(s => s.status === 'in_progress').length || 0;
   const progressPercentage = Math.round((completedSegments / animation.total_segments) * 100);
-  const isProcessing = ['PENDING', 'IN_PROGRESS', 'ASSEMBLING'].includes(animation.status);
+  const isProcessing = ['pending', 'in_progress', 'assembling'].includes(animation.status);
 
   const formatLastUpdate = (date: Date) => {
     const now = new Date();
@@ -63,11 +63,11 @@ export default function CompactAnimationMonitor({
           <div className="text-xl">{getStatusIcon(animation.status)}</div>
           <div>
             <h3 className="font-medium text-gray-900">
-              {animation.status === 'PENDING' ? 'Ожидание' : 
-               animation.status === 'IN_PROGRESS' ? 'Генерация' :
-               animation.status === 'ASSEMBLING' ? 'Сборка' :
-               animation.status === 'COMPLETED' ? 'Готово' :
-               animation.status === 'FAILED' ? 'Ошибка' : animation.status}
+                            {animation.status === 'pending' ? 'Ожидание' :
+               animation.status === 'in_progress' ? 'Генерация' :
+               animation.status === 'assembling' ? 'Сборка' :
+               animation.status === 'completed' ? 'Готово' :
+               animation.status === 'failed' ? 'Ошибка' : animation.status}
             </h3>
             <p className="text-sm text-gray-600">
               {completedSegments} / {animation.total_segments} сегментов
@@ -109,24 +109,24 @@ export default function CompactAnimationMonitor({
       {/* Status Messages */}
       {isProcessing && (
         <div className="text-xs text-gray-600">
-          {animation.status === 'PENDING' && '📋 В очереди на обработку'}
-          {animation.status === 'IN_PROGRESS' && (
+          {animation.status === 'pending' && '📋 В очереди на обработку'}
+          {animation.status === 'in_progress' && (
             <>
               🤖 ИИ генерирует сегменты
               {inProgressSegments > 0 && ` (${inProgressSegments} в работе)`}
             </>
           )}
-          {animation.status === 'ASSEMBLING' && '🎬 Сборка финального видео'}
+          {animation.status === 'assembling' && '🎬 Сборка финального видео'}
         </div>
       )}
 
-      {animation.status === 'COMPLETED' && (
+      {animation.status === 'completed' && (
         <div className="text-xs text-green-600">
           🎉 Анимация готова к просмотру
         </div>
       )}
 
-      {animation.status === 'FAILED' && (
+      {animation.status === 'failed' && (
         <div className="text-xs text-red-600">
           ❌ Ошибка при обработке
         </div>

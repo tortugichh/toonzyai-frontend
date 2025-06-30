@@ -11,7 +11,7 @@ function DashboardPage() {
   const navigate = useNavigate();
   const { data: user } = useCurrentUser();
   const { data: avatars, isLoading: avatarsLoading } = useAvatars();
-  const { data: animations, isLoading: animationsLoading } = useAnimations();
+  const { projects: animations, loading: animationsLoading } = useAnimations();
   const logoutMutation = useLogout();
 
   const handleCreateAvatar = () => {

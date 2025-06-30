@@ -56,7 +56,7 @@ export interface Avatar {
   status: AvatarStatus;
   user_id: string;
   created_at: string;
-  moderation_flags?: string | null;
+  moderation_flags?: string[] | null;
 }
 
 export interface AvatarsResponse {
@@ -73,8 +73,8 @@ export interface CreateAnimationRequest {
   total_segments: number;
 }
 
-export type AnimationStatus = 'PENDING' | 'IN_PROGRESS' | 'ASSEMBLING' | 'COMPLETED' | 'FAILED';
-export type SegmentStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
+export type AnimationStatus = 'pending' | 'in_progress' | 'assembling' | 'completed' | 'failed';
+export type SegmentStatus = 'pending' | 'in_progress' | 'completed' | 'failed' | 'assembling';
 
 export interface AnimationSegment {
   id: string;
@@ -90,7 +90,7 @@ export interface AnimationSegment {
   // New structured data from updated API
   prompts?: {
     active_prompt: string;
-    prompt_source: 'custom' | 'project_default';
+    prompt_source: 'custom' | 'project';
     segment_prompt: string | null;
     project_prompt: string;
   };

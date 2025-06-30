@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
-import { AnimationStudio, VideoPreview, AnimationMonitor } from '@/components/common';
+import { AnimationStudio } from '@/components/common';
 import { useAnimation, useDeleteAnimation, useAssembleVideo } from '@/hooks/useAnimations';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
@@ -12,7 +12,7 @@ function AnimationDetailPage() {
   const navigate = useNavigate();
 
   const { data: user } = useCurrentUser();
-  const { data: animation, isLoading, error, refetch } = useAnimation(id!);
+  const { data: animation, isLoading, error } = useAnimation(id!);
   const deleteAnimationMutation = useDeleteAnimation();
   const assembleVideoMutation = useAssembleVideo();
   const logoutMutation = useLogout();
@@ -47,12 +47,12 @@ function AnimationDetailPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'COMPLETED':
+      case 'completed':
         return 'bg-green-100 text-green-800';
-      case 'IN_PROGRESS':
-      case 'ASSEMBLING':
+      case 'in_progress':
+      case 'assembling':
         return 'bg-yellow-100 text-yellow-800';
-      case 'FAILED':
+      case 'failed':
         return 'bg-red-100 text-red-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -61,15 +61,15 @@ function AnimationDetailPage() {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'COMPLETED':
+      case 'completed':
         return 'Завершено';
-      case 'IN_PROGRESS':
+      case 'in_progress':
         return 'Генерация';
-      case 'ASSEMBLING':
+      case 'assembling':
         return 'Сборка видео';
-      case 'FAILED':
+      case 'failed':
         return 'Ошибка';
-      case 'PENDING':
+      case 'pending':
         return 'Ожидание';
       default:
         return status;
@@ -119,9 +119,8 @@ function AnimationDetailPage() {
   }
 
   const completedSegments = animation.segments?.filter(s =>
-    s.status === 'COMPLETED'
+    s.status === 'completed'
   ).length || 0;
-  const progressPercentage = Math.round((completedSegments / animation.total_segments) * 100);
   const allSegmentsCompleted = completedSegments === animation.total_segments;
 
   return (
@@ -178,8 +177,7 @@ function AnimationDetailPage() {
 
         {/* Animation Studio - Main Content */}
         <AnimationStudio 
-          project={animation}
-          onRefresh={() => refetch()}
+          projectId={animation.id}
         />
 
         {/* Final Video Section */}
@@ -187,7 +185,7 @@ function AnimationDetailPage() {
           <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg mt-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">🎬 Финальное видео</h2>
             
-            {animation.status === 'COMPLETED' && animation.final_video_url ? (
+            {animation.status === 'completed' && animation.final_video_url ? (
               <div className="bg-green-50 p-6 rounded-lg border border-green-200">
                 <h3 className="text-lg font-semibold text-green-800 mb-4">Готовое видео</h3>
                 <video
@@ -216,7 +214,7 @@ function AnimationDetailPage() {
                   </Button>
                 </div>
               </div>
-            ) : animation.status === 'ASSEMBLING' ? (
+            ) : animation.status === 'assembling' ? (
               <div className="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
                 <div className="flex items-center space-x-3">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-600"></div>
