@@ -619,7 +619,7 @@ export const createPoller = <T>(
   maxAttempts: number = 60
 ) => {
   let attempts = 0;
-  let timeoutId: NodeJS.Timeout;
+  let timeoutId: ReturnType<typeof setTimeout>;
 
   const poll = async (): Promise<T> => {
     try {
