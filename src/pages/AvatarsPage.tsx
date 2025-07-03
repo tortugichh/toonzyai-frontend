@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
-import { AvatarCard } from '@/components/common/AvatarCard';
+import { AvatarCard } from '@entities/avatar';
 import { CreateAvatarForm } from '@/components/forms';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import { useAvatars, useCreateAvatar, useDeleteAvatar } from '@/hooks/useAvatars';

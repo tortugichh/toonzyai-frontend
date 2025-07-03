@@ -20,9 +20,9 @@ import { getErrorMessage } from '@/services/api';
 import type { AnimationProject } from '@/services/api';
 
 const createAnimationSchema = z.object({
-  sourceAvatarId: z.string().min(1, 'Выберите аватар'),
-  animationPrompt: z.string().min(10, 'Описание должно содержать минимум 10 символов'),
-  totalSegments: z.number().min(1).max(20),
+  source_avatar_id: z.string().min(1, 'Выберите аватар'),
+  animation_prompt: z.string().min(10, 'Описание должно содержать минимум 10 символов'),
+  total_segments: z.number().min(1).max(20),
 });
 
 type CreateAnimationFormData = z.infer<typeof createAnimationSchema>;
@@ -102,15 +102,12 @@ function AnimationPage() {
   };
 
   const onSubmit = async (data: any) => {
-    // Приводим данные формы к camelCase, так как backend-hook ожидает именно их
+    // Преобразуем данные формы в camelCase для API клиента
     const payload = {
-      name: data.name || 'Новый проект',
-      sourceAvatarId: data.sourceAvatarId ?? data.source_avatar_id,
-      totalSegments:
-        typeof data.totalSegments !== 'undefined'
-          ? Number(data.totalSegments)
-          : Number(data.total_segments),
-      animationPrompt: data.animationPrompt ?? data.animation_prompt,
+      name: 'Новый проект',
+      sourceAvatarId: data.source_avatar_id,
+      totalSegments: Number(data.total_segments),
+      animationPrompt: data.animation_prompt,
     };
 
     console.log('🚀 Отправляем payload для создания анимации:', payload);
@@ -781,9 +778,9 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            {animation.animation_prompt.length > 100 
-              ? `${animation.animation_prompt.substring(0, 100)}...` 
-              : animation.animation_prompt}
+            {((animation.animation_prompt ?? '')).length > 100
+              ? `${(animation.animation_prompt ?? '').substring(0, 100)}...`
+              : (animation.animation_prompt ?? animation.name)}
           </h3>
           
           <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">

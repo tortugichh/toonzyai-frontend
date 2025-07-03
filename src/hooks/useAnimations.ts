@@ -463,7 +463,7 @@ export function useSegments(projectId: string) {
 export function useTaskProgress(taskId: string | undefined, onComplete?: (result: any) => void) {
   const [status, setStatus] = useState<string>('PENDING');
   const [progress, setProgress] = useState(0);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!taskId) return;
