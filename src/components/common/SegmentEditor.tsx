@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useTaskProgress, useGenerateSegment } from '@/hooks/useAnimations';
+import { useTaskProgress, useGenerateSegment, useSegmentProgressWS } from '@/hooks/useAnimations';
 import type { AnimationSegment } from '@/services/api';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
@@ -17,6 +17,9 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generateSegmentMutation = useGenerateSegment();
+
+  // live progress via WebSocket
+  useSegmentProgressWS(segment.id, projectId);
 
   const { status: taskStatus } = useTaskProgress(
     (segment as any).task_id, 

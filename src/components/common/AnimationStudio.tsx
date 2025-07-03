@@ -13,6 +13,7 @@ import {
   useAssembleVideo, 
   useGenerateAllSegments 
 } from '@/hooks/useAnimations';
+import { useProjectProgressWS } from '@/hooks/useAnimations';
 import { apiClient, getErrorMessage } from '@/services/api';
 import VideoPreview from '@/components/common/VideoPreview';
 import type { AnimationSegment } from '@/services/api';
@@ -34,6 +35,9 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
   useEffect(() => {
     fetchProject();
   }, [projectId, fetchProject]);
+
+  // subscribe to websocket progress
+  useProjectProgressWS(projectId);
 
   // В версии API v2 генерация требует обязательный segment_prompt,
   // поэтому автоматический запуск для pending-сегментов отключён.
@@ -159,7 +163,9 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
   }
 
   const completedSegments = currentProject.segments.filter(s => s.status === 'completed');
-  const progressPercent = Math.round((completedSegments.length / currentProject.total_segments) * 100);
+  // Суммируем progress всех сегментов для более плавной полосы
+  const totalProgressPoints = currentProject.segments.reduce((sum, seg) => sum + (seg.progress ?? (seg.status === 'completed' ? 100 : 0)), 0);
+  const progressPercent = Math.round(totalProgressPoints / (currentProject.total_segments * 100) * 100);
   const canAssemble = completedSegments.length > 0 && !currentProject.final_video_url;
 
   return (

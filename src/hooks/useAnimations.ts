@@ -9,6 +9,169 @@ import {
 } from '@/services/api';
 import { toastError } from '@/utils/toast';
 
+// ======== WEBSOCKET HELPERS =========
+const createWSUrl = (path: string) => {
+  const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  return `${proto}://${window.location.host}${path}`;
+};
+
+export const useProjectProgressWS = (projectId: string | undefined) => {
+  const queryClient = useQueryClient();
+  const wsRef = useRef<WebSocket | null>(null);
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    // Prevent double connections
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+
+    const token = localStorage.getItem('access_token');
+    const wsUrl = createWSUrl(`/api/ws/progress/project/${projectId}?token=${token ?? ''}`);
+    
+    console.log('Creating WebSocket connection to:', wsUrl);
+    
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log('WebSocket connected successfully');
+    };
+
+    ws.onmessage = (event) => {
+      console.log('WebSocket message received:', event.data);
+      try {
+        const progressData = JSON.parse(event.data);
+        
+        // Update project status directly in React Query cache
+        queryClient.setQueryData(['animation-project', projectId], (oldData: any) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            status: progressData.status,
+            // Update project progress if available
+            ...(progressData.completed !== undefined && {
+              completedSegments: progressData.completed,
+              totalSegments: progressData.total
+            })
+          };
+        });
+
+        // Also invalidate project list to keep it fresh
+        queryClient.invalidateQueries({ queryKey: ['animation-projects'] });
+        
+      } catch (error) {
+        console.error('Failed to parse WebSocket message:', error);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      ws.close();
+    };
+    
+    ws.onclose = (event) => {
+      console.log('WebSocket closed:', event.code, event.reason);
+      wsRef.current = null;
+    };
+
+    return () => {
+      console.log('Cleaning up WebSocket');
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
+  }, [projectId, queryClient]);
+};
+
+export const useSegmentProgressWS = (segmentId: string | undefined, projectId?: string) => {
+  const queryClient = useQueryClient();
+  const wsRef = useRef<WebSocket | null>(null);
+
+  useEffect(() => {
+    if (!segmentId) return;
+    
+    // Prevent double connections
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+    
+    const token = localStorage.getItem('access_token');
+    const wsUrl = createWSUrl(`/api/ws/progress/segment/${segmentId}?token=${token ?? ''}`);
+    
+    console.log('Creating WebSocket connection to:', wsUrl);
+    
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log('WebSocket connected successfully');
+    };
+
+    ws.onmessage = (event) => {
+      console.log('WebSocket message received:', event.data);
+      try {
+        const progressData = JSON.parse(event.data);
+        
+        // Update segment data directly in React Query cache
+        if (projectId) {
+          queryClient.setQueryData(['animation-project', projectId], (oldData: any) => {
+            if (!oldData) return oldData;
+            
+            return {
+              ...oldData,
+              segments: oldData.segments.map((segment: any) => 
+                segment.id === segmentId 
+                  ? { 
+                      ...segment, 
+                      status: progressData.status,
+                      progress: progressData.progress 
+                    }
+                  : segment
+              )
+            };
+          });
+        }
+        
+        // Also update individual segment cache if it exists
+        queryClient.setQueryData(['segment-details', segmentId], (oldData: any) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            status: progressData.status,
+            progress: progressData.progress
+          };
+        });
+        
+      } catch (error) {
+        console.error('Failed to parse WebSocket message:', error);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      ws.close();
+    };
+    
+    ws.onclose = (event) => {
+      console.log('WebSocket closed:', event.code, event.reason);
+      wsRef.current = null;
+    };
+
+    return () => {
+      console.log('Cleaning up WebSocket');
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
+  }, [segmentId, projectId, queryClient]);
+};
+
 // ============ QUERY-BASED HOOKS ============
 
 // Хук для создания анимационного проекта

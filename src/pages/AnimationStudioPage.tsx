@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CreateProject } from '@/components/common';
-import { useAnimationProjects } from '@/hooks/useAnimations';
+import { useAnimationProjects, useAnimationProject } from '@/hooks/useAnimations';
 import { useNavigate } from 'react-router-dom';
 import type { AnimationProject as AnimationProjectType } from '@/services/api';
 
@@ -126,6 +126,10 @@ interface ProjectCardProps {
 }
 
 function ProjectCard({ project, onOpen }: ProjectCardProps) {
+  // Fetch live data for accurate progress without reloading the whole page
+  const { data: liveProject } = useAnimationProject(project.id);
+  const p = liveProject || project;
+
   const getStatusColor = (status: string) => {
     const s = status?.toLowerCase?.().trim();
     switch (s) {
@@ -148,10 +152,13 @@ function ProjectCard({ project, onOpen }: ProjectCardProps) {
     }
   };
 
-  const completedSegments = project.segments?.filter(s => s.status === 'completed').length || 0;
-  const inProgressSegments = project.segments?.filter(s => s.status === 'in_progress').length || 0;
-  const failedSegments = project.segments?.filter(s => s.status === 'failed').length || 0;
-  const totalSegments = project.total_segments;
+  const completedSegments = p.segments?.filter(s => s.status === 'completed').length || 0;
+  const inProgressSegments = p.segments?.filter(s => s.status === 'in_progress').length || 0;
+  const failedSegments = p.segments?.filter(s => s.status === 'failed').length || 0;
+  const totalSegments = p.total_segments;
+
+  const totalProgressPoints = p.segments?.reduce((sum, seg: any) => sum + (seg.progress ?? (seg.status === 'completed' ? 100 : 0)), 0) || 0;
+  const progressPercent = totalSegments > 0 ? (totalProgressPoints / (totalSegments * 100)) * 100 : 0;
 
   return (
     <Card className="project-card cursor-pointer hover:shadow-lg transition-shadow" onClick={onOpen}>
@@ -159,13 +166,13 @@ function ProjectCard({ project, onOpen }: ProjectCardProps) {
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <h3 className="font-semibold text-lg text-gray-900 mb-1">
-              Проект #{project.id.slice(0, 8)}
+              Проект #{p.id.slice(0, 8)}
             </h3>
             {/* General prompt is no longer displayed */}
           </div>
           
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
-            {getStatusText(project.status)}
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(p.status)}`}>
+            {getStatusText(p.status)}
           </span>
         </div>
 
@@ -173,12 +180,12 @@ function ProjectCard({ project, onOpen }: ProjectCardProps) {
         <div className="mb-4 space-y-1 text-xs text-gray-600">
           <div className="flex justify-between">
             <span className="font-medium">Прогресс</span>
-            <span>{completedSegments}/{totalSegments}</span>
+            <span>{Math.round(progressPercent)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
             <div
-              className="bg-green-500 h-2"
-              style={{ width: `${(completedSegments / totalSegments) * 100}%` }}
+              className="bg-green-500 h-2 transition-all"
+              style={{ width: `${progressPercent}%` }}
             />
           </div>
           {/* Status counters */}
@@ -190,10 +197,10 @@ function ProjectCard({ project, onOpen }: ProjectCardProps) {
         </div>
 
         {/* Final Video Preview */}
-        {project.final_video_url && (
+        {p.final_video_url && (
           <div className="mb-4">
             <video 
-              src={project.final_video_url}
+              src={p.final_video_url}
               className="w-full h-24 object-cover rounded bg-gray-100"
               muted
               poster="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggNVYxOUwxOSAxMkw4IDVaIiBmaWxsPSIjNjM2NjcwIi8+Cjwvc3ZnPgo="
@@ -203,8 +210,8 @@ function ProjectCard({ project, onOpen }: ProjectCardProps) {
 
         {/* Metadata */}
         <div className="text-xs text-gray-500">
-          <div>Создан: {new Date(project.created_at).toLocaleDateString('ru-RU')}</div>
-          <div>Аватар: {project.source_avatar_id.slice(0, 8)}...</div>
+          <div>Создан: {new Date(p.created_at).toLocaleDateString('ru-RU')}</div>
+          <div>Аватар: {p.source_avatar_id.slice(0, 8)}...</div>
         </div>
       </div>
     </Card>

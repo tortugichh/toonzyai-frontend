@@ -56,6 +56,7 @@ export interface AnimationSegment {
   video_url: string | null;
   created_at: string;
   updated_at: string;
+  progress?: number;
   // Новые поля из расширенного API
   status_description?: string;
   prompts?: {

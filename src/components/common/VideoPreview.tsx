@@ -33,8 +33,11 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({
   const [retryCount, setRetryCount] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Initialize video URL
+  // Initialize / retry video URL until available
   useEffect(() => {
+    let mounted = true;
+    let retryTimer: NodeJS.Timeout;
+
     const initializeVideoUrl = async () => {
       setIsLoading(true);
       setError(null);
@@ -58,21 +61,32 @@ const VideoPreview: React.FC<VideoPreviewProps> = ({
         }
 
         if (workingUrl) {
-          setCurrentVideoUrl(workingUrl);
+          if (!mounted) return;
+          setCurrentVideoUrl(workingUrl + (workingUrl.includes('?') ? '&' : '?') + `ts=${Date.now()}`);
           console.log(`✅ Using video URL: ${workingUrl}`);
         } else {
           throw new Error('Не удалось найти доступный URL для видео');
         }
       } catch (err: any) {
         console.error('❌ Error initializing video URL:', err);
+        if (!mounted) return;
         setError(err.message || 'Ошибка загрузки видео');
         onError?.(err.message || 'Ошибка загрузки видео');
+
+        // Schedule retry in 5s
+        retryTimer = setTimeout(initializeVideoUrl, 5000);
       } finally {
         setIsLoading(false);
       }
     };
 
     initializeVideoUrl();
+
+    return () => {
+      mounted = false;
+      if (retryTimer) clearTimeout(retryTimer);
+    };
+
   }, [videoUrl, projectId, segmentNumber, segment, onError]);
 
   const handleLoadStart = () => {
