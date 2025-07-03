@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
 import { AvatarCard } from '@/components/common/AvatarCard';
-import { CreateAvatarForm } from '@/components/forms/CreateAvatarForm';
-import { AvatarDebugPanel } from '@/components/common/AvatarDebugPanel';
+import { CreateAvatarForm } from '@/components/forms';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import { useAvatars, useCreateAvatar, useDeleteAvatar } from '@/hooks/useAvatars';
 import type { CreateAvatarRequest } from '@/types/api';
@@ -47,23 +46,6 @@ function AvatarsPage() {
   const createAvatarMutation = useCreateAvatar();
   const deleteAvatarMutation = useDeleteAvatar();
   const logoutMutation = useLogout();
-
-  // Временное логирование для отладки статусов
-  if (avatars?.avatars) {
-    console.log('=== ОТЛАДКА СТАТУСОВ АВАТАРОВ ===');
-    avatars.avatars.forEach((avatar, index) => {
-      console.log(`Аватар ${index + 1}:`, {
-        id: avatar.avatar_id,
-        status: avatar.status,
-        statusType: typeof avatar.status,
-        statusUpperCase: avatar.status?.toString().toUpperCase(),
-        prompt: avatar.prompt.slice(0, 30) + '...',
-        created: avatar.created_at,
-        hasImageUrl: !!avatar.image_url
-      });
-    });
-    console.log('=== КОНЕЦ ОТЛАДКИ ===');
-  }
 
   const handleLogout = async () => {
     try {
@@ -115,42 +97,6 @@ function AvatarsPage() {
           </div>
           <div className="flex gap-2 mt-4 sm:mt-0">
             <Button
-              onClick={async () => {
-                try {
-                  console.log('🔍 ПРЯМОЙ ВЫЗОВ API...');
-                  const token = localStorage.getItem('access_token');
-                  console.log('🔑 Токен:', token ? 'Есть' : 'Нет');
-                  
-                  const response = await fetch('/api/v1/avatars/?page=1&per_page=20', {
-                    headers: {
-                      'Authorization': `Bearer ${token}`,
-                      'Content-Type': 'application/json'
-                    }
-                  });
-                  
-                  console.log('📡 Статус ответа:', response.status);
-                  const data = await response.json();
-                  console.log('📊 СЫРЫЕ ДАННЫЕ ОТ API:', data);
-                  
-                  if (data.avatars) {
-                    data.avatars.forEach((avatar: any, index: number) => {
-                      console.log(`🎭 Аватар ${index + 1} (RAW):`, avatar);
-                    });
-                  }
-                  
-                  alert(`Проверьте консоль браузера (F12) для подробной информации`);
-                } catch (error) {
-                  console.error('❌ Ошибка API:', error);
-                  alert(`Ошибка: ${error}`);
-                }
-              }}
-              variant="outline"
-              size="sm"
-              className="text-blue-600 hover:text-blue-700 border-blue-300"
-            >
-              🔍 Проверить API
-            </Button>
-            <Button
               onClick={() => setShowCreateForm(true)}
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3"
             >
@@ -188,13 +134,6 @@ function AvatarsPage() {
           </Card>
         )}
 
-        {/* Debug Panel - only in development */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mb-8">
-            <AvatarDebugPanel />
-          </div>
-        )}
-
         {/* Create Avatar Form */}
         {showCreateForm && (
           <CreateAvatarForm
@@ -219,7 +158,7 @@ function AvatarsPage() {
             ))}
           </div>
         ) : avatars?.avatars?.length ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {avatars.avatars.map((avatar) => (
               <AvatarCard
                 key={avatar.avatar_id}

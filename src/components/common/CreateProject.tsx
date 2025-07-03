@@ -41,7 +41,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
       const project = await createProjectMutation.mutateAsync({
         sourceAvatarId: formData.avatarId,
         totalSegments: formData.totalSegments,
-        animationPrompt: formData.prompt
+        animationPrompt: formData.prompt.trim()
       });
       
       onProjectCreated(project);
@@ -69,7 +69,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
   const segmentsError = formData.totalSegments < 1 || formData.totalSegments > 10;
 
   // Validation helpers
-  const promptError = formData.prompt.trim().length < 10;
+  const promptError = formData.prompt.trim().length > 0 && formData.prompt.trim().length < 10;
 
   return (
     <Card className="create-project-form max-w-2xl mx-auto p-6">
@@ -171,33 +171,29 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
           </p>
         </div>
 
-        {/* Animation Prompt */}
+        {/* Animation Prompt (optional) */}
         <div className="form-group">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Общий промпт для анимации
+            (Необязательно) Общий промпт для анимации
           </label>
           <textarea
             value={formData.prompt}
             onChange={(e) => handleInputChange('prompt', e.target.value)}
-            placeholder="Опишите общую концепцию анимации... (минимум 10 символов)"
+            placeholder="Опишите общую концепцию (необязательно)"
             rows={4}
             disabled={isSubmitting}
-            className={`w-full p-3 border rounded-lg resize-vertical focus:ring-2 focus:ring-blue-500 focus:border-transparent ${promptError ? 'border-red-500' : 'border-gray-300'}`}
-            required
+            className="w-full p-3 border rounded-lg resize-vertical focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
           />
           {promptError && (
-            <p className="text-red-500 text-xs mt-1">Описание должно содержать минимум 10 символов</p>
+            <p className="text-red-500 text-xs mt-1">Если заполняете, минимум 10 символов</p>
           )}
-          <p className="text-xs text-gray-500 mt-1">
-            Этот промпт будет применен ко всем сегментам, если не указан индивидуальный промпт
-          </p>
         </div>
 
         {/* Action Buttons */}
         <div className="form-actions flex gap-3 pt-4">
           <Button
             type="submit"
-            disabled={isSubmitting || !formData.avatarId || promptError}
+            disabled={isSubmitting || !formData.avatarId || segmentsError}
             className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3"
           >
             {isSubmitting ? (

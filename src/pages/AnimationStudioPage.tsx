@@ -30,13 +30,16 @@ function AnimationStudioPage() {
       <div className="max-w-6xl mx-auto p-6">
         {/* Header */}
         <div className="studio-header flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              🎬 Студия анимации
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Создавайте анимации с уникальными промптами для каждого сегмента
-            </p>
+          <div className="flex items-center gap-4">
+            <Button onClick={() => navigate(-1)} variant="outline">← Назад</Button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                🎬 Студия анимации
+              </h1>
+              <p className="text-gray-600 mt-2">
+                Создавайте анимации с уникальными промптами для каждого сегмента
+              </p>
+            </div>
           </div>
           
           <Button 
@@ -158,9 +161,7 @@ function ProjectCard({ project, onOpen }: ProjectCardProps) {
             <h3 className="font-semibold text-lg text-gray-900 mb-1">
               Проект #{project.id.slice(0, 8)}
             </h3>
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {project.animation_prompt}
-            </p>
+            {/* General prompt is no longer displayed */}
           </div>
           
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>

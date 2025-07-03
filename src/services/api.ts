@@ -451,6 +451,11 @@ class APIClient {
     });
   }
 
+  /**
+   * Update prompt for a single segment. Backend only exposes a bulk prompt update endpoint:
+   *   PUT /api/v1/animations/{project_id}/segments/prompts
+   * We therefore proxy the single-segment update by sending a one-element prompts array.
+   */
   async updateSegmentPrompt(
     projectId: string,
     segmentNumber: number,
@@ -458,12 +463,13 @@ class APIClient {
   ): Promise<{
     message: string;
     project_id: string;
-    segment_number: number;
-    new_prompt: string;
+    updated_segments: Array<{ segment_number: number; prompt: string; status: string }>;
   }> {
-    return this.request(`/animations/${projectId}/segments/${segmentNumber}/prompt`, {
+    return this.request(`/animations/${projectId}/segments/prompts`, {
       method: 'PUT',
-      body: JSON.stringify({ segment_prompt: segmentPrompt }),
+      body: JSON.stringify({
+        prompts: [{ segment_number: segmentNumber, segment_prompt: segmentPrompt }],
+      }),
     });
   }
 
@@ -474,7 +480,7 @@ class APIClient {
   ): Promise<{
     message: string;
     project_id: string;
-    updated: number;
+    updated_segments: Array<{ segment_number: number; prompt: string; status: string }>;
   }> {
     return this.request(`/animations/${projectId}/segments/prompts`, {
       method: 'PUT',
@@ -489,7 +495,7 @@ class APIClient {
     segmentPrompt: string,
   ): Promise<GenerateSegmentResponse> {
     if (!segmentPrompt) {
-      throw new Error('segmentPrompt is required by API v2');
+      throw new Error('segmentPrompt is required');
     }
     return this.request<GenerateSegmentResponse>(
       `/animations/${projectId}/segments/${segmentNumber}/generate`,
@@ -505,22 +511,7 @@ class APIClient {
   }
 
   // New shortcuts by segmentId (from FULL_API_GUIDE)
-  async generateSegmentById(segmentId: string, segmentPrompt: string) {
-    if (!segmentPrompt) {
-      throw new Error('segmentPrompt is required by API v2');
-    }
-    return this.request<GenerateSegmentResponse>(
-      `/animations/segments/${segmentId}/generate`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ segment_prompt: segmentPrompt }),
-      }
-    );
-  }
-
-  async getSegmentDetailsById(segmentId: string) {
-    return this.request<AnimationSegment>(`/animations/segments/${segmentId}`);
-  }
+  // remove generateSegmentById as not used with new spec
 
   getSegmentVideoUrl(projectId: string, segmentNumber: number): string {
     return `${MEDIA_API_BASE}/animations/${projectId}/segments/${segmentNumber}/video`;
@@ -614,8 +605,10 @@ class APIClient {
     forceRegenerate: boolean = false,
   ): Promise<{
     message: string;
-    task_ids: string[];
+    project_id: string;
+    segments_started: number;
     status: string;
+    task_ids: string[];
   }> {
     return this.request(`/animations/${projectId}/segments/generate-all`, {
       method: 'POST',
@@ -624,8 +617,30 @@ class APIClient {
   }
 
   // ============ UTILITY METHODS ============
-  async checkHealth(): Promise<{ status: string }> {
-    return this.request<{ status: string }>('/health');
+  // Health check is exposed at the root level (/health) without /api/v1 prefix.
+  async checkHealth(): Promise<{ status: string; version?: string }> {
+    const response = await fetch('/health');
+    if (!response.ok) {
+      throw await APIError.fromResponse(response);
+    }
+    return response.json();
+  }
+
+  async generateSegmentById(segmentId: string, segmentPrompt: string) {
+    if (!segmentPrompt) {
+      throw new Error('segmentPrompt is required');
+    }
+    return this.request<GenerateSegmentResponse>(
+      `/segments/${segmentId}/generate`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ segment_prompt: segmentPrompt }),
+      }
+    );
+  }
+
+  async getSegmentDetailsById(segmentId: string) {
+    return this.request<AnimationSegment>(`/segments/${segmentId}`);
   }
 }
 

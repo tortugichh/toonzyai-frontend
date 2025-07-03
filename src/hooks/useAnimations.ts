@@ -58,14 +58,23 @@ export function useAnimationProject(projectId: string) {
     enabled: !!projectId,
     refetchInterval: (query) => {
       const data = query.state.data;
-      const hasActive = data && (
-        data.status === 'in_progress' || 
-        data.status === 'pending' ||
-        data.segments?.some((segment: any) => 
-          segment.status === 'in_progress' || segment.status === 'pending'
-        )
-      );
-      return hasActive ? 3000 : false;
+
+      if (!data) return false;
+
+      // 1. No segments yet but backend will create them asynchronously
+      if ((data.segments?.length ?? 0) === 0) return 3000;
+
+      const hasGenerating = data.segments.some((s: any) => s.status === 'in_progress' || s.status === 'pending');
+
+      // 2. Some segments still generating
+      if (hasGenerating) return 3000;
+
+      // 3. All segments completed but some videos not yet attached
+      const missingVideos = data.segments.some((s: any) => s.status === 'completed' && !s.video_url && !s.generated_video_url);
+      if (missingVideos) return 5000;
+
+      // 4. Otherwise stop polling
+      return false;
     },
   });
 }

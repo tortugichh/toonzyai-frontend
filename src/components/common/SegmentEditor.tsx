@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { useTaskProgress, useGenerateSegment } from '@/hooks/useAnimations';
 import type { AnimationSegment } from '@/services/api';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
@@ -15,7 +14,6 @@ interface SegmentEditorProps {
 
 export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorProps) {
   const [prompt, setPrompt] = useState(segment.segment_prompt || '');
-  const [isEditing, setIsEditing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generateSegmentMutation = useGenerateSegment();
@@ -28,17 +26,12 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
     }
   );
 
-  const handleSavePrompt = async () => {
-    // В API v2 нет отдельного endpoint для обновления промпта.
-    // Сохраняем только локально – фактически prompt уйдёт при следующем generate.
-    setIsEditing(false);
-    onUpdate();
-  };
+  const isPromptValid = prompt.trim().length >= 10;
 
   const handleGenerate = async () => {
-    const effectivePrompt = prompt.trim() || segment.prompts?.project_prompt || segment.segment_prompt || '';
-    if (!effectivePrompt) {
-      alert('Укажите prompt для сегмента');
+    const effectivePrompt = prompt.trim();
+    if (!isPromptValid) {
+      alert('Prompt must be at least 10 characters');
       return;
     }
     try {
@@ -46,7 +39,7 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
       await generateSegmentMutation.mutateAsync({
         projectId,
         segmentNumber: segment.segment_number,
-        segmentPrompt: effectivePrompt
+        segmentPrompt: effectivePrompt,
       });
       onUpdate();
     } catch (error: any) {
@@ -85,46 +78,13 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
       </div>
 
       <div className="prompt-section mb-4">
-        {isEditing ? (
-          <div>
-            <textarea
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Опишите что должно происходить в этом сегменте..."
-              rows={3}
-              className="prompt-input w-full p-2 border border-gray-300 rounded resize-vertical"
-            />
-            <div className="prompt-actions mt-2 flex gap-2">
-              <Button 
-                onClick={handleSavePrompt}
-                disabled={generateSegmentMutation.isPending}
-                className="btn-save bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-sm"
-              >
-                {generateSegmentMutation.isPending ? 'Сохранение...' : 'Сохранить'}
-              </Button>
-              <Button 
-                onClick={() => setIsEditing(false)}
-                variant="outline"
-                className="btn-cancel px-3 py-1 text-sm"
-              >
-                Отмена
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <p className="prompt-display p-2 bg-gray-50 rounded mb-2 min-h-[40px]">
-              {segment.segment_prompt || segment.prompts?.project_prompt || 'Промпт не задан'}
-            </p>
-            <Button 
-              onClick={() => setIsEditing(true)}
-              variant="outline"
-              className="btn-edit text-sm"
-            >
-              ✏️ Редактировать промпт
-            </Button>
-          </div>
-        )}
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Опишите что должно происходить в этом сегменте..."
+          rows={3}
+          className="prompt-input w-full p-2 border border-gray-300 rounded resize-vertical mb-3"
+        />
       </div>
 
       {/* Progress bar */}
@@ -142,8 +102,15 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
       <div className="generation-section">
         <Button 
           onClick={handleGenerate}
-          disabled={isGenerating || segment.status === 'in_progress' || generateSegmentMutation.isPending}
-          className="btn-generate bg-blue-600 hover:bg-blue-700 text-white mb-3"
+          disabled={
+            isGenerating ||
+            segment.status === 'in_progress' ||
+            segment.status === 'completed' ||
+            generateSegmentMutation.isPending ||
+            !isPromptValid
+          }
+          title={segment.status === 'completed' ? 'Сегмент уже сгенерирован' : undefined}
+          className="btn-generate bg-blue-600 hover:bg-blue-700 text-white mb-3 disabled:opacity-50"
         >
           {isGenerating || generateSegmentMutation.isPending ? (
             <div className="flex items-center gap-2">

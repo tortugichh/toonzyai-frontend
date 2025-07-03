@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useSegments, useAnimationProject, useAssembleVideo } from '@/hooks/useAnimations';
 import { SegmentEditor } from './SegmentEditor';
-import PromptPlanner from './PromptPlanner';
 import GenerationControls from './GenerationControls';
 import ProgressMonitor from './ProgressMonitor';
 
@@ -63,11 +62,6 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
           <h2 className="text-2xl font-bold text-gray-900">
             Редактор анимационного проекта
           </h2>
-          {project.animation_prompt && (
-            <p className="text-gray-600 mt-1">
-              Общий промпт: {project.animation_prompt}
-            </p>
-          )}
         </div>
       </div>
 
@@ -138,12 +132,6 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
           </div>
         </Card>
       )}
-
-      {/* Prompt Planner & Generate All */}
-      <PromptPlanner 
-        project={project} 
-        onSaved={() => { refetch(); refresh(); }} 
-      />
 
       <GenerationControls 
         project={project}
