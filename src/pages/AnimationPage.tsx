@@ -9,9 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Header } from '@/components/layout/Header';
 import { AnimationSegments, VideoPreview, AvatarSelector, BackendStatus, CompactAnimationMonitor } from '@/components/common';
 import { 
-  useCreateAnimation, 
-  useAnimations, 
-  useDeleteAnimation, 
+  useCreateAnimationProject, 
+  useAnimationProjects, 
+  useDeleteAnimationProject, 
   useAssembleVideo 
 } from '@/hooks/useAnimations';
 import { useAvatars } from '@/hooks/useAvatars';
@@ -20,9 +20,9 @@ import { getErrorMessage } from '@/services/api';
 import type { AnimationProject } from '@/services/api';
 
 const createAnimationSchema = z.object({
-  source_avatar_id: z.string().min(1, 'Выберите аватар'),
-  animation_prompt: z.string().min(10, 'Описание должно содержать минимум 10 символов'),
-  total_segments: z.number().min(1).max(20),
+  sourceAvatarId: z.string().min(1, 'Выберите аватар'),
+  animationPrompt: z.string().min(10, 'Описание должно содержать минимум 10 символов'),
+  totalSegments: z.number().min(1).max(20),
 });
 
 type CreateAnimationFormData = z.infer<typeof createAnimationSchema>;
@@ -58,9 +58,9 @@ function AnimationPage() {
   // API hooks
   const { data: user } = useCurrentUser();
   const { data: avatars, isLoading: avatarsLoading } = useAvatars();
-  const { projects: animations, loading: animationsLoading, fetchProjects: refetch } = useAnimations();
-  const createAnimationMutation = useCreateAnimation();
-  const deleteAnimationMutation = useDeleteAnimation();
+  const { data: animations, isLoading: animationsLoading, refetch } = useAnimationProjects();
+  const createAnimationMutation = useCreateAnimationProject();
+  const deleteAnimationMutation = useDeleteAnimationProject();
   const assembleVideoMutation = useAssembleVideo();
   const logoutMutation = useLogout();
 
@@ -101,9 +101,21 @@ function AnimationPage() {
     }
   };
 
-  const onSubmit = async (data: CreateAnimationFormData) => {
+  const onSubmit = async (data: any) => {
+    // Приводим данные формы к camelCase, так как backend-hook ожидает именно их
+    const payload = {
+      sourceAvatarId: data.sourceAvatarId ?? data.source_avatar_id,
+      totalSegments:
+        typeof data.totalSegments !== 'undefined'
+          ? Number(data.totalSegments)
+          : Number(data.total_segments),
+      animationPrompt: data.animationPrompt ?? data.animation_prompt,
+    };
+
+    console.log('🚀 Отправляем payload для создания анимации:', payload);
+
     try {
-      await createAnimationMutation.mutateAsync(data);
+      await createAnimationMutation.mutateAsync(payload as any);
       setShowCreateForm(false);
       reset();
       setSuccessMessage('Анимация запущена! Процесс может занять несколько минут.');

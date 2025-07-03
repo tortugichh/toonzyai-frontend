@@ -3,6 +3,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { QUERY_STALE_TIME, QUERY_CACHE_TIME, IS_DEVELOPMENT } from '@/constants';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useCurrentUser } from '@/hooks/useAuth';
+import { ErrorBoundary } from '@/components/common';
 import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
@@ -10,6 +11,8 @@ import DashboardPage from '@/pages/DashboardPage';
 import AvatarsPage from '@/pages/AvatarsPage';
 import AnimationPage from '@/pages/AnimationPage';
 import AnimationDetailPage from '@/pages/AnimationDetailPage';
+import AnimationStudioPage from '@/pages/AnimationStudioPage';
+import ProjectPage from '@/pages/ProjectPage';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -71,17 +74,25 @@ function AppRoutes() {
         />
         <Route
           path="/animations"
+          element={<Navigate to="/studio" replace />}
+        />
+        <Route
+          path="/animations/:id"
+          element={<Navigate to="/studio/:id" replace />}
+        />
+        <Route
+          path="/studio"
           element={
             <ProtectedRoute>
-              <AnimationPage />
+              <AnimationStudioPage />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/animations/:id"
+          path="/studio/:projectId"
           element={
             <ProtectedRoute>
-              <AnimationDetailPage />
+              <ProjectPage />
             </ProtectedRoute>
           }
         />
@@ -92,10 +103,12 @@ function AppRoutes() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AppRoutes />
-      {IS_DEVELOPMENT && <ReactQueryDevtools initialIsOpen={false} />}
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AppRoutes />
+        {IS_DEVELOPMENT && <ReactQueryDevtools initialIsOpen={false} />}
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

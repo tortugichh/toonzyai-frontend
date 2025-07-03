@@ -2,8 +2,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
-import { AnimationStudio } from '@/components/common';
-import { useAnimation, useDeleteAnimation, useAssembleVideo } from '@/hooks/useAnimations';
+import { AnimationProject } from '@/components/common';
+import { useAnimationProject, useDeleteAnimationProject, useAssembleVideo } from '@/hooks/useAnimations';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
 
@@ -12,8 +12,8 @@ function AnimationDetailPage() {
   const navigate = useNavigate();
 
   const { data: user } = useCurrentUser();
-  const { data: animation, isLoading, error } = useAnimation(id!);
-  const deleteAnimationMutation = useDeleteAnimation();
+  const { data: animation, isLoading, error } = useAnimationProject(id!);
+  const deleteAnimationMutation = useDeleteAnimationProject();
   const assembleVideoMutation = useAssembleVideo();
   const logoutMutation = useLogout();
 
@@ -118,7 +118,7 @@ function AnimationDetailPage() {
     );
   }
 
-  const completedSegments = animation.segments?.filter(s =>
+  const completedSegments = animation.segments?.filter((s: any) =>
     s.status === 'completed'
   ).length || 0;
   const allSegmentsCompleted = completedSegments === animation.total_segments;
@@ -175,9 +175,10 @@ function AnimationDetailPage() {
           </div>
         </div>
 
-        {/* Animation Studio - Main Content */}
-        <AnimationStudio 
+        {/* Animation Project - Main Content */}
+        <AnimationProject 
           projectId={animation.id}
+          onBack={() => navigate('/animations')}
         />
 
         {/* Final Video Section */}

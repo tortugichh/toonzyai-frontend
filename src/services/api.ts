@@ -3,7 +3,11 @@
  * Полная реализация согласно BACKEND_API_DOCUMENTATION.md
  */
 
+// Для всех API запросов используем прокси Vite
 const API_BASE = '/api/v1';
+
+// Для медиа-ресурсов также используем прокси, чтобы избежать проблем с CORS
+const MEDIA_API_BASE = '/api/v1';
 
 // ============ TYPES ============
 export interface User {
@@ -373,12 +377,12 @@ class APIClient {
 
   getAvatarImageUrl(avatarId: string): string {
     const token = this.tokenManager.getAccessToken();
-    return `${API_BASE}/avatars/${avatarId}/image${token ? `?token=${token}` : ''}`;
+    return `${MEDIA_API_BASE}/avatars/${avatarId}/image${token ? `?token=${token}` : ''}`;
   }
 
   // Add new method for fetching images with proper authentication
   async getAvatarImageBlob(avatarId: string): Promise<Blob> {
-    const url = `${API_BASE}/avatars/${avatarId}/image`;
+    const url = `${MEDIA_API_BASE}/avatars/${avatarId}/image`;
     const token = this.tokenManager.getAccessToken();
 
     const makeRequest = async (authToken: string | null): Promise<Response> => {
@@ -463,16 +467,35 @@ class APIClient {
     });
   }
 
+  // NEW: Bulk update prompts for multiple segments according to BACKEND_ENDPOINTS_OVERVIEW.md
+  async updateSegmentPromptsBulk(
+    projectId: string,
+    prompts: { segment_number: number; segment_prompt: string }[],
+  ): Promise<{
+    message: string;
+    project_id: string;
+    updated: number;
+  }> {
+    return this.request(`/animations/${projectId}/segments/prompts`, {
+      method: 'PUT',
+      body: JSON.stringify({ prompts }),
+    });
+  }
+
+  // Legacy projectId+segmentNumber (kept for backward compatibility)
   async generateSegment(
     projectId: string,
     segmentNumber: number,
-    segmentPrompt?: string
+    segmentPrompt: string,
   ): Promise<GenerateSegmentResponse> {
+    if (!segmentPrompt) {
+      throw new Error('segmentPrompt is required by API v2');
+    }
     return this.request<GenerateSegmentResponse>(
       `/animations/${projectId}/segments/${segmentNumber}/generate`,
       {
         method: 'POST',
-        body: JSON.stringify(segmentPrompt ? { segment_prompt: segmentPrompt } : {}),
+        body: JSON.stringify({ segment_prompt: segmentPrompt }),
       }
     );
   }
@@ -481,14 +504,31 @@ class APIClient {
     return this.request<AnimationSegment>(`/animations/${projectId}/segments/${segmentNumber}`);
   }
 
+  // New shortcuts by segmentId (from FULL_API_GUIDE)
+  async generateSegmentById(segmentId: string, segmentPrompt: string) {
+    if (!segmentPrompt) {
+      throw new Error('segmentPrompt is required by API v2');
+    }
+    return this.request<GenerateSegmentResponse>(
+      `/animations/segments/${segmentId}/generate`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ segment_prompt: segmentPrompt }),
+      }
+    );
+  }
+
+  async getSegmentDetailsById(segmentId: string) {
+    return this.request<AnimationSegment>(`/animations/segments/${segmentId}`);
+  }
+
   getSegmentVideoUrl(projectId: string, segmentNumber: number): string {
-    const token = this.tokenManager.getAccessToken();
-    return `${API_BASE}/animations/${projectId}/segments/${segmentNumber}/video${token ? `?token=${token}` : ''}`;
+    return `${MEDIA_API_BASE}/animations/${projectId}/segments/${segmentNumber}/video`;
   }
 
   // Add method for fetching segment video with proper authentication
   async getSegmentVideoBlob(projectId: string, segmentNumber: number): Promise<Blob> {
-    const url = `${API_BASE}/animations/${projectId}/segments/${segmentNumber}/video`;
+    const url = `${MEDIA_API_BASE}/animations/${projectId}/segments/${segmentNumber}/video`;
     const token = this.tokenManager.getAccessToken();
 
     const makeRequest = async (authToken: string | null): Promise<Response> => {
@@ -531,13 +571,12 @@ class APIClient {
   }
 
   getFinalVideoUrl(projectId: string): string {
-    const token = this.tokenManager.getAccessToken();
-    return `${API_BASE}/animations/${projectId}/video${token ? `?token=${token}` : ''}`;
+    return `${MEDIA_API_BASE}/animations/${projectId}/video`;
   }
 
   // Add method for fetching final video with proper authentication
   async getFinalVideoBlob(projectId: string): Promise<Blob> {
-    const url = `${API_BASE}/animations/${projectId}/video`;
+    const url = `${MEDIA_API_BASE}/animations/${projectId}/video`;
     const token = this.tokenManager.getAccessToken();
 
     const makeRequest = async (authToken: string | null): Promise<Response> => {
@@ -567,6 +606,21 @@ class APIClient {
     }
 
     return response.blob();
+  }
+
+  // NEW: Parallel generation of all segments
+  async generateAllSegments(
+    projectId: string,
+    forceRegenerate: boolean = false,
+  ): Promise<{
+    message: string;
+    task_ids: string[];
+    status: string;
+  }> {
+    return this.request(`/animations/${projectId}/segments/generate-all`, {
+      method: 'POST',
+      body: JSON.stringify({ force_regenerate: forceRegenerate }),
+    });
   }
 
   // ============ UTILITY METHODS ============
@@ -600,6 +654,14 @@ export const getErrorMessage = (error: unknown): string => {
       case 500:
         return 'Ошибка сервера. Попробуйте позже.';
       default:
+        // Если details объект – показываем detail/field_errors
+        if (typeof error.details === 'object') {
+          const d = error.details as any;
+          if (d.detail) return d.detail;
+          if (d.field_errors) {
+            return d.field_errors.map((fe: any) => `${fe.field}: ${fe.message}`).join(', ');
+          }
+        }
         return error.message || 'Произошла неизвестная ошибка.';
     }
   }
@@ -608,7 +670,12 @@ export const getErrorMessage = (error: unknown): string => {
     return error.message;
   }
   
-  return 'Произошла неожиданная ошибка.';
+  // Fallback: stringify если объект
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return 'Произошла неожиданная ошибка.';
+  }
 };
 
 // Polling utility for async operations

@@ -6,12 +6,40 @@ export function useCreateAvatar() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateAvatarRequest) => apiClient.createAvatar(data.prompt),
-    onSuccess: () => {
+    mutationFn: async (data: CreateAvatarRequest) => {
+      console.log('🎨 Создаем аватара с промптом:', data.prompt);
+      
+      const result = await apiClient.createAvatar(data.prompt);
+      
+      console.log('✅ Аватар создан успешно:', {
+        avatar_id: result.avatar_id,
+        status: result.status,
+        prompt: result.prompt,
+        user_id: result.user_id,
+        created_at: result.created_at,
+        image_url: result.image_url
+      });
+      
+      return result;
+    },
+    onSuccess: (data) => {
+      console.log('🔄 Обновляем кэш аватаров после создания...');
       queryClient.invalidateQueries({ queryKey: ['avatars'] });
+      
+      console.log('📊 Созданный аватар будет иметь статус:', data.status);
+      // Проверяем статус более гибко, так как могут быть разные значения
+      const statusStr = String(data.status).toLowerCase();
+      if (statusStr === 'pending' || statusStr === 'generating' || statusStr === 'in_progress') {
+        console.log('⏳ Аватар в процессе генерации. Изображение появится через несколько минут.');
+      } else if (statusStr === 'completed') {
+        console.log('🎉 Аватар готов!');
+      } else {
+        console.log('ℹ️ Статус аватара:', statusStr);
+      }
     },
     onError: (error) => {
-      console.error('Create avatar error:', getErrorMessage(error));
+      console.error('❌ Ошибка создания аватара:', getErrorMessage(error));
+      console.error('🔍 Детали ошибки:', error);
     },
   });
 }
@@ -19,14 +47,45 @@ export function useCreateAvatar() {
 export function useAvatars(page = 1, perPage = 10) {
   return useQuery({
     queryKey: ['avatars', page, perPage],
-    queryFn: () => apiClient.getAvatars(page, perPage),
+    queryFn: async () => {
+      console.log(`📥 Загружаем аватары: страница ${page}, на странице ${perPage}`);
+      
+      const result = await apiClient.getAvatars(page, perPage);
+      
+      console.log(`📊 Получено аватаров: ${result.avatars.length} из ${result.total}`);
+      
+      if (result.avatars.length === 0) {
+        console.log('❌ АВАТАРЫ НЕ НАЙДЕНЫ! Возможные причины:');
+        console.log('1. Аватары не создавались');
+        console.log('2. Проблемы с базой данных на бэкенде');
+        console.log('3. Проблемы с авторизацией');
+        console.log('💡 Попробуйте создать аватара или проверить логи бэкенда');
+      } else {
+        console.log('🎭 Детали аватаров:');
+        result.avatars.forEach((avatar, index) => {
+          console.log(`  ${index + 1}. ID: ${avatar.avatar_id}`);
+          console.log(`     Статус: ${avatar.status}`);
+          console.log(`     Промпт: ${avatar.prompt.slice(0, 50)}...`);
+          console.log(`     Создан: ${avatar.created_at}`);
+          console.log(`     Изображение: ${avatar.image_url || 'НЕТ'}`);
+          console.log(`     ---`);
+        });
+      }
+      
+      return result;
+    },
     refetchInterval: (query) => {
       // Автоматически обновляем данные каждые 5 секунд, если есть аватары в процессе генерации
       const data = query.state.data;
-      // Обновлены статусы согласно новой документации
-      const hasGenerating = data?.avatars?.some((avatar: any) => 
-        avatar.status === 'generating' || avatar.status === 'pending'
-      );
+      const hasGenerating = data?.avatars?.some((avatar: any) => {
+        const status = String(avatar.status).toLowerCase();
+        return status === 'generating' || status === 'pending' || status === 'in_progress';
+      });
+      
+      if (hasGenerating) {
+        console.log('⏳ Есть аватары в процессе генерации, обновляем каждые 5 секунд');
+      }
+      
       return hasGenerating ? 5000 : false;
     },
     refetchIntervalInBackground: true,

@@ -77,6 +77,13 @@ export default function AnimationSegments({ segments, totalSegments }: Animation
               <div className={`w-3 h-3 rounded-full ${getStatusColor(segment.status)}`}></div>
             </div>
             
+            {/* Prompt preview */}
+            {isAnimationSegment(segment) && (
+              <p className="text-xs text-gray-600 mb-2 line-clamp-3">
+                {segment.segment_prompt || segment.prompts?.active_prompt || segment.prompts?.segment_prompt || segment.prompts?.project_prompt || 'Промпт не задан'}
+              </p>
+            )}
+            
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Статус:</span>

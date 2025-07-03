@@ -78,12 +78,11 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
       <div className="relative aspect-square w-full bg-gray-100">
         <AvatarImage 
           avatar={avatar}
-          className="w-full h-48"
+          className="absolute inset-0 w-full h-full object-cover z-0"
           showPlaceholder={true}
         />
       </div>
-      
-      <div className="p-6">
+      <div className="p-6 relative z-20">
         <p className="font-medium text-gray-900 mb-2 line-clamp-2">
           {avatar.prompt}
         </p>

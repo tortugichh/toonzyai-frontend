@@ -29,8 +29,8 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
             <Link to="/avatars" className="text-gray-600 hover:text-gray-900">
               Аватары
             </Link>
-            <Link to="/animations" className="text-gray-600 hover:text-gray-900">
-              Анимации
+            <Link to="/studio" className="text-gray-600 hover:text-gray-900 font-medium">
+              🎬 Студия
             </Link>
           </nav>
           

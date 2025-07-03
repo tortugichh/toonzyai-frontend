@@ -21,7 +21,11 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
   console.log(`🖼️ AvatarImage для ${avatar.avatar_id}:`, {
     status: avatar.status,
     hasImageUrl: !!avatar.image_url,
-    imageUrl: avatar.image_url
+    imageUrl: avatar.image_url,
+    isLoading,
+    hasError,
+    blobUrl: !!blobUrl,
+    imageLoaded
   });
 
   // Загружаем изображение с авторизацией через новый метод API
@@ -46,6 +50,7 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
         const url = URL.createObjectURL(blob);
         setBlobUrl(url);
         console.log('🎯 Blob URL создан:', url);
+        console.log('📊 Состояние после создания URL:', { isLoading, hasError, url });
         
       } catch (error: any) {
         console.error('❌ Ошибка загрузки изображения:', error);
@@ -62,28 +67,52 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
 
     loadImageWithAuth();
 
-    // Cleanup blob URL при размонтировании
+    // Cleanup blob URL при размонтировании или смене аватара
     return () => {
+      // Очищаем предыдущий blob URL только если он есть
       if (blobUrl) {
+        console.log('🧹 Очищаем предыдущий blob URL:', blobUrl);
         URL.revokeObjectURL(blobUrl);
       }
     };
-  }, [avatar.avatar_id]);
+  }, [avatar.avatar_id]); // Убираем blobUrl из зависимостей
+
+  // Отдельный useEffect для очистки blob URL при размонтировании
+  useEffect(() => {
+    return () => {
+      if (blobUrl) {
+        console.log('🧽 Финальная очистка blob URL при размонтировании:', blobUrl);
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
+  }, [blobUrl]);
 
   const imageUrl = blobUrl || avatar.image_url;
 
   const handleImageLoad = () => {
+    console.log('✅ Изображение успешно загружено в DOM');
     setImageLoaded(true);
     setHasError(false);
   };
 
   const handleImageError = () => {
+    console.error('❌ Ошибка загрузки изображения в DOM');
     setHasError(true);
     setImageLoaded(false);
   };
 
+  console.log('🎭 Логика отображения:', { 
+    hasError, 
+    isLoading, 
+    imageUrl: !!imageUrl, 
+    imageLoaded,
+    willShowError: hasError && !isLoading,
+    willShowLoading: isLoading || !imageUrl 
+  });
+
   // Показываем ошибку только если загрузка завершена и есть ошибка
   if (hasError && !isLoading) {
+    console.log('🚨 Показываем состояние ошибки');
     if (!showPlaceholder) return null;
     
     return (
@@ -100,6 +129,7 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
 
   // Показываем загрузку пока идет процесс
   if (isLoading || !imageUrl) {
+    console.log('⏳ Показываем состояние загрузки, причина:', { isLoading, hasImageUrl: !!imageUrl });
     return (
       <div className={`bg-gray-100 rounded-lg flex items-center justify-center ${className}`}>
         <div className="text-center p-4">
@@ -112,21 +142,24 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
     );
   }
 
+  console.log('🖼️ Показываем изображение с URL:', imageUrl);
+
   return (
     <div className={`relative ${className}`}>
       {!imageLoaded && (
-        <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center">
+        <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center z-10">
           <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
         </div>
       )}
       <img
         src={imageUrl}
         alt="Avatar"
-        className={`w-full h-full object-cover rounded-lg transition-opacity duration-300 ${
-          imageLoaded ? 'opacity-100' : 'opacity-0'
+        className={`w-full h-full object-cover rounded-lg ${
+          imageLoaded ? 'block' : 'hidden'
         }`}
         onLoad={handleImageLoad}
         onError={handleImageError}
+        style={{ display: imageLoaded ? 'block' : 'none' }}
       />
     </div>
   );

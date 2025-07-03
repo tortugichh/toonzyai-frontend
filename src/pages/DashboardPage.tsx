@@ -4,14 +4,14 @@ import { Card } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
 import { AvatarCard, BackendStatus } from '@/components/common';
 import { useAvatars } from '@/hooks/useAvatars';
-import { useAnimations } from '@/hooks/useAnimations';
+import { useAnimationProjects } from '@/hooks/useAnimations';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 
 function DashboardPage() {
   const navigate = useNavigate();
   const { data: user } = useCurrentUser();
   const { data: avatars, isLoading: avatarsLoading } = useAvatars();
-  const { projects: animations, loading: animationsLoading } = useAnimations();
+  const { data: animations, isLoading: animationsLoading } = useAnimationProjects();
   const logoutMutation = useLogout();
 
   const handleCreateAvatar = () => {
@@ -202,7 +202,7 @@ function DashboardPage() {
                   <p className="text-gray-500 mt-2">Загрузка анимаций...</p>
                 </div>
               ) : recentAnimations.length > 0 ? (
-                recentAnimations.map((animation) => (
+                recentAnimations.map((animation: any) => (
                   <Card key={animation.id} className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">

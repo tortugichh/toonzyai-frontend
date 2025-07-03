@@ -67,6 +67,8 @@ export function useLogout() {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         queryClient.clear();
+        // Перенаправляем на страницу логина
+        window.location.replace('/login');
       }
     },
   });

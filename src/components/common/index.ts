@@ -10,4 +10,10 @@ export { default as VideoPreview } from './VideoPreview';
 export { default as VideoDebugPanel } from './VideoDebugPanel';
 export { DebugAvatarInfo } from './DebugAvatarInfo';
 export { DebugTokenInfo } from './DebugTokenInfo';
-export { default as AvatarDebugPanel } from './AvatarDebugPanel'; 
+export { default as AvatarDebugPanel } from './AvatarDebugPanel';
+
+// New components from documentation
+export { SegmentEditor } from './SegmentEditor';
+export { AnimationProject } from './AnimationProject';
+export { CreateProject } from './CreateProject';
+export { ErrorBoundary } from './ErrorBoundary'; 

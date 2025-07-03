@@ -71,7 +71,8 @@ export const getSegmentVideoUrls = (
   }
 
   // 2. Стандартный endpoint
-  const standardEndpoint = `/api/v1/animations/${projectId}/segments/${segmentNumber}/video`;
+  const MEDIA_API_BASE = import.meta.env.DEV ? 'http://0.0.0.0:8000/api/v1' : '/api/v1';
+  const standardEndpoint = `${MEDIA_API_BASE}/animations/${projectId}/segments/${segmentNumber}/video`;
   urls.push(createAuthenticatedVideoUrl({
     baseUrl: standardEndpoint,
     token: token || undefined,

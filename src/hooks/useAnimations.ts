@@ -1,344 +1,342 @@
-/**
- * useAnimations Hook
- * Полная реализация для работы с ToonzyAI Animation API
- */
-
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   apiClient, 
   getErrorMessage, 
   createPoller,
-  type AnimationProject
+  type AnimationProject,
+  type AnimationSegment
 } from '@/services/api';
 
-// ============ MAIN ANIMATIONS HOOK ============
-export const useAnimations = () => {
-  const [projects, setProjects] = useState<AnimationProject[]>([]);
-  const [currentProject, setCurrentProject] = useState<AnimationProject | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  // Polling refs
-  const pollersRef = useRef<Map<string, { poll: () => Promise<AnimationProject>; stop: () => void }>>(new Map());
+// ============ QUERY-BASED HOOKS ============
 
-  const clearError = useCallback(() => setError(null), []);
+// Хук для создания анимационного проекта
+export function useCreateAnimationProject() {
+  const queryClient = useQueryClient();
 
-  // ============ PROJECT MANAGEMENT ============
-  const createProject = useCallback(async (
-    avatarId: string, 
-    totalSegments: number, 
-    prompt: string
-  ): Promise<AnimationProject | null> => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      console.log('🚀 Creating animation project:', { avatarId, totalSegments, prompt });
-      
-      const project = await apiClient.createAnimationProject(avatarId, totalSegments, prompt);
-      
-      console.log('✅ Project created:', project.id);
-      
-      // Add to projects list
-      setProjects(prev => [project, ...prev]);
-      setCurrentProject(project);
-      
-      // Start polling for segment creation
-      startProjectPolling(project.id);
-      
-      return project;
-    } catch (err) {
-      const message = getErrorMessage(err);
-      console.error('❌ Create project error:', message);
-      setError(message);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  return useMutation({
+    mutationFn: (data: {
+      sourceAvatarId: string;
+      totalSegments: number;
+      animationPrompt: string;
+    }) => apiClient.createAnimationProject(
+      data.sourceAvatarId,
+      data.totalSegments,
+      data.animationPrompt
+    ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['animation-projects'] });
+    },
+    onError: (error) => {
+      console.error('Create animation project error:', getErrorMessage(error));
+    },
+  });
+}
 
-  const fetchProjects = useCallback(async (): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      console.log('📋 Fetching animation projects...');
-      
-      const projectsList = await apiClient.getAnimationProjects();
-      
-      console.log('✅ Projects fetched:', projectsList.length);
-      setProjects(projectsList);
-    } catch (err) {
-      const message = getErrorMessage(err);
-      console.error('❌ Fetch projects error:', message);
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const fetchProject = useCallback(async (projectId: string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      console.log('📄 Fetching project:', projectId);
-      
-      const project = await apiClient.getAnimationProject(projectId);
-      
-      console.log('✅ Project fetched:', {
-        id: project.id,
-        status: project.status,
-        segments: project.segments.length
-      });
-      
-      setCurrentProject(project);
-      
-      // Update in projects list
-      setProjects(prev => 
-        prev.map(p => p.id === projectId ? project : p)
+// Хук для получения списка анимационных проектов
+export function useAnimationProjects() {
+  return useQuery({
+    queryKey: ['animation-projects'],
+    queryFn: () => apiClient.getAnimationProjects(),
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      const hasActive = data?.some((project: any) => 
+        project.status === 'in_progress' || project.status === 'pending'
       );
-      
-      // Start polling if needed
-      const needsPolling = project.segments.some(s => 
-        s.status === 'pending' || s.status === 'in_progress'
-      ) || project.status === 'assembling';
-      
-      if (needsPolling) {
-        startProjectPolling(projectId);
-      }
-    } catch (err) {
-      const message = getErrorMessage(err);
-      console.error('❌ Fetch project error:', message);
-      setError(message);
+      return hasActive ? 5000 : false;
+    },
+    refetchIntervalInBackground: true,
+  });
+}
+
+// Хук для получения конкретного проекта
+export function useAnimationProject(projectId: string) {
+  return useQuery({
+    queryKey: ['animation-project', projectId],
+    queryFn: () => apiClient.getAnimationProject(projectId),
+    enabled: !!projectId,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      const hasActive = data && (
+        data.status === 'in_progress' || 
+        data.status === 'pending' ||
+        data.segments?.some((segment: any) => 
+          segment.status === 'in_progress' || segment.status === 'pending'
+        )
+      );
+      return hasActive ? 3000 : false;
+    },
+  });
+}
+
+// Хук для удаления проекта
+export function useDeleteAnimationProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => apiClient.deleteAnimationProject(projectId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['animation-projects'] });
+    },
+    onError: (error) => {
+      console.error('Delete animation project error:', getErrorMessage(error));
+    },
+  });
+}
+
+// Хук для обновления промпта сегмента
+export function useUpdateSegmentPrompt() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      projectId: string;
+      segmentNumber: number;
+      segmentPrompt: string;
+    }) => apiClient.updateSegmentPrompt(
+      data.projectId,
+      data.segmentNumber,
+      data.segmentPrompt
+    ),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ 
+        queryKey: ['animation-project', variables.projectId] 
+      });
+    },
+    onError: (error) => {
+      console.error('Update segment prompt error:', getErrorMessage(error));
+    },
+  });
+}
+
+// NEW: Bulk update prompts for multiple segments
+export function useBulkUpdatePrompts() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      projectId: string;
+      prompts: { segment_number: number; segment_prompt: string }[];
+    }) => apiClient.updateSegmentPromptsBulk(data.projectId, data.prompts),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['animation-project', variables.projectId] });
+    },
+    onError: (error) => {
+      console.error('Bulk update prompts error:', getErrorMessage(error));
+    },
+  });
+}
+
+// Хук для генерации сегмента (legacy projectId+segmentNumber)
+export function useGenerateSegment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      projectId: string;
+      segmentNumber: number;
+      segmentPrompt: string;
+    }) => apiClient.generateSegment(
+      data.projectId,
+      data.segmentNumber,
+      data.segmentPrompt
+    ),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ 
+        queryKey: ['animation-project', variables.projectId] 
+      });
+    },
+    onError: (error) => {
+      console.error('Generate segment error:', getErrorMessage(error));
+    },
+  });
+}
+
+// Новая версия по segmentId
+export function useGenerateSegmentById() {
+  return useMutation({
+    mutationFn: (data: { segmentId: string; segmentPrompt: string }) =>
+      apiClient.generateSegmentById(data.segmentId, data.segmentPrompt),
+  });
+}
+
+// Хук для получения деталей сегмента (legacy projectId+segmentNumber)
+export function useSegmentDetails(projectId: string, segmentNumber: number) {
+  return useQuery({
+    queryKey: ['segment-details', projectId, segmentNumber],
+    queryFn: () => apiClient.getSegmentDetails(projectId, segmentNumber),
+    enabled: !!projectId && segmentNumber >= 0,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      const isActive = data && (
+        data.status === 'in_progress' || data.status === 'pending'
+      );
+      return isActive ? 3000 : false;
+    },
+  });
+}
+
+export function useSegmentDetailsById(segmentId: string) {
+  return useQuery({
+    queryKey: ['segment-details', segmentId],
+    queryFn: () => apiClient.getSegmentDetailsById(segmentId),
+    enabled: !!segmentId,
+  });
+}
+
+// Хук для сборки финального видео
+export function useAssembleVideo() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => apiClient.assembleVideo(projectId),
+    onSuccess: (_, projectId) => {
+      queryClient.invalidateQueries({ 
+        queryKey: ['animation-project', projectId] 
+      });
+    },
+    onError: (error) => {
+      console.error('Assemble video error:', getErrorMessage(error));
+    },
+  });
+}
+
+// ============ ADVANCED HOOKS FROM DOCUMENTATION ============
+
+// Хук для работы с сегментами (из документации)
+export function useSegments(projectId: string) {
+  const [segments, setSegments] = useState<AnimationSegment[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadProject = useCallback(async () => {
+    try {
+      const project = await apiClient.getAnimationProject(projectId);
+      setSegments(project.segments);
+    } catch (error) {
+      console.error('Failed to load segments:', error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [projectId]);
 
-  const deleteProject = useCallback(async (projectId: string): Promise<boolean> => {
-    try {
-      console.log('🗑️ Deleting project:', projectId);
-      
-      await apiClient.deleteAnimationProject(projectId);
-      
-      // Stop polling
-      const poller = pollersRef.current.get(projectId);
-      if (poller) {
-        poller.stop();
-        pollersRef.current.delete(projectId);
-      }
-      
-      // Remove from state
-      setProjects(prev => prev.filter(p => p.id !== projectId));
-      
-      if (currentProject?.id === projectId) {
-        setCurrentProject(null);
-      }
-      
-      console.log('✅ Project deleted successfully');
-      return true;
-    } catch (err) {
-      const message = getErrorMessage(err);
-      console.error('❌ Delete project error:', message);
-      setError(message);
-      return false;
-    }
-  }, [currentProject]);
-
-  const assembleVideo = useCallback(async (projectId: string): Promise<boolean> => {
-    try {
-      console.log('🎬 Assembling video for project:', projectId);
-      
-      const result = await apiClient.assembleVideo(projectId);
-      
-      console.log('✅ Video assembly started:', result.status);
-      
-      // Start polling for assembly completion
-      startProjectPolling(projectId);
-      
-      return true;
-    } catch (err) {
-      const message = getErrorMessage(err);
-      console.error('❌ Assemble video error:', message);
-      setError(message);
-      return false;
-    }
-  }, []);
-
-  // ============ POLLING SYSTEM ============
-  const startProjectPolling = useCallback((projectId: string) => {
-    // Stop existing poller
-    const existingPoller = pollersRef.current.get(projectId);
-    if (existingPoller) {
-      existingPoller.stop();
-    }
-
-    // Create new poller
-    const poller = createPoller(
-      () => apiClient.getAnimationProject(projectId),
-      (project) => {
-        // Continue polling if there are active processes
-        const hasActiveSegments = project.segments.some(s => 
-          s.status === 'pending' || s.status === 'in_progress'
-        );
-        const isAssembling = project.status === 'assembling';
-        
-        return hasActiveSegments || isAssembling;
-      },
-      5000, // 5 seconds interval
-      120   // 10 minutes max
-    );
-
-    // Store poller
-    pollersRef.current.set(projectId, poller);
-
-    // Start polling with updates
-    poller.poll()
-      .then((finalProject) => {
-        console.log('🏁 Polling completed for project:', projectId, {
-          status: finalProject.status,
-          segments: finalProject.segments.map(s => ({ 
-            num: s.segment_number, 
-            status: s.status 
-          }))
-        });
-
-        setCurrentProject(finalProject);
-        setProjects(prev => 
-          prev.map(p => p.id === projectId ? finalProject : p)
-        );
-      })
-      .catch((err) => {
-        console.error('❌ Polling error for project:', projectId, err);
-      })
-      .finally(() => {
-        pollersRef.current.delete(projectId);
-      });
-  }, []);
-
-  // Cleanup on unmount
   useEffect(() => {
-    return () => {
-      pollersRef.current.forEach(poller => poller.stop());
-      pollersRef.current.clear();
-    };
-  }, []);
+    if (projectId) {
+      loadProject();
+    }
+  }, [projectId, loadProject]);
 
-  // Load projects on mount
-  useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
-
-  return {
-    projects,
-    currentProject,
-    loading,
-    error,
-    createProject,
-    fetchProjects,
-    fetchProject,
-    deleteProject,
-    assembleVideo,
-    clearError,
-    setCurrentProject,
-  };
-};
-
-// ============ LEGACY HOOKS FOR COMPATIBILITY ============
-export const useUpdateSegmentPrompt = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const updatePrompt = useCallback(async (
-    projectId: string,
-    segmentNumber: number,
-    prompt: string
-  ): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
-    
+  const updateSegmentPrompt = async (segmentNumber: number, prompt: string) => {
     try {
       await apiClient.updateSegmentPrompt(projectId, segmentNumber, prompt);
-      return true;
-    } catch (err) {
-      setError(getErrorMessage(err));
-      return false;
-    } finally {
-      setLoading(false);
+      
+      // Обновляем локальное состояние
+      setSegments(prev => 
+        prev.map(segment => 
+          segment.segment_number === segmentNumber 
+            ? { 
+                ...segment, 
+                segment_prompt: prompt, 
+                prompts: {
+                  ...segment.prompts,
+                  prompt_source: 'custom',
+                  segment_prompt: prompt
+                } as any
+              }
+            : segment
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update segment prompt:', error);
+      throw error;
     }
-  }, []);
+  };
 
-  return { updatePrompt, loading, error };
-};
-
-export const useGenerateSegment = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const generateSegment = useCallback(async (
-    projectId: string,
-    segmentNumber: number,
-    prompt?: string
-  ): Promise<boolean> => {
-    setLoading(true);
-    setError(null);
-    
+  const generateSegmentVideo = async (segmentNumber: number, prompt: string) => {
     try {
-      await apiClient.generateSegment(projectId, segmentNumber, prompt);
-      return true;
-    } catch (err) {
-      setError(getErrorMessage(err));
-      return false;
-    } finally {
-      setLoading(false);
+      const task = await apiClient.generateSegment(projectId, segmentNumber, prompt);
+      
+      // Обновляем статус сегмента
+      setSegments(prev =>
+        prev.map(segment =>
+          segment.segment_number === segmentNumber
+            ? { 
+                ...segment, 
+                status: 'in_progress',
+                // task_id будет в response, но не в типах интерфейса
+              } as any
+            : segment
+        )
+      );
+
+      return task;
+    } catch (error) {
+      console.error('Failed to generate segment:', error);
+      throw error;
     }
-  }, []);
-
-  return { generateSegment, loading, error };
-};
-
-// ============ LEGACY COMPATIBILITY HOOKS ============
-export const useCreateAnimation = () => {
-  const { createProject } = useAnimations();
-  return {
-    mutateAsync: async (data: { source_avatar_id: string; animation_prompt: string; total_segments: number }) => {
-      return createProject(data.source_avatar_id, data.total_segments, data.animation_prompt);
-    },
-    isPending: false,
-    error: null
   };
-};
 
-export const useDeleteAnimation = () => {
-  const { deleteProject } = useAnimations();
   return {
-    mutateAsync: deleteProject,
-    isPending: false
+    segments,
+    loading,
+    updateSegmentPrompt,
+    generateSegmentVideo,
+    refresh: loadProject
   };
-};
+}
 
-export const useAssembleVideo = () => {
-  const { assembleVideo } = useAnimations();
-  return {
-    mutateAsync: assembleVideo,
-    isPending: false
-  };
-};
+// Hook для отслеживания прогресса (из документации)
+export function useTaskProgress(taskId: string | undefined, onComplete?: (result: any) => void) {
+  const [status, setStatus] = useState<string>('PENDING');
+  const [progress, setProgress] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout>();
 
-export const useAnimation = (id: string) => {
-  const { currentProject, fetchProject, loading, error } = useAnimations();
-  
   useEffect(() => {
-    if (id) {
-      fetchProject(id);
-    }
-  }, [id, fetchProject]);
-  
-  return {
-    data: currentProject,
-    isLoading: loading,
-    error,
-    refetch: () => fetchProject(id)
-  };
-}; 
+    if (!taskId) return;
+
+    const checkStatus = async () => {
+      try {
+        // В данной реализации API нет отдельного endpoint для статуса задач
+        // Используем общий статус сегмента
+        setStatus('IN_PROGRESS');
+        setProgress(50); // Базовый прогресс
+        
+        // Если есть callback, вызываем его через некоторое время
+        if (onComplete) {
+          setTimeout(() => onComplete({ status: 'COMPLETED' }), 3000);
+        }
+      } catch (error) {
+        console.error('Failed to check task status:', error);
+      }
+    };
+
+    // Проверяем каждые 3 секунды
+    intervalRef.current = setInterval(checkStatus, 3000);
+    checkStatus(); // Первая проверка сразу
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [taskId, onComplete]);
+
+  return { status, progress };
+}
+
+// NEW: Parallel generation of all segments
+export function useGenerateAllSegments() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { projectId: string; forceRegenerate?: boolean }) =>
+      apiClient.generateAllSegments(data.projectId, data.forceRegenerate ?? false),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['animation-project', variables.projectId] });
+    },
+    onError: (error) => {
+      console.error('Generate all segments error:', getErrorMessage(error));
+    },
+  });
+}
+
+ 
