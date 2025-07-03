@@ -23,6 +23,7 @@ export default function PromptPlanner({ project, onSaved }: PromptPlannerProps) 
     return initial;
   });
 
+  
   const handleChange = (index: number, value: string) => {
     setPrompts((prev) => ({ ...prev, [index]: value }));
   };
