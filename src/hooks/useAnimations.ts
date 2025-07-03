@@ -7,6 +7,7 @@ import {
   type AnimationProject,
   type AnimationSegment
 } from '@/services/api';
+import { toastError } from '@/utils/toast';
 
 // ============ QUERY-BASED HOOKS ============
 
@@ -28,7 +29,7 @@ export function useCreateAnimationProject() {
       queryClient.invalidateQueries({ queryKey: ['animation-projects'] });
     },
     onError: (error) => {
-      console.error('Create animation project error:', getErrorMessage(error));
+      toastError(error);
     },
   });
 }
@@ -79,7 +80,7 @@ export function useDeleteAnimationProject() {
       queryClient.invalidateQueries({ queryKey: ['animation-projects'] });
     },
     onError: (error) => {
-      console.error('Delete animation project error:', getErrorMessage(error));
+      toastError(error);
     },
   });
 }
@@ -104,7 +105,7 @@ export function useUpdateSegmentPrompt() {
       });
     },
     onError: (error) => {
-      console.error('Update segment prompt error:', getErrorMessage(error));
+      toastError(error);
     },
   });
 }
@@ -122,7 +123,7 @@ export function useBulkUpdatePrompts() {
       queryClient.invalidateQueries({ queryKey: ['animation-project', variables.projectId] });
     },
     onError: (error) => {
-      console.error('Bulk update prompts error:', getErrorMessage(error));
+      toastError(error);
     },
   });
 }
@@ -147,7 +148,7 @@ export function useGenerateSegment() {
       });
     },
     onError: (error) => {
-      console.error('Generate segment error:', getErrorMessage(error));
+      toastError(error);
     },
   });
 }
@@ -196,7 +197,7 @@ export function useAssembleVideo() {
       });
     },
     onError: (error) => {
-      console.error('Assemble video error:', getErrorMessage(error));
+      toastError(error);
     },
   });
 }
@@ -334,7 +335,7 @@ export function useGenerateAllSegments() {
       queryClient.invalidateQueries({ queryKey: ['animation-project', variables.projectId] });
     },
     onError: (error) => {
-      console.error('Generate all segments error:', getErrorMessage(error));
+      toastError(error);
     },
   });
 }

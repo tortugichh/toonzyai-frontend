@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'react-hot-toast';
 import { QUERY_STALE_TIME, QUERY_CACHE_TIME, IS_DEVELOPMENT } from '@/constants';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useCurrentUser } from '@/hooks/useAuth';
@@ -106,6 +107,7 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AppRoutes />
+        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
         {IS_DEVELOPMENT && <ReactQueryDevtools initialIsOpen={false} />}
       </QueryClientProvider>
     </ErrorBoundary>

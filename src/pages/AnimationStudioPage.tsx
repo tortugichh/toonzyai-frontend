@@ -146,6 +146,8 @@ function ProjectCard({ project, onOpen }: ProjectCardProps) {
   };
 
   const completedSegments = project.segments?.filter(s => s.status === 'completed').length || 0;
+  const inProgressSegments = project.segments?.filter(s => s.status === 'in_progress').length || 0;
+  const failedSegments = project.segments?.filter(s => s.status === 'failed').length || 0;
   const totalSegments = project.total_segments;
 
   return (
@@ -167,16 +169,22 @@ function ProjectCard({ project, onOpen }: ProjectCardProps) {
         </div>
 
         {/* Progress */}
-        <div className="mb-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-1">
-            <span>Прогресс сегментов</span>
+        <div className="mb-4 space-y-1 text-xs text-gray-600">
+          <div className="flex justify-between">
+            <span className="font-medium">Прогресс</span>
             <span>{completedSegments}/{totalSegments}</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-blue-600 h-2 rounded-full transition-all"
+          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+            <div
+              className="bg-green-500 h-2"
               style={{ width: `${(completedSegments / totalSegments) * 100}%` }}
-            ></div>
+            />
+          </div>
+          {/* Status counters */}
+          <div className="grid grid-cols-3 gap-2 mt-1">
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500"></span>{completedSegments}</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span>{inProgressSegments}</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500"></span>{failedSegments}</span>
           </div>
         </div>
 

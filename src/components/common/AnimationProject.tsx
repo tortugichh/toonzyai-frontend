@@ -3,6 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useSegments, useAnimationProject, useAssembleVideo } from '@/hooks/useAnimations';
 import { SegmentEditor } from './SegmentEditor';
+import PromptPlanner from './PromptPlanner';
+import GenerationControls from './GenerationControls';
+import ProgressMonitor from './ProgressMonitor';
 
 interface AnimationProjectProps {
   projectId: string;
@@ -110,6 +113,9 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
         )}
       </Card>
 
+      {/* Global Progress Monitor */}
+      <ProgressMonitor project={project} onRefresh={refetch} />
+
       {/* Final Video */}
       {project.final_video_url && (
         <Card className="final-video p-4 mb-6 bg-green-50 border-green-200">
@@ -132,6 +138,18 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
           </div>
         </Card>
       )}
+
+      {/* Prompt Planner & Generate All */}
+      <PromptPlanner 
+        project={project} 
+        onSaved={() => { refetch(); refresh(); }} 
+      />
+
+      <GenerationControls 
+        project={project}
+        promptsFilled={project.segments.every(s => ((s.segment_prompt ?? s.prompts?.segment_prompt ?? '').trim().length >= 10))}
+        onStarted={() => { refetch(); refresh(); }}
+      />
 
       {/* Segments */}
       <div className="segments-section">

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient, getErrorMessage } from '@/services/api';
+import { toastError, toastSuccess } from '@/utils/toast';
 import type { CreateAvatarRequest } from '@/types/api';
 
 export function useCreateAvatar() {
@@ -38,8 +39,7 @@ export function useCreateAvatar() {
       }
     },
     onError: (error) => {
-      console.error('❌ Ошибка создания аватара:', getErrorMessage(error));
-      console.error('🔍 Детали ошибки:', error);
+      toastError(error);
     },
   });
 }
@@ -109,7 +109,7 @@ export function useDeleteAvatar() {
       queryClient.invalidateQueries({ queryKey: ['avatars'] });
     },
     onError: (error) => {
-      console.error('Delete avatar error:', getErrorMessage(error));
+      toastError(error);
     },
   });
 }

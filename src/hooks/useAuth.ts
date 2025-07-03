@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/services/api';
+import { toastError, toastSuccess } from '@/utils/toast';
 import type { LoginRequest, RegisterRequest } from '@/types/api';
 
 export function useLogin() {
@@ -12,6 +13,7 @@ export function useLogin() {
       localStorage.setItem('refresh_token', response.refresh_token);
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
+    onError: (error) => toastError(error),
   });
 }
 
@@ -24,6 +26,7 @@ export function useRegister() {
       // После успешной регистрации пользователь должен войти в систему
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
+    onError: (error) => toastError(error),
   });
 }
 
@@ -45,6 +48,7 @@ export function useUpdateProfile() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
+    onError: (error) => toastError(error),
   });
 }
 
@@ -98,5 +102,6 @@ export function useTokenLogin() {
       localStorage.setItem('refresh_token', response.refresh_token);
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
+    onError: (error) => toastError(error),
   });
 } 

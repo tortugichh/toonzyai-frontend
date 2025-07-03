@@ -4,6 +4,8 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useTaskProgress, useGenerateSegment } from '@/hooks/useAnimations';
 import type { AnimationSegment } from '@/services/api';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 interface SegmentEditorProps {
   projectId: string;
@@ -69,6 +71,8 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
     return '📝 По умолчанию';
   };
 
+  const progress = (segment as any).progress ?? 0;
+
   return (
     <Card className="segment-editor p-4 mb-4 bg-white shadow-sm">
       <div className="segment-header flex justify-between items-center mb-3">
@@ -123,6 +127,18 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
         )}
       </div>
 
+      {/* Progress bar */}
+      {segment.status === 'in_progress' && (
+        <div className="mb-3">
+          <div className="flex justify-between text-xs text-gray-600 mb-1">
+            <span>Прогресс</span><span>{progress}%</span>
+          </div>
+          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-2 bg-blue-500" style={{width:`${progress}%`}} />
+          </div>
+        </div>
+      )}
+
       <div className="generation-section">
         <Button 
           onClick={handleGenerate}
@@ -151,10 +167,11 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
 
         {segment.video_url && !segment.generated_video_url && (
           <div className="video-preview">
-            <video 
-              src={segment.video_url} 
-              controls 
-              className="segment-video w-full max-w-md rounded shadow-sm"
+            <LazyLoadImage 
+              src={segment.start_frame_url}
+              alt={`Сегмент ${segment.segment_number}`}
+              effect="blur"
+              className="w-full max-w-md h-40 object-cover rounded"
             />
           </div>
         )}
