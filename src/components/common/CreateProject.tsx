@@ -37,11 +37,17 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
       return;
     }
 
+    if (!formData.title.trim()) {
+      alert('Введите название проекта');
+      return;
+    }
+
     try {
       const project = await createProjectMutation.mutateAsync({
+        name: formData.title.trim(),
         sourceAvatarId: formData.avatarId,
         totalSegments: formData.totalSegments,
-        animationPrompt: formData.prompt.trim()
+        animationPrompt: formData.prompt.trim() || undefined
       });
       
       onProjectCreated(project);
@@ -171,23 +177,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
           </p>
         </div>
 
-        {/* Animation Prompt (optional) */}
-        <div className="form-group">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            (Необязательно) Общий промпт для анимации
-          </label>
-          <textarea
-            value={formData.prompt}
-            onChange={(e) => handleInputChange('prompt', e.target.value)}
-            placeholder="Опишите общую концепцию (необязательно)"
-            rows={4}
-            disabled={isSubmitting}
-            className="w-full p-3 border rounded-lg resize-vertical focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300"
-          />
-          {promptError && (
-            <p className="text-red-500 text-xs mt-1">Если заполняете, минимум 10 символов</p>
-          )}
-        </div>
+       
 
         {/* Action Buttons */}
         <div className="form-actions flex gap-3 pt-4">

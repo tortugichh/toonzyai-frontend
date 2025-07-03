@@ -180,10 +180,12 @@ export function useCreateAnimationProject() {
 
   return useMutation({
     mutationFn: (data: {
+      name: string;
       sourceAvatarId: string;
       totalSegments: number;
-      animationPrompt: string;
+      animationPrompt?: string;
     }) => apiClient.createAnimationProject(
+      data.name,
       data.sourceAvatarId,
       data.totalSegments,
       data.animationPrompt

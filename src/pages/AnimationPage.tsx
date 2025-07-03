@@ -104,6 +104,7 @@ function AnimationPage() {
   const onSubmit = async (data: any) => {
     // Приводим данные формы к camelCase, так как backend-hook ожидает именно их
     const payload = {
+      name: data.name || 'Новый проект',
       sourceAvatarId: data.sourceAvatarId ?? data.source_avatar_id,
       totalSegments:
         typeof data.totalSegments !== 'undefined'

@@ -210,9 +210,10 @@ function DashboardPage() {
                       </div>
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900 mb-1">
-                          {animation.animation_prompt.length > 50 
-                            ? `${animation.animation_prompt.substring(0, 50)}...` 
-                            : animation.animation_prompt}
+                          {(() => {
+                            const title = animation.name || animation.animation_prompt || 'Без названия';
+                            return title.length > 50 ? `${title.substring(0, 50)}...` : title;
+                          })()}
                         </h4>
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${

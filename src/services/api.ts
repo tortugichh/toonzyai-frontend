@@ -97,11 +97,13 @@ export interface AnimationProject {
   id: string;
   user_id: string;
   source_avatar_id: string;
+  name: string; // Название проекта
   total_segments: number;
-  animation_prompt: string;
+  animation_prompt: string | null; // Теперь опциональный
   status: AnimationStatus;
   final_video_url: string | null;
   video_url: string | null;
+  source_avatar_url: string | null; // URL аватара для отображения
   created_at: string;
   updated_at: string;
   segments: AnimationSegment[];
@@ -424,16 +426,18 @@ class APIClient {
 
   // ============ ANIMATION ENDPOINTS ============
   async createAnimationProject(
+    name: string,
     sourceAvatarId: string,
     totalSegments: number,
-    animationPrompt: string
+    animationPrompt?: string
   ): Promise<AnimationProject> {
     return this.request<AnimationProject>('/animations/', {
       method: 'POST',
       body: JSON.stringify({
+        name,
         source_avatar_id: sourceAvatarId,
         total_segments: totalSegments,
-        animation_prompt: animationPrompt,
+        animation_prompt: animationPrompt || null,
       }),
     });
   }
