@@ -2,6 +2,8 @@ import type { Avatar } from '../model';
 import { Card, Button } from '@shared/ui';
 import { useNavigate } from 'react-router-dom';
 import AvatarImage from './AvatarImage';
+import Modal from '@/components/ui/Modal';
+import { useState } from 'react';
 
 interface AvatarCardProps {
   avatar: Avatar;
@@ -11,11 +13,14 @@ interface AvatarCardProps {
 
 export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardProps) {
   const navigate = useNavigate();
+  const [isModalOpen, setModalOpen] = useState(false);
 
   const handleDelete = () => {
-    if (window.confirm('Вы уверены, что хотите удалить этот аватар?')) {
-      onDelete(avatar.avatar_id);
-    }
+    setModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    onDelete(avatar.avatar_id);
   };
 
   const handleAnimate = () => {
@@ -52,7 +57,27 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
   };
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+    <Card className="relative bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-visible">
+      {/* Delete cross */}
+      <button
+        onClick={handleDelete}
+        className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 text-gray-500 z-10"
+        aria-label="Удалить аватар"
+        disabled={isDeleting}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <Modal
+        open={isModalOpen}
+        title="Удалить аватар?"
+        description="Вы уверены, что хотите удалить этот аватар? Это действие нельзя отменить."
+        confirmText="Удалить"
+        cancelText="Отмена"
+        onConfirm={confirmDelete}
+        onClose={() => setModalOpen(false)}
+      />
       <div className="relative aspect-square w-full bg-gray-100">
         <AvatarImage avatar={avatar} className="absolute inset-0 w-full h-full object-cover z-0" showPlaceholder />
       </div>
@@ -62,19 +87,13 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(avatar.status)}`}>{getStatusText(avatar.status)}</span>
           <p className="text-xs text-gray-500">{new Date(avatar.created_at).toLocaleDateString('ru-RU')}</p>
         </div>
-        <div className="flex space-x-2">
+        <div className="flex">
           {normalizedStatus === 'completed' ? (
-            <>
-              <Button onClick={handleAnimate} className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm py-2 font-medium">🎬 Создать анимацию</Button>
-              <Button onClick={handleDelete} variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50 text-sm py-2 px-4" disabled={isDeleting}>{isDeleting ? '...' : '🗑️'}</Button>
-            </>
+            <Button onClick={handleAnimate} className="flex-1 bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white text-sm py-2 font-medium transform-gpu transition-transform duration-300 hover:scale-105">🎬 Создать анимацию</Button>
           ) : (
-            <>
-              <div className="flex-1 bg-gray-100 text-gray-600 text-sm py-2 px-4 rounded-md text-center">
-                {normalizedStatus === 'generating' ? '⚙️ Генерируется...' : normalizedStatus === 'failed' ? '❌ Ошибка генерации' : '⏳ В очереди...'}
-              </div>
-              <Button onClick={handleDelete} variant="outline" className="text-red-600 hover:text-red-700 hover:bg-red-50 text-sm py-2 px-4" disabled={isDeleting}>{isDeleting ? '...' : '🗑️'}</Button>
-            </>
+            <div className="flex-1 bg-gray-100 text-gray-600 text-sm py-2 px-4 rounded-md text-center">
+              {normalizedStatus === 'generating' ? '⚙️ Генерируется...' : normalizedStatus === 'failed' ? '❌ Ошибка генерации' : '⏳ В очереди...'}
+            </div>
           )}
         </div>
       </div>

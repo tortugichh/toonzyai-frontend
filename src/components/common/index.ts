@@ -15,5 +15,4 @@ export { SegmentEditor } from './SegmentEditor';
 export { AnimationProject } from './AnimationProject';
 export { CreateProject } from './CreateProject';
 export { ErrorBoundary } from './ErrorBoundary';
-export { default as GenerationControls } from './GenerationControls';
 export { default as ProgressMonitor } from './ProgressMonitor'; 

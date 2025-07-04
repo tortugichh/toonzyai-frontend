@@ -5,6 +5,7 @@ import { Input } from '../ui/input';
 import VideoPreview from './VideoPreview';
 import VideoDebugPanel from './VideoDebugPanel';
 import { findWorkingVideoUrl, getSegmentVideoUrls } from '../../utils/videoUtils';
+import { toastError } from '@/utils/toast';
 
 const VideoTestComponent: React.FC = () => {
   const [testProjectId, setTestProjectId] = useState('');
@@ -14,7 +15,7 @@ const VideoTestComponent: React.FC = () => {
 
   const runVideoTest = async () => {
     if (!testProjectId) {
-      alert('Введите ID проекта');
+      toastError('Введите ID проекта');
       return;
     }
 

@@ -5,6 +5,7 @@ import { useTaskProgress, useGenerateSegment, useSegmentProgressWS } from '@/hoo
 import type { AnimationSegment } from '@/services/api';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
+import { toastError } from '@/utils/toast';
 
 interface SegmentEditorProps {
   projectId: string;
@@ -13,7 +14,12 @@ interface SegmentEditorProps {
 }
 
 export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorProps) {
-  const [prompt, setPrompt] = useState(segment.segment_prompt || '');
+  const [prompt, setPrompt] = useState(
+    segment.segment_prompt ||
+    segment.prompts?.segment_prompt ||
+    segment.prompts?.project_prompt ||
+    ''
+  );
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generateSegmentMutation = useGenerateSegment();
@@ -34,7 +40,7 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
   const handleGenerate = async () => {
     const effectivePrompt = prompt.trim();
     if (!isPromptValid) {
-      alert('Prompt must be at least 10 characters');
+      toastError('Prompt must be at least 10 characters');
       return;
     }
     try {
@@ -46,7 +52,7 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
       });
       onUpdate();
     } catch (error: any) {
-      alert('Ошибка запуска генерации: ' + error.message);
+      toastError('Ошибка запуска генерации: ' + (error as any).message);
       setIsGenerating(false);
     }
   };

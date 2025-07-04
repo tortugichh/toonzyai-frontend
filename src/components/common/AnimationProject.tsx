@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useSegments, useAnimationProject, useAssembleVideo } from '@/hooks/useAnimations';
 import { SegmentEditor } from './SegmentEditor';
-import GenerationControls from './GenerationControls';
 import ProgressMonitor from './ProgressMonitor';
+import { toastError } from '@/utils/toast';
 
 interface AnimationProjectProps {
   projectId: string;
@@ -39,7 +39,7 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
       await assembleVideoMutation.mutateAsync(projectId);
       refetch();
     } catch (error: any) {
-      alert('Ошибка сборки видео: ' + error.message);
+      toastError('Ошибка сборки видео: ' + error.message);
     }
   };
 
@@ -133,11 +133,7 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
         </Card>
       )}
 
-      <GenerationControls 
-        project={project}
-        promptsFilled={project.segments.every(s => ((s.segment_prompt ?? s.prompts?.segment_prompt ?? '').trim().length >= 10))}
-        onStarted={() => { refetch(); refresh(); }}
-      />
+     
 
       {/* Segments */}
       <div className="segments-section">

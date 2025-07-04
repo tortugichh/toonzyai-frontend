@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { useAvatars } from '@/hooks/useAvatars';
 import { useCreateAnimationProject } from '@/hooks/useAnimations';
 import type { AnimationProject } from '@/services/api';
+import { toastError } from '@/utils/toast';
 
 interface CreateProjectProps {
   onProjectCreated: (project: AnimationProject) => void;
@@ -33,12 +34,12 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
     e.preventDefault();
     
     if (!formData.avatarId) {
-      alert('Выберите аватар');
+      toastError('Выберите аватар');
       return;
     }
 
     if (!formData.title.trim()) {
-      alert('Введите название проекта');
+      toastError('Введите название проекта');
       return;
     }
 
@@ -52,7 +53,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
       
       onProjectCreated(project);
     } catch (error: any) {
-      alert('Ошибка создания проекта: ' + error.message);
+      toastError('Ошибка создания проекта: ' + error.message);
     }
   };
 

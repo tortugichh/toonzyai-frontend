@@ -98,7 +98,7 @@ function AvatarsPage() {
           <div className="flex gap-2 mt-4 sm:mt-0">
             <Button
               onClick={() => setShowCreateForm(true)}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3"
+              className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] hover:opacity-90 text-white px-6 py-3 transform-gpu hover:scale-105 transition"
             >
               ✨ Создать аватар
             </Button>
@@ -129,6 +129,33 @@ function AvatarsPage() {
                     Анимации
                   </Button>
                 </p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Stats */}
+        {avatars?.avatars && avatars.avatars.length > 0 && (
+          <Card className="mb-8 p-6 bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] text-white border-0">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2">📊 Статистика</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <div>
+                  <p className="text-3xl font-bold">{avatars.total || 0}</p>
+                  <p className="text-orange-100">Всего аватаров</p>
+                </div>
+                <div className="text-center mb-4">
+                  <div className="text-3xl font-bold text-gray-800">
+                    {avatars.avatars.filter(a => a.status?.toLowerCase?.().trim() === 'completed').length}
+                  </div>
+                  <div className="text-sm text-gray-100">Готовых аватаров</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-semibold text-yellow-200">
+                    {avatars.avatars.filter(a => a.status?.toLowerCase?.().trim() === 'generating').length}
+                  </div>
+                  <div className="text-sm text-gray-100">В процессе</div>
+                </div>
               </div>
             </div>
           </Card>
@@ -182,37 +209,10 @@ function AvatarsPage() {
             </p>
             <Button
               onClick={() => setShowCreateForm(true)}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg"
+              className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] hover:opacity-90 text-white px-8 py-3 text-lg transform-gpu hover:scale-105 transition"
             >
               ✨ Создать первого аватара
             </Button>
-          </Card>
-        )}
-
-        {/* Stats */}
-        {avatars?.avatars && avatars.avatars.length > 0 && (
-          <Card className="mt-8 p-6 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white border-0">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-2">📊 Статистика</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                <div>
-                  <p className="text-3xl font-bold">{avatars.total || 0}</p>
-                  <p className="text-purple-100">Всего аватаров</p>
-                </div>
-                <div className="text-center mb-4">
-                  <div className="text-3xl font-bold text-gray-800">
-                    {avatars.avatars.filter(a => a.status?.toLowerCase?.().trim() === 'completed').length}
-                  </div>
-                  <div className="text-sm text-gray-600">Готовых аватаров</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-semibold text-yellow-600">
-                    {avatars.avatars.filter(a => a.status?.toLowerCase?.().trim() === 'generating').length}
-                  </div>
-                  <div className="text-sm text-gray-600">В процессе</div>
-                </div>
-              </div>
-            </div>
           </Card>
         )}
       </div>

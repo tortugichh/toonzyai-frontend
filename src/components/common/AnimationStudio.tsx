@@ -17,6 +17,7 @@ import { useProjectProgressWS } from '@/hooks/useAnimations';
 import { apiClient, getErrorMessage } from '@/services/api';
 import VideoPreview from '@/components/common/VideoPreview';
 import type { AnimationSegment } from '@/services/api';
+import { toastError } from '@/utils/toast';
 
 interface AnimationStudioProps {
   projectId: string;
@@ -77,9 +78,11 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
   };
 
   const handleGenerateSegment = async (segmentNumber: number, prompt?: string) => {
-    const effectivePrompt = (prompt ?? segmentPrompts[segmentNumber] ?? '').trim();
-    if (!effectivePrompt) {
-      alert('Укажите prompt перед генерацией');
+    const segmentObj = currentProject?.segments.find(s => s.segment_number === segmentNumber);
+    const fallbackPrompt = segmentObj?.segment_prompt || segmentObj?.prompts?.project_prompt || '';
+    const effectivePrompt = (prompt ?? segmentPrompts[segmentNumber] ?? fallbackPrompt).trim();
+    if (effectivePrompt.length < 10) {
+      toastError('Prompt должен содержать минимум 10 символов');
       return;
     }
     try {
@@ -103,7 +106,28 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
 
   const handleGenerateAll = async () => {
     try {
+      if (!currentProject) return; // safety check, но в UI он всегда есть
+
       setLocalError(null);
+
+      // 1) Собираем промпты для всех сегментов
+      const bulkPrompts = currentProject.segments.map(seg => {
+        const localPrompt = segmentPrompts[seg.segment_number];
+        const effective = (localPrompt ?? seg.segment_prompt ?? seg.prompts?.project_prompt ?? '').trim();
+        return { segment_number: seg.segment_number, segment_prompt: effective };
+      });
+
+      // Проверка: все промпты должны быть ≥10 символов
+      const invalid = bulkPrompts.filter(p => p.segment_prompt.length < 10);
+      if (invalid.length > 0) {
+        toastError(`Укажите промпты (≥10 символов) для сегментов: ${invalid.map(i => i.segment_number).join(', ')}`);
+        return;
+      }
+
+      // 2) Обновляем промпты пакетно на бэке
+      await apiClient.updateSegmentPromptsBulk(projectId, bulkPrompts);
+
+      // 3) Запускаем параллельную генерацию
       await generateAllSegments({ projectId, forceRegenerate: false });
       console.log('🚀 Parallel generation started for all segments');
     } catch (err) {

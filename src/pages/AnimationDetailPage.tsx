@@ -6,6 +6,8 @@ import { AnimationProject } from '@/components/common';
 import { useAnimationProject, useDeleteAnimationProject, useAssembleVideo } from '@/hooks/useAnimations';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
+import Modal from '@/components/ui/Modal';
+import { useState } from 'react';
 
 function AnimationDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +19,8 @@ function AnimationDetailPage() {
   const assembleVideoMutation = useAssembleVideo();
   const logoutMutation = useLogout();
 
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
@@ -26,14 +30,18 @@ function AnimationDetailPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (window.confirm('Вы уверены, что хотите удалить эту анимацию?')) {
-      try {
-        await deleteAnimationMutation.mutateAsync(id!);
-        navigate('/animations');
-      } catch (error) {
-        console.error('Delete error:', error);
-      }
+  const handleDelete = () => {
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await deleteAnimationMutation.mutateAsync(id!);
+      navigate('/animations');
+    } catch (error) {
+      console.error('Delete error:', error);
+    } finally {
+      setDeleteModalOpen(false);
     }
   };
 
@@ -171,6 +179,15 @@ function AnimationDetailPage() {
               >
                 {deleteAnimationMutation.isPending ? 'Удаление...' : '🗑️ Удалить'}
               </Button>
+              <Modal
+                open={isDeleteModalOpen}
+                title="Удалить анимацию?"
+                description="Вы уверены, что хотите удалить эту анимацию? Это действие нельзя отменить."
+                confirmText="Удалить"
+                cancelText="Отмена"
+                onConfirm={confirmDelete}
+                onClose={() => setDeleteModalOpen(false)}
+              />
             </div>
           </div>
         </div>

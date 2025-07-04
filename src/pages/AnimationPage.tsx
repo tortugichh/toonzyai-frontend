@@ -18,6 +18,8 @@ import { useAvatars } from '@/hooks/useAvatars';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
 import type { AnimationProject } from '@/services/api';
+import { toastSuccess, toastError } from '@/utils/toast';
+import Modal from '@/components/ui/Modal';
 
 const createAnimationSchema = z.object({
   source_avatar_id: z.string().min(1, 'Выберите аватар'),
@@ -34,6 +36,7 @@ function AnimationPage() {
   
   const [showCreateForm, setShowCreateForm] = useState(!!preselectedAvatarId);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [deleteAnimationId, setDeleteAnimationId] = useState<string | null>(null);
 
   // Debug: отслеживаем изменения showCreateForm
   useEffect(() => {
@@ -123,15 +126,20 @@ function AnimationPage() {
     }
   };
 
-  const handleDeleteAnimation = async (animationId: string) => {
-    if (confirm('Вы уверены, что хотите удалить эту анимацию?')) {
-      try {
-        await deleteAnimationMutation.mutateAsync(animationId);
-        setSuccessMessage('Анимация удалена');
-        refetch();
-      } catch (error) {
-        console.error('Delete animation error:', error);
-      }
+  const handleDeleteAnimation = (animationId: string) => {
+    setDeleteAnimationId(animationId);
+  };
+
+  const confirmDeleteAnimation = async () => {
+    if (!deleteAnimationId) return;
+    try {
+      await deleteAnimationMutation.mutateAsync(deleteAnimationId);
+      setSuccessMessage('Анимация удалена');
+      refetch();
+    } catch (error) {
+      console.error('Delete animation error:', error);
+    } finally {
+      setDeleteAnimationId(null);
     }
   };
 
@@ -240,10 +248,10 @@ function AnimationPage() {
                        });
                      }
                      
-                     alert(`Аватары: ${response.status}\nВсего: ${data.total}\nСтатусы: ${data.avatars?.map((a: any) => a.status).join(', ')}`);
+                     toastSuccess(`Аватары загружены: ${data.total}`);
                   } catch (error) {
                     console.error('API Test Error:', error);
-                    alert(`Ошибка: ${error}`);
+                    toastError(error as unknown);
                   }
                 }}
               >
@@ -277,10 +285,10 @@ function AnimationPage() {
                        });
                      }
                      
-                     alert(`Анимации: ${response.status}\nВсего: ${Array.isArray(data) ? data.length : 0}\nСтатусы: ${Array.isArray(data) ? data.map((a: any) => a.status).join(', ') : 'N/A'}`);
+                     toastSuccess(`Анимации загружены: ${Array.isArray(data) ? data.length : 0}`);
                   } catch (error) {
                     console.error('API Test Error:', error);
-                    alert(`Ошибка: ${error}`);
+                    toastError(error as unknown);
                   }
                 }}
               >
@@ -300,10 +308,10 @@ function AnimationPage() {
                     });
                     const data = await response.json();
                     console.log('API Test - Auth:', response.status, data);
-                    alert(`Профиль: ${response.status} - ${JSON.stringify(data).substring(0, 100)}`);
+                    toastSuccess('Профиль загружен');
                   } catch (error) {
                     console.error('API Test Error:', error);
-                    alert(`Ошибка: ${error}`);
+                    toastError(error as unknown);
                   }
                 }}
               >
@@ -499,9 +507,9 @@ function AnimationPage() {
                       try {
                         const response = await fetch('/api/v1/health');
                         const data = await response.json();
-                        alert(`Backend доступен: ${data.status} v${data.version}`);
+                        toastSuccess(`Backend доступен: v${data.version}`);
                                              } catch (error) {
-                         alert(`Ошибка подключения к backend: ${error instanceof Error ? error.message : String(error)}`);
+                         toastError(error as unknown);
                       }
                     }}
                     variant="outline"
@@ -651,6 +659,17 @@ function AnimationPage() {
             </form>
           </Card>
         )}
+
+        {/* Delete animation modal */}
+        <Modal
+          open={Boolean(deleteAnimationId)}
+          title="Удалить анимацию?"
+          description="Вы уверены, что хотите удалить эту анимацию? Это действие нельзя отменить."
+          confirmText="Удалить"
+          cancelText="Отмена"
+          onConfirm={confirmDeleteAnimation}
+          onClose={() => setDeleteAnimationId(null)}
+        />
 
         {/* Animations List */}
                   {animations && animations.length > 0 ? (

@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import type { AnimationProject as AnimationProjectType } from '@/services/api';
 import { Header } from '@/components/layout/Header';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
+import Modal from '@/components/ui/Modal';
 
 function AnimationStudioPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -19,25 +20,29 @@ function AnimationStudioPage() {
   const navigate = useNavigate();
   const { data: user } = useCurrentUser();
   const logoutMutation = useLogout();
+  const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
+  const [deleteProjectName, setDeleteProjectName] = useState<string>('');
   
   // Apply filter
   const filteredProjects = avatarFilter === 'all'
     ? projects
     : projects.filter(p => p.source_avatar_id === avatarFilter);
 
-  const handleDeleteProject = async (projectId: string, projectName: string) => {
-    const confirmed = window.confirm(
-      `Вы уверены, что хотите удалить проект "${projectName}"?\n\nЭто действие нельзя отменить. Все сегменты и видео будут удалены.`
-    );
-    
-    if (confirmed) {
-      try {
-        await deleteProjectMutation.mutateAsync(projectId);
-        refetch();
-      } catch (error) {
-        console.error('Error deleting project:', error);
-        alert('Ошибка при удалении проекта. Попробуйте снова.');
-      }
+  const openDeleteModal = (projectId: string, projectName: string) => {
+    setDeleteProjectId(projectId);
+    setDeleteProjectName(projectName);
+  };
+
+  const confirmDeleteProject = async () => {
+    if (!deleteProjectId) return;
+    try {
+      await deleteProjectMutation.mutateAsync(deleteProjectId);
+      refetch();
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      // TODO: Implement global toast; temporarily use console.
+    } finally {
+      setDeleteProjectId(null);
     }
   };
 
@@ -133,7 +138,7 @@ function AnimationStudioPage() {
                 key={project.id}
                 project={project}
                 onOpen={() => navigate(`/studio/${project.id}`)}
-                onDelete={() => handleDeleteProject(project.id, project.name)}
+                onDelete={() => openDeleteModal(project.id, project.name)}
               />
             ))}
           </div>
@@ -166,6 +171,16 @@ function AnimationStudioPage() {
           </Card>
         </div>
       </div>
+      {/* Delete Confirm Modal */}
+      <Modal
+        open={Boolean(deleteProjectId)}
+        title="Удалить проект?"
+        description={`Вы уверены, что хотите удалить проект "${deleteProjectName}"? Это действие нельзя отменить.`}
+        confirmText="Удалить"
+        cancelText="Отмена"
+        onConfirm={confirmDeleteProject}
+        onClose={() => setDeleteProjectId(null)}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { toastSuccess } from '@/utils/toast';
 
 export function DebugTokenInfo() {
   const [showDebug, setShowDebug] = useState(false);
@@ -24,7 +25,7 @@ export function DebugTokenInfo() {
   const clearTokens = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    alert('Токены очищены');
+    toastSuccess('Токены очищены');
     window.location.reload();
   };
 

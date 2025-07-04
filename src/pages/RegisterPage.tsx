@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useRegister } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
+import { toastSuccess } from '@/utils/toast';
 import logoSrc from '@/assets/logo.svg';
 
 const registerSchema = z.object({
@@ -43,7 +44,7 @@ function RegisterPage() {
       await registerMutation.mutateAsync(registerData);
       
       // Регистрация успешна, но нужно войти в систему
-      alert('Регистрация прошла успешно! Теперь войдите в свой аккаунт.');
+      toastSuccess('Регистрация прошла успешно! Теперь войдите в свой аккаунт.');
       navigate('/login');
     } catch (error) {
       console.error('Registration error:', error);

@@ -39,20 +39,14 @@ function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Floating background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 right-20 w-96 h-96 bg-gradient-to-r from-primary-light/10 to-transparent rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-10 w-80 h-80 bg-gradient-to-r from-secondary-light/10 to-transparent rounded-full blur-3xl animate-pulse delay-2000"></div>
-      </div>
-      
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
       <Header 
         user={user} 
         onLogout={() => logoutMutation.mutate()} 
         isLoggingOut={logoutMutation.isPending} 
       />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Backend Status */}
         <div className="mb-6">
           <BackendStatus />
@@ -60,24 +54,23 @@ function DashboardPage() {
 
         {/* Welcome Section */}
         <div className="mb-12 text-center">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white/80 text-sm font-medium mb-6">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-gray-100 text-black text-sm font-medium mb-6">
             🏠 Панель управления
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 gradient-text-animated">
+          <h1 className="text-4xl md:text-6xl font-black mb-6 gradient-text-animated">
             Добро пожаловать, {user?.username}! 👋
           </h1>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
             Управляйте своими аватарами и анимациями из единого центра
           </p>
         </div>
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
-          <Card className="p-8 premium-card text-white border-0 cursor-pointer interactive-element group relative overflow-hidden"
+          <Card className="p-8 bg-white rounded-xl shadow-card cursor-pointer overflow-hidden group transition-shadow duration-300 hover:shadow-lg"
                 onClick={handleCreateAvatar}>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-light/20 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-light to-primary rounded-2xl flex items-center justify-center shadow-2xl group-hover:rotate-12 transition-transform duration-500 neon-pink">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary-light to-primary rounded-lg flex items-center justify-center shadow group-hover:scale-105 transition-transform duration-300">
                 <span className="text-3xl">🎨</span>
               </div>
               <div className="relative z-10">
@@ -87,11 +80,10 @@ function DashboardPage() {
             </div>
           </Card>
 
-          <Card className="p-8 premium-card text-white border-0 cursor-pointer interactive-element group relative overflow-hidden"
+          <Card className="p-8 bg-white rounded-xl shadow-card cursor-pointer overflow-hidden group transition-shadow duration-300 hover:shadow-lg"
                 onClick={handleCreateAnimation}>
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary-light/20 via-secondary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-secondary-light to-secondary rounded-2xl flex items-center justify-center shadow-2xl group-hover:rotate-12 transition-transform duration-500 neon-blue">
+              <div className="w-16 h-16 bg-gradient-to-br from-secondary-light to-secondary rounded-lg flex items-center justify-center shadow group-hover:scale-105 transition-transform duration-300">
                 <span className="text-3xl">🎬</span>
               </div>
               <div className="relative z-10">
@@ -102,47 +94,47 @@ function DashboardPage() {
           </Card>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards - unified design */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <Card className="p-8 glass-frosted interactive-element group">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary-light to-primary rounded-2xl flex items-center justify-center shadow-2xl group-hover:rotate-12 transition-transform duration-500">
+          <Card className="p-8 bg-gray-50 border border-gray-200 rounded-xl shadow-card group relative hover:shadow-lg">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary-light to-primary rounded-2xl flex items-center justify-center shadow">
                 <span className="text-3xl text-white">👤</span>
               </div>
-              <div>
-                <p className="text-sm text-white/70 uppercase tracking-wide font-medium">Всего аватаров</p>
-                <p className="text-3xl font-bold text-white gradient-text-animated">
-                  {avatarsLoading ? '...' : avatars?.avatars?.length || 0}
-                </p>
-              </div>
+              <h3 className="text-5xl font-bold text-black">
+                {avatarsLoading ? '...' : avatars?.avatars?.length || 0}
+              </h3>
+              <p className="text-sm text-gray-600 uppercase tracking-wide font-medium">Всего аватаров</p>
             </div>
+            <Link to="/avatars" className="absolute bottom-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary-light font-medium">
+              Посмотреть все
+            </Link>
           </Card>
 
-          <Card className="p-8 glass-frosted interactive-element group">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-secondary-light to-secondary rounded-2xl flex items-center justify-center shadow-2xl group-hover:rotate-12 transition-transform duration-500">
+          <Card className="p-8 bg-gray-50 border border-gray-200 rounded-xl shadow-card group relative hover:shadow-lg">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-secondary-light to-secondary rounded-2xl flex items-center justify-center shadow">
                 <span className="text-3xl text-white">🎭</span>
               </div>
-              <div>
-                <p className="text-sm text-white/70 uppercase tracking-wide font-medium">Анимации</p>
-                <p className="text-3xl font-bold text-white gradient-text-animated">
-                  {animationsLoading ? '...' : animations?.length || 0}
-                </p>
-              </div>
+              <h3 className="text-5xl font-bold text-black">
+                {animationsLoading ? '...' : animations?.length || 0}
+              </h3>
+              <p className="text-sm text-gray-600 uppercase tracking-wide font-medium">Анимации</p>
             </div>
+            <Link to="/animations" className="absolute bottom-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary-light font-medium">
+              Посмотреть все
+            </Link>
           </Card>
 
-          <Card className="p-8 glass-frosted interactive-element group">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-2xl group-hover:rotate-12 transition-transform duration-500">
+          <Card className="p-8 bg-gray-50 border border-gray-200 rounded-xl shadow-card group relative hover:shadow-lg">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow">
                 <span className="text-3xl text-white">📊</span>
               </div>
-              <div>
-                <p className="text-sm text-white/70 uppercase tracking-wide font-medium">Всего проектов</p>
-                <p className="text-3xl font-bold text-white gradient-text-animated">
-                  {(avatars?.avatars?.length || 0) + (animations?.length || 0)}
-                </p>
-              </div>
+              <h3 className="text-5xl font-bold text-black">
+                {(avatars?.avatars?.length || 0) + (animations?.length || 0)}
+              </h3>
+              <p className="text-sm text-gray-600 uppercase tracking-wide font-medium">Всего проектов</p>
             </div>
           </Card>
         </div>
@@ -152,10 +144,10 @@ function DashboardPage() {
           {/* Recent Avatars */}
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold text-white">Последние аватары</h2>
+              <h2 className="text-3xl font-bold text-black">Последние аватары</h2>
               <Link 
                 to="/avatars" 
-                className="text-primary-light hover:text-white font-medium transition-colors duration-300 hover:scale-105 inline-flex items-center space-x-2 group"
+                className="text-primary hover:text-secondary font-medium transition-colors duration-300 inline-flex items-center space-x-2 group"
               >
                 <span>Смотреть все</span>
                 <span className="transform group-hover:translate-x-1 transition-transform duration-300">→</span>
@@ -164,9 +156,9 @@ function DashboardPage() {
 
             <div className="space-y-4">
               {avatarsLoading ? (
-                <Card className="glass-frosted text-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-light mx-auto"></div>
-                  <p className="text-white/70 mt-4 text-lg">Загрузка аватаров...</p>
+                <Card className="p-12 bg-gray-50 border border-gray-200 rounded-xl shadow-card text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                  <p className="text-gray-700 mt-4 text-lg">Загрузка аватаров...</p>
                 </Card>
               ) : recentAvatars.length > 0 ? (
                 recentAvatars.map((avatar) => (
@@ -179,16 +171,16 @@ function DashboardPage() {
                   />
                 ))
               ) : (
-                <Card className="p-12 text-center glass-frosted group hover:scale-105 transition-transform duration-300">
+                <Card className="p-12 bg-white border border-gray-200 rounded-xl shadow-card group hover:shadow-lg transition-shadow duration-300 text-center">
                   <div className="w-20 h-20 bg-gradient-to-br from-primary-light to-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:rotate-12 transition-transform duration-500">
                     <span className="text-3xl text-white">🎨</span>
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">Нет аватаров</h3>
-                  <p className="text-white/80 mb-6 leading-relaxed">Создайте своего первого персонажа</p>
+                  <h3 className="text-2xl font-bold text-black mb-4">Нет аватаров</h3>
+                  <p className="text-gray-700 mb-6 leading-relaxed">Создайте своего первого персонажа</p>
                   <Button 
                     onClick={handleCreateAvatar}
                     size="lg"
-                    className="bg-gradient-to-br from-primary-light via-primary to-secondary-light text-white hover:opacity-90 btn-glow hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden group"
+                    className="bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white px-6 py-3 rounded-xl hover:opacity-90 transition transform-gpu hover:scale-105 shadow-lg"
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
                     <span className="relative z-10">
@@ -203,10 +195,10 @@ function DashboardPage() {
           {/* Recent Animations */}
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold text-white">Последние анимации</h2>
+              <h2 className="text-3xl font-bold text-black">Последние анимации</h2>
               <Link 
                 to="/animations" 
-                className="text-primary-light hover:text-white font-medium transition-colors duration-300 hover:scale-105 inline-flex items-center space-x-2 group"
+                className="text-primary hover:text-secondary font-medium transition-colors duration-300 inline-flex items-center space-x-2 group"
               >
                 <span>Смотреть все</span>
                 <span className="transform group-hover:translate-x-1 transition-transform duration-300">→</span>
@@ -216,12 +208,12 @@ function DashboardPage() {
             <div className="space-y-4">
               {animationsLoading ? (
                 <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-                  <p className="text-gray-500 mt-2">Загрузка анимаций...</p>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                  <p className="text-gray-700 mt-2">Загрузка анимаций...</p>
                 </div>
               ) : recentAnimations.length > 0 ? (
                 recentAnimations.map((animation: any) => (
-                  <Card key={animation.id} className="p-4 bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-shadow">
+                  <Card key={animation.id} className="p-4 bg-white rounded-xl shadow-card hover:shadow-lg transition-shadow">
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                         <span className="text-xl">🎬</span>
@@ -253,15 +245,15 @@ function DashboardPage() {
                   </Card>
                 ))
               ) : (
-                <Card className="p-8 text-center bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+                <Card className="p-8 bg-gray-50 border border-gray-200 rounded-xl shadow-card text-center">
                   <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-2xl">🎬</span>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Нет анимаций</h3>
-                  <p className="text-gray-600 mb-4">Создайте свою первую анимацию</p>
+                  <h3 className="text-lg font-medium text-black mb-2">Нет анимаций</h3>
+                  <p className="text-gray-700 mb-4">Создайте свою первую анимацию</p>
                   <Button 
                     onClick={handleCreateAnimation}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                    className="bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white px-6 py-3 rounded-xl hover:opacity-90 transition transform-gpu hover:scale-105 shadow-lg"
                   >
                     Создать анимацию
                   </Button>

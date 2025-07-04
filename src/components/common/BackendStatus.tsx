@@ -46,10 +46,10 @@ export default function BackendStatus({ onStatusChange }: BackendStatusProps) {
 
   if (isOnline === null) {
     return (
-      <Card className="p-4 bg-gray-50 border-gray-200">
+      <Card className="p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-card">
         <div className="flex items-center space-x-3">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <span className="text-gray-700">Проверка подключения к серверу...</span>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand"></div>
+          <span className="text-gray-800">Проверка подключения к серверу...</span>
         </div>
       </Card>
     );
@@ -57,20 +57,19 @@ export default function BackendStatus({ onStatusChange }: BackendStatusProps) {
 
   if (isOnline) {
     return (
-      <Card className="p-4 bg-green-50 border-green-200">
+      <Card className="p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-card">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+            <div className="w-6 h-6 bg-brand rounded-full flex items-center justify-center">
               <span className="text-white text-xs">✓</span>
             </div>
-            <span className="text-green-800">Сервер доступен</span>
+            <span className="text-gray-800 font-medium">Сервер доступен</span>
           </div>
           <Button
             onClick={checkBackendStatus}
             disabled={isChecking}
-            variant="outline"
-            className="text-green-600 border-green-300 text-sm"
             size="sm"
+            className="bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white px-3 py-1 rounded-md font-medium shadow hover:opacity-90 transition"
           >
             {isChecking ? 'Проверка...' : 'Обновить'}
           </Button>
@@ -80,19 +79,19 @@ export default function BackendStatus({ onStatusChange }: BackendStatusProps) {
   }
 
   return (
-    <Card className="p-4 bg-red-50 border-red-200">
+    <Card className="p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-card">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
             <span className="text-white text-xs">!</span>
           </div>
           <div>
-            <p className="text-red-800 font-medium">Сервер недоступен</p>
-            <p className="text-red-600 text-sm">
+            <p className="text-gray-800 font-medium">Сервер недоступен</p>
+            <p className="text-gray-600 text-sm">
               Backend сервер не отвечает на localhost:8000
             </p>
             {lastCheck && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-gray-500 text-xs mt-1">
                 Последняя проверка: {lastCheck.toLocaleTimeString()}
               </p>
             )}
@@ -111,7 +110,7 @@ export default function BackendStatus({ onStatusChange }: BackendStatusProps) {
         </div>
       </div>
       
-      <div className="mt-3 p-3 bg-red-100 rounded-lg text-sm">
+      <div className="mt-3 p-3 bg-gray-100 rounded-lg text-sm">
         <p className="text-red-800 font-medium mb-2">Возможные решения:</p>
         <ul className="text-red-700 space-y-1 text-xs">
           <li>• Запустите backend сервер ToonzyAI на порту 8000</li>
