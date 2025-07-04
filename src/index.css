@@ -3,23 +3,55 @@
 
 /* Base typography */
 @layer base {
-  h1, .heading-1 { @apply text-5xl md:text-6xl font-bold text-gray-900; }
-  h2, .heading-2 { @apply text-4xl md:text-5xl font-bold text-gray-900; }
-  h3, .heading-3 { @apply text-3xl md:text-4xl font-semibold text-gray-900; }
-  h4, .heading-4 { @apply text-2xl font-semibold text-gray-800; }
-  p { @apply text-base text-gray-700; }
+  h1, .heading-1 { @apply text-6xl md:text-8xl font-black text-black; }
+  h2, .heading-2 { @apply text-5xl md:text-7xl font-black text-black; }
+  h3, .heading-3 { @apply text-4xl md:text-6xl font-black text-black; }
+  h4, .heading-4 { @apply text-3xl font-black text-black; }
+  p { @apply text-lg font-semibold text-black; }
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: #FFF8F0;
+  font-weight: 600;
+  background-color: #ffffff;
   position: relative;
   overflow-x: hidden;
-  color: #111827; /* Dark text */
+  color: #000000;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Strong focus styles */
+*:focus {
+  outline: 4px solid #000000 !important;
+  outline-offset: 2px !important;
+}
+
+/* High contrast selections */
+::selection {
+  background-color: #000000;
+  color: #ffffff;
 }
 
 /* Disable animated gradient particles for cleaner background */
 body::before { display: none; }
+
+/* Pulse slow animation */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 
 /* Enhanced glass effect utility classes */
 .glass-card {

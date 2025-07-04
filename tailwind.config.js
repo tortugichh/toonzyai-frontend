@@ -1,3 +1,5 @@
+// Tailwind CSS v4 clean configuration for ToonzyAI
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     './index.html',
@@ -5,69 +7,56 @@ module.exports = {
   ],
   theme: {
     extend: {
+      /* Brand palette */
       colors: {
-        primary: {
-          light: '#FF4ECF', // Shelby pink
-          DEFAULT: '#B600E0', // Shelby purple
-          dark: '#7D00B5',
-        },
-        secondary: {
-          light: '#00FFD1', // Shelby aqua
-          DEFAULT: '#00D492', // Shelby green
-          dark: '#00A16B',
-          fox: {
-            light: '#FFA657', // Fox light
-            DEFAULT: '#FF8800', // Fox orange
-            dark: '#CC6E00',   // Fox dark
-          },
-        },
         brand: {
-          light: '#F9E6C9',   // Soft peach (Dribbble start)
-          DEFAULT: '#9C4DFF', // Vibrant purple (Dribbble mid)
-          dark: '#0A001E',    // Deep violet/near-black (Dribbble end)
+          light: '#6366F1',   // Indigo 500
+          DEFAULT: '#4338CA', // Indigo 600
+          dark: '#312E81',    // Indigo 800
+        },
+        accent: {
+          light: '#F59E0B',   // Amber 500
+          DEFAULT: '#D97706', // Amber 600
+          dark: '#92400E',    // Amber 800
         },
         neutral: {
-          background: '#FFF8F0',
-          muted: '#E0E0E0',
+          50:  '#FFFFFF',
+          100: '#F5F5F5',
+          200: '#E5E5E5',
+          300: '#D4D4D4',
+          400: '#A3A3A3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#262626',
+          900: '#171717',
         },
       },
       fontFamily: {
-        sans: ['"GT Planar"', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
+      /* Simple scale for headings */
       fontSize: {
-        'display-1': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }], // 72px
-        'display-2': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }], // 60px
-        'heading-1': ['3rem', { lineHeight: '1.15', letterSpacing: '-0.01em' }], // 48px
-        'heading-2': ['2.25rem', { lineHeight: '1.2' }], // 36px
-        'heading-3': ['1.875rem', { lineHeight: '1.25' }], // 30px
-        'heading-4': ['1.5rem', { lineHeight: '1.3' }], // 24px
-        'heading-5': ['1.25rem', { lineHeight: '1.35' }], // 20px
+        'h1': ['3.75rem', { lineHeight: '1.1', fontWeight: '800' }], // 60px
+        'h2': ['3rem',    { lineHeight: '1.15', fontWeight: '800' }], // 48px
+        'h3': ['2.25rem', { lineHeight: '1.25', fontWeight: '700' }], // 36px
+        'h4': ['1.875rem',{ lineHeight: '1.3',  fontWeight: '700' }], // 30px
         'body-lg': ['1.125rem', { lineHeight: '1.6' }], // 18px
-        'body-base': ['1rem', { lineHeight: '1.7' }], // 16px
-        'body-sm': ['0.875rem', { lineHeight: '1.6' }], // 14px
       },
-      gradientColorStops: {
-        'shelby-start': '#FF4ECF',
-        'shelby-mid': '#9C4DFF',
-        'shelby-end': '#00FFD1',
-        'brand-start': '#F9E6C9',
-        'brand-mid': '#9C4DFF',
-        'brand-end': '#0A001E',
-      },
-      backgroundImage: {
-        'radial-brand': 'radial-gradient(circle at top left, var(--tw-gradient-stops))',
-      },
-      borderRadius: {
-        panel: '2rem',
-      },
+      /* Simple box-shadow helpers */
       boxShadow: {
-        'panel-md': '0 10px 40px rgba(0, 0, 0, 0.4)',
+        card: '0 6px 16px rgba(0,0,0,0.08)',
+        btn:  '0 3px 8px rgba(0,0,0,0.15)',
+      },
+      /* Gradient animation */
+      backgroundImage: {
+        'brand-gradient': 'linear-gradient(90deg, #6366F1 0%, #4338CA 50%, #6366F1 100%)',
       },
       animation: {
-        'gradient-xy': 'gradientXY 8s ease infinite',
+        'gradient-x': 'gradient-x 8s ease infinite',
       },
       keyframes: {
-        gradientXY: {
+        'gradient-x': {
           '0%, 100%': { 'background-position': '0% 50%' },
           '50%': { 'background-position': '100% 50%' },
         },
