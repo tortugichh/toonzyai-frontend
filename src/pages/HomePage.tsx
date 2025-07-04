@@ -1,223 +1,138 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import { useRef } from 'react';
+import logoSrc from '@/assets/logo.svg';
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const featuresRef = useRef<HTMLElement>(null);
 
   const scrollToFeatures = () => {
-    const featuresSection = document.getElementById('features')
-    if (featuresSection) {
-      featuresSection.scrollIntoView({ behavior: 'smooth' })
+    if (featuresRef.current) {
+      featuresRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }
+  };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen bg-neutral-background">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div 
-              className="flex items-center cursor-pointer" 
-              onClick={() => window.location.reload()}
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center mr-3">
-                <span className="text-white font-bold text-lg">T</span>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                ToonzyAI
-              </span>
-            </div>
-            
-            <div className="flex space-x-4">
-              <Button 
-                variant="ghost" 
-                className="text-gray-700 hover:text-purple-600"
-                onClick={() => navigate('/login')}
-              >
-                Войти
-              </Button>
-              <Button 
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                onClick={() => navigate('/register')}
-              >
-                Регистрация
-              </Button>
-            </div>
+      <header className="sticky top-0 z-20 bg-gradient-to-r from-brand-start via-brand-mid to-brand-end shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center cursor-pointer" onClick={() => window.location.reload()}>
+            <img src={logoSrc} alt="ToonzyAI logo" className="w-8 h-8 mr-2" />
+            <span className="text-2xl font-bold text-white">ToonzyAI</span>
+          </div>
+          <div className="flex space-x-4">
+            <Button variant="ghost" className="text-white hover:text-brand-light transition-colors" onClick={() => navigate('/login')}>
+              Войти
+            </Button>
+            <Button className="bg-gradient-to-br from-brand-light via-brand-mid to-brand-end text-white px-4 py-2 rounded-full hover:opacity-90 transition" onClick={() => navigate('/register')}>
+              Регистрация
+            </Button>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative px-4 sm:px-6 lg:px-8 py-24">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl font-bold mb-8">
-            <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-              Создавайте аватары
+      <section className="relative flex flex-col lg:flex-row items-center justify-between min-h-[80vh] px-8 py-16 bg-gradient-to-r from-brand-start via-brand-mid to-brand-end animate-gradient-xy text-white overflow-hidden">
+        <div className="w-full lg:w-1/2 space-y-6">
+          <h1 className="text-4xl md:text-6xl font-bold">Unlock the Magic of ToonzyAI</h1>
+          <p className="text-lg md:text-xl text-white/80">Создавайте анимированные аватары за один клик с помощью ИИ.</p>
+          <Button size="lg" className="bg-black bg-opacity-30 backdrop-blur-sm px-6 py-4 rounded-full hover:bg-opacity-50 transition" onClick={() => navigate('/register')}>
+            Начать прямо сейчас ➔
+          </Button>
+        </div>
+        <div className="w-full lg:w-1/2 flex justify-center items-center mt-12 lg:mt-0">
+          <div className="relative w-64 h-64 spin-slow">
+            <span className="absolute inset-0 w-full h-full border border-white opacity-20 rounded-full"></span>
+            <span className="absolute inset-[12.5%] w-[75%] h-[75%] border border-white opacity-10 rounded-full"></span>
+            <span className="absolute top-0 left-1/2 transform -translate-x-1/2">
+              <span className="block w-12 h-12 bg-white rounded-full opacity-90 shadow-md"></span>
             </span>
-            <br />
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              будущего 🚀
+            <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
+              <span className="block w-10 h-10 bg-white opacity-80 rounded-full shadow-md"></span>
             </span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            Превратите ваши идеи в потрясающие анимированные аватары с помощью 
-            искусственного интеллекта. Просто опишите — мы создадим!
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Button 
-              size="lg" 
-              className="text-lg px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white transform hover:scale-105 transition-all duration-200"
-              onClick={() => navigate('/register')}
-            >
-              Начать создание бесплатно ✨
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="text-lg px-8 py-4 border-purple-300 text-purple-600 hover:bg-purple-50 transform hover:scale-105 transition-all duration-200"
-              onClick={scrollToFeatures}
-            >
-              Посмотреть примеры 👀
-            </Button>
-          </div>
-          
-          {/* Scroll Indicator */}
-          <div 
-            className="animate-bounce cursor-pointer mx-auto w-6 h-6"
-            onClick={scrollToFeatures}
-          >
-            <div className="w-6 h-6 border-2 border-purple-400 rounded-full flex items-center justify-center">
-              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-            </div>
+            <span className="absolute top-1/2 left-0 transform -translate-y-1/2">
+              <span className="block w-8 h-8 bg-white opacity-80 rounded-full shadow-md"></span>
+            </span>
+            <span className="absolute top-1/2 right-0 transform -translate-y-1/2">
+              <span className="block w-8 h-8 bg-white opacity-80 rounded-full shadow-md"></span>
+            </span>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="px-4 sm:px-6 lg:px-8 py-24 bg-white/50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Возможности платформы
-            </span>
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Feature Card 1 */}
-            <Card 
-              className="p-8 border-0 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer group"
-              onClick={() => navigate('/register')}
-            >
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
-                  <span className="text-2xl">🎨</span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Создание аватаров</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Опишите своего персонажа текстом, и ИИ создаст уникального аватара, 
-                  идеально соответствующего вашему видению.
-                </p>
-              </div>
-            </Card>
+      <section ref={featuresRef} className="py-24 px-8 bg-gradient-to-r from-brand-light via-brand-mid to-brand-end animate-gradient-xy text-white">
+        <div className="max-w-7xl mx-auto text-center mb-20">
+          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 text-white font-medium mb-6">⚡ Возможности платформы</div>
+          <h2 className="text-4xl md:text-5xl font-bold mb-8">Безграничные возможности</h2>
+          <p className="text-xl leading-relaxed max-w-4xl mx-auto">Наша платформа предоставляет все инструменты для создания профессиональных аватаров</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {['🎨', '⚡', '🎬'].map((icon, idx) => (
+            <div key={idx} className="p-8 bg-white/20 backdrop-blur-md rounded-panel shadow-panel-md hover:scale-105 transition transform text-center">
+              <div className="w-20 h-20 mx-auto mb-6 bg-white/10 rounded-2xl flex items-center justify-center text-3xl">{icon}</div>
+              <h3 className="text-2xl font-bold mb-3">Feature {idx+1}</h3>
+              <p className="text-white/80">Описание возможности {idx+1}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-            {/* Feature Card 2 */}
-            <Card 
-              className="p-8 border-0 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer group"
-              onClick={() => navigate('/register')}
-            >
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
-                  <span className="text-2xl">🎬</span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Анимация персонажей</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Оживите ваших аватаров с помощью продвинутых алгоритмов анимации. 
-                  Создавайте говорящих персонажей из статичных изображений.
-                </p>
-              </div>
-            </Card>
+      {/* How It Works Section */}
+      <section className="py-24 px-8 bg-neutral-muted">
+        <div className="max-w-6xl mx-auto text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">Как это работает?</h2>
+          <p className="text-lg text-neutral-background max-w-3xl mx-auto">Всего три простых шага — и ваш уникальный анимированный аватар готов!</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {[1,2,3].map((step,i) => (
+            <div key={i} className="p-8 bg-white/20 backdrop-blur-md rounded-panel shadow-panel-md transform hover:-translate-y-2 hover:shadow-lg transition-all duration-500">
+              <div className="w-16 h-16 mb-6 mx-auto bg-white/10 rounded-full flex items-center justify-center text-2xl font-bold text-white">{step}</div>
+              <h3 className="text-xl text-white font-semibold mb-3">Шаг {step}</h3>
+              <p className="text-white/80">Описание шага {step}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-            {/* Feature Card 3 */}
-            <Card 
-              className="p-8 border-0 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 cursor-pointer group"
-              onClick={() => navigate('/register')}
-            >
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:rotate-12 transition-transform duration-300">
-                  <span className="text-2xl">⚡</span>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Быстрая обработка</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Мощные серверы и оптимизированные алгоритмы обеспечивают 
-                  быструю генерацию высококачественных результатов.
-                </p>
-              </div>
-            </Card>
+      {/* Partners Section */}
+      <section className="py-16 px-8 bg-neutral-muted/50">
+        <div className="max-w-6xl mx-auto text-center space-y-4">
+          <p className="text-neutral-background text-lg">Нам доверяют разработчики и дизайнеры из ведущих компаний</p>
+          <div className="flex justify-center gap-12 text-4xl text-neutral-background">
+            <span>🚀</span><span>🎮</span><span>📺</span><span>🛍️</span>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="px-4 sm:px-6 lg:px-8 py-24 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
-            Готовы создать что-то невероятное? 🌟
-          </h2>
-          <p className="text-xl text-purple-100 mb-12">
-            Присоединяйтесь к тысячам пользователей, которые уже создают удивительные аватары
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="text-lg px-8 py-4 bg-white text-purple-600 hover:bg-gray-50 transform hover:scale-105 transition-all duration-200"
-              onClick={() => navigate('/register')}
-            >
-              Начать сейчас 🚀
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="text-lg px-8 py-4 border-white text-white hover:bg-white/10 transform hover:scale-105 transition-all duration-200"
-              onClick={() => alert('Функция "Связаться с нами" будет доступна в ближайшее время!')}
-            >
-              Связаться с нами 💬
-            </Button>
-          </div>
+      <section className="py-24 px-8 bg-gradient-to-r from-brand-start via-brand-mid to-brand-end animate-gradient-xy text-white">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
+          <h2 className="text-4xl md:text-5xl font-bold">Готовы начать?</h2>
+          <Button size="lg" className="px-10 py-4 bg-white text-brand-start font-semibold rounded-full shadow-lg hover:scale-105 transition">
+            Начать бесплатно 🚀
+          </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div 
-              className="flex items-center justify-center mb-6 cursor-pointer" 
-              onClick={scrollToTop}
-            >
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center mr-3">
-                <span className="text-white font-bold text-xl">T</span>
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                ToonzyAI
-              </span>
-            </div>
-            <p className="text-gray-400 mb-4">
-              Создавайте, анимируйте, вдохновляйте. Будущее цифрового контента уже здесь.
-            </p>
-            <p className="text-gray-500 text-sm">
-              © 2024 ToonzyAI. Все права защищены.
-            </p>
+      <footer className="py-12 px-8 bg-brand-dark text-white">
+        <div className="max-w-7xl mx-auto text-center space-y-4">
+          <div className="cursor-pointer flex items-center justify-center gap-2" onClick={scrollToTop}>
+            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">T</div>
+            <span className="text-xl font-bold">ToonzyAI</span>
           </div>
+          <p className="text-white/75">Создавайте, анимируйте, вдохновляйте.</p>
+          <p className="text-white/50 text-sm">© 2024 ToonzyAI. Все права защищены.</p>
         </div>
       </footer>
     </div>
   );
-} 
+}

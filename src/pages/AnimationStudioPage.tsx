@@ -45,14 +45,14 @@ function AnimationStudioPage() {
     return (
       <>
         <Header user={user} onLogout={logoutMutation.mutateAsync} isLoggingOut={logoutMutation.isPending} />
-        <CreateProject 
-          onProjectCreated={(project) => {
-            setShowCreateForm(false);
-            refetch();
-            navigate(`/studio/${project.id}`);
-          }}
-          onCancel={() => setShowCreateForm(false)}
-        />
+      <CreateProject 
+        onProjectCreated={(project) => {
+          setShowCreateForm(false);
+          refetch();
+          navigate(`/studio/${project.id}`);
+        }}
+        onCancel={() => setShowCreateForm(false)}
+      />
       </>
     );
   }
@@ -91,7 +91,7 @@ function AnimationStudioPage() {
               ))}
             </select>
           </div>
-
+          
           <Button 
             onClick={() => setShowCreateForm(true)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3"
@@ -264,7 +264,7 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
             )}
             <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(p.status)}`}>
               {getStatusText(p.status)}
-            </span>
+          </span>
           </div>
         </div>
 

@@ -1,0 +1,10 @@
+@layer utilities {
+  /* Reset text overrides to dark */
+  .text-white { @apply text-gray-900; }
+  .text-white\/90 { color: rgba(17,24,39,0.9); }
+  .text-white\/80 { color: rgba(17,24,39,0.8); }
+  .text-white\/70 { color: rgba(17,24,39,0.7); }
+  .text-white\/60 { color: rgba(17,24,39,0.6); }
+  /* Glass background tweaks for light theme */
+  .glass-card, .glass-frosted { backdrop-filter: blur(10px); background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.05); }
+} 

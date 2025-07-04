@@ -1,9 +1,200 @@
 @import "tailwindcss";
+@import "./overrides.css";
+
+/* Base typography */
+@layer base {
+  h1, .heading-1 { @apply text-5xl md:text-6xl font-bold text-gray-900; }
+  h2, .heading-2 { @apply text-4xl md:text-5xl font-bold text-gray-900; }
+  h3, .heading-3 { @apply text-3xl md:text-4xl font-semibold text-gray-900; }
+  h4, .heading-4 { @apply text-2xl font-semibold text-gray-800; }
+  p { @apply text-base text-gray-700; }
+}
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: linear-gradient(135deg, #FF4ECF 0%, #9C4DFF 50%, #00FFD1 100%);
-  color: #111827;
+  background-color: #FFF8F0;
+  position: relative;
+  overflow-x: hidden;
+  color: #111827; /* Dark text */
+}
+
+/* Disable animated gradient particles for cleaner background */
+body::before { display: none; }
+
+/* Enhanced glass effect utility classes */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.gradient-border {
+  position: relative;
+  background: linear-gradient(135deg, #FF4ECF, #9C4DFF, #00FFD1);
+  padding: 2px;
+  border-radius: 12px;
+}
+
+.gradient-border > * {
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+}
+
+/* Enhanced button effects */
+.btn-glow {
+  box-shadow: 
+    0 0 20px rgba(255, 78, 207, 0.3),
+    0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.btn-glow:hover {
+  box-shadow: 
+    0 0 30px rgba(255, 78, 207, 0.5),
+    0 8px 25px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Advanced glass effects */
+.glass-frosted {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.glass-frosted::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Premium card styles */
+.premium-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 166, 87, 0.1) 0%,
+    rgba(255, 136, 0, 0.1) 50%,
+    rgba(204, 110, 0, 0.1) 100%
+  );
+  backdrop-filter: blur(30px);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, #FFA657, #FF8800, #CC6E00);
+  border-radius: inherit;
+  z-index: -1;
+}
+
+/* Animated gradient text */
+.gradient-text-animated {
+  background: linear-gradient(
+    45deg,
+    #FFA657 0%,
+    #FF8800 25%,
+    #CC6E00 50%,
+    #FF8800 75%,
+    #FFA657 100%
+  );
+  background-size: 300% 300%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Holographic effect */
+.holographic {
+  background: linear-gradient(
+    45deg,
+    rgba(255, 78, 207, 0.8) 0%,
+    rgba(156, 77, 255, 0.8) 25%,
+    rgba(0, 255, 209, 0.8) 50%,
+    rgba(255, 78, 207, 0.8) 75%,
+    rgba(156, 77, 255, 0.8) 100%
+  );
+  background-size: 400% 400%;
+  animation: holographicShimmer 4s ease-in-out infinite;
+  position: relative;
+}
+
+@keyframes holographicShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Neon glow effects */
+.neon-pink {
+  box-shadow: 
+    0 0 20px rgba(255, 78, 207, 0.6),
+    0 0 40px rgba(255, 78, 207, 0.4),
+    0 0 60px rgba(255, 78, 207, 0.2);
+}
+
+.neon-blue {
+  box-shadow: 
+    0 0 20px rgba(0, 255, 209, 0.6),
+    0 0 40px rgba(0, 255, 209, 0.4),
+    0 0 60px rgba(0, 255, 209, 0.2);
+}
+
+/* Enhanced hover states */
+.interactive-element {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.interactive-element:hover {
+  transform: translateY(-4px) scale(1.02);
+  filter: brightness(1.1) saturate(1.2);
 }
 
 /* ToonzyAI Animation Studio Styles */
@@ -197,4 +388,31 @@ body {
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #a0aec0;
+}
+
+/* Add animated gradient background class */
+@keyframes bgGradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.bg-gradient-animated {
+  background: linear-gradient(45deg, #FFA657, #FF8800, #CC6E00, #FFA657);
+  background-size: 300% 300%;
+  animation: bgGradientShift 20s ease infinite;
+}
+
+@keyframes spinSlow {
+  to { transform: rotate(360deg); }
+}
+.spin-slow { animation: spinSlow 20s linear infinite; }
+.spin-slower { animation: spinSlow 40s linear infinite; }
+
+/* Scroll reveal fade-in-up animation */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.8s ease-out forwards;
 }

@@ -41,27 +41,32 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen relative flex items-center justify-center px-4 overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-32 left-1/2 transform -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-br from-primary-light/10 via-primary/10 to-transparent rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-[-200px] right-[-200px] w-[500px] h-[500px] bg-gradient-to-br from-secondary-light/10 via-secondary/10 to-transparent rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
+      <div className="w-full max-w-md relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2 mb-6">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">T</span>
+          <Link to="/" className="inline-flex items-center space-x-2 mb-6 group">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-light via-primary to-secondary-light rounded-xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300">
+              <span className="text-white font-bold text-xl">T</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-br from-primary-light via-primary to-secondary-light bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
               ToonzyAI
             </span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Добро пожаловать</h1>
-          <p className="text-gray-600">Войдите в свой аккаунт, чтобы продолжить</p>
+          <h1 className="text-4xl font-bold text-white mb-4 gradient-text-animated">Добро пожаловать</h1>
+          <p className="text-white/80">Войдите в свой аккаунт, чтобы продолжить</p>
         </div>
 
-        <Card className="p-8 shadow-xl border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="p-10 glass-frosted interactive-element">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Username Field */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="username" className="block text-sm font-medium text-white/80 mb-2">
                 Имя пользователя
               </label>
               <Input
@@ -69,7 +74,7 @@ function LoginPage() {
                 type="text"
                 placeholder="username"
                 {...register('username')}
-                className={`w-full ${errors.username ? 'border-red-500 focus:border-red-500' : ''}`}
+                className={`w-full bg-white/10 backdrop-blur-md text-white placeholder:text-white/60 ${errors.username ? 'border-red-500 focus:border-red-500' : ''}`}
               />
               {errors.username && (
                 <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
@@ -78,7 +83,7 @@ function LoginPage() {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-white/80 mb-2">
                 Пароль
               </label>
               <div className="relative">
@@ -87,12 +92,12 @@ function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Введите пароль"
                   {...register('password')}
-                  className={`w-full pr-10 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
+                  className={`w-full pr-10 bg-white/10 backdrop-blur-md text-white placeholder:text-white/60 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/60 hover:text-white"
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +132,8 @@ function LoginPage() {
             <Button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 text-lg font-medium"
+              size="lg"
+              className="w-full bg-gradient-to-br from-primary-light via-primary to-secondary-light text-white hover:opacity-90 btn-glow hover:shadow-2xl transition-all duration-300 relative overflow-hidden group py-4 text-xl font-semibold"
             >
               {loginMutation.isPending ? (
                 <div className="flex items-center justify-center space-x-2">
@@ -147,18 +153,18 @@ function LoginPage() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">или</span>
+                <span className="px-2 bg-white/10 backdrop-blur-xl text-white/80">или</span>
               </div>
             </div>
           </div>
 
           {/* Register Link */}
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-white/80">
               Нет аккаунта?{' '}
               <Link
                 to="/register"
-                className="text-purple-600 hover:text-purple-500 font-medium transition-colors"
+                className="text-primary-light hover:text-white font-medium transition-colors duration-300 hover:scale-105"
               >
                 Зарегистрироваться
               </Link>
@@ -170,7 +176,7 @@ function LoginPage() {
         <div className="mt-6 text-center">
           <Link
             to="/"
-            className="text-gray-500 hover:text-gray-700 text-sm transition-colors inline-flex items-center space-x-1"
+            className="text-white/70 hover:text-white inline-flex items-center space-x-1 transition-all duration-300 hover:scale-105"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
