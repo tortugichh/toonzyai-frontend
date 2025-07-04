@@ -24,38 +24,36 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center px-6 py-20 bg-white">
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 via-white to-blue-100 opacity-50"></div>
-        
         <div className="relative max-w-7xl mx-auto text-center">
           <div className="space-y-8">
             <div className="inline-flex items-center gap-2 px-8 py-4 bg-yellow-400 rounded-full text-black font-black text-sm uppercase tracking-wider">
               <span className="text-2xl">⚡</span>
               <span>РЕВОЛЮЦИЯ В СОЗДАНИИ АВАТАРОВ</span>
-            </div>
+              </div>
             
-            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-black leading-tight">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-black leading-tight">
               СОЗДАВАЙТЕ
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-purple-600 to-blue-600">
+              <span className="block text-brand">
                 АНИМИРОВАННЫЕ АВАТАРЫ
               </span>
             </h1>
             
-            <p className="text-2xl md:text-3xl text-black font-bold max-w-4xl mx-auto">
+            <p className="text-2xl md:text-2xl lg:text-3xl text-black font-bold max-w-4xl mx-auto">
               Используйте мощь ИИ для создания уникальных персонажей за считанные минуты
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-red-600 to-purple-600 text-white px-12 py-8 text-xl font-black shadow-2xl hover:scale-110 transform transition-all"
+              <Button
+                size="lg"
+                className="w-full sm:w-auto whitespace-normal px-6 sm:px-10 py-6 text-lg"
                 onClick={() => navigate('/register')}
               >
                 ПОПРОБОВАТЬ БЕСПЛАТНО →
               </Button>
-              <Button 
+              <Button
                 size="lg"
-                variant="outline" 
-                className="border-4 border-black text-black px-12 py-8 text-xl font-black hover:bg-black hover:text-white transition-all"
+                variant="outline"
+                className="w-full sm:w-auto whitespace-normal px-6 sm:px-10 py-6 text-lg"
                 onClick={scrollToFeatures}
               >
                 УЗНАТЬ БОЛЬШЕ
@@ -69,7 +67,7 @@ export default function HomePage() {
       <section ref={featuresRef} className="py-24 px-6 bg-gray-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-5xl md:text-7xl font-black text-black mb-8">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-black mb-8">
               ВОЗМОЖНОСТИ ПЛАТФОРМЫ
             </h2>
             <p className="text-2xl text-black font-bold max-w-3xl mx-auto">
@@ -77,7 +75,7 @@ export default function HomePage() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
                 icon: '🎨',
@@ -103,14 +101,14 @@ export default function HomePage() {
             ].map((feature, idx) => (
               <div 
                 key={idx} 
-                className={`relative p-10 bg-white rounded-none border-8 ${feature.border} shadow-2xl hover:scale-105 transition-transform`}
+                className="relative p-8 bg-white rounded-xl border border-neutral-200 shadow-card hover:shadow-none transition"
               >
-                <div className={`w-24 h-24 ${feature.bg} rounded-lg flex items-center justify-center text-5xl mb-8 shadow-xl`}>
+                <div className={`w-16 h-16 bg-neutral-100 rounded-lg flex items-center justify-center text-3xl mb-6`}>
                   {feature.icon}
                 </div>
                 <h3 className="text-3xl font-black text-black mb-4">{feature.title}</h3>
                 <p className="text-lg text-black font-semibold">{feature.description}</p>
-              </div>
+            </div>
             ))}
           </div>
         </div>
@@ -120,15 +118,15 @@ export default function HomePage() {
       <section className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-5xl md:text-7xl font-black text-black mb-6">
+            <h2 className="text-5xl md:text-6xl lg:text-7xl font-black text-black mb-6">
               КАК ЭТО РАБОТАЕТ?
-            </h2>
+          </h2>
             <p className="text-2xl text-black font-bold">
               Всего три простых шага!
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
             {[
               { step: 1, title: 'ОПИШИТЕ ИДЕЮ', icon: '💭', color: 'bg-yellow-400' },
               { step: 2, title: 'ИИ ГЕНЕРИРУЕТ', icon: '🤖', color: 'bg-green-400' },
@@ -138,30 +136,35 @@ export default function HomePage() {
                 <div className={`w-32 h-32 ${item.color} rounded-full flex items-center justify-center text-5xl mx-auto mb-6 shadow-2xl border-4 border-black`}>
                   {item.icon}
                 </div>
-                <div className="text-8xl font-black text-black mb-4">
+                <div className="text-6xl lg:text-8xl font-black text-black mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-2xl font-black text-black mb-3">{item.title}</h3>
               </div>
             ))}
-          </div>
-        </div>
+                </div>
+              </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-24 px-6 bg-gray-100">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl md:text-6xl font-black text-black mb-16">
-            НАМ ДОВЕРЯЮТ ТЫСЯЧИ
-          </h2>
-          <div className="flex flex-wrap justify-center gap-12">
-            {['STARTUP X', 'GAME HUB', 'STREAM FLOW', 'SHOPSTER'].map((company, idx) => (
-              <div 
+      {/* Animated Showcase Section */}
+      <section className="py-16 bg-neutral-100 overflow-hidden">
+        <div className="max-w-none">
+          <div className="marquee gap-24 px-6 text-4xl font-black whitespace-nowrap">
+            {Array.from({ length: 10 }).map((_, idx) => (
+              <span
                 key={idx}
-                className="text-3xl font-black text-black hover:text-purple-600 transition-colors"
+                className={
+                  [
+                    'text-brand',
+                    'text-accent',
+                    'text-purple-600',
+                    'text-blue-600',
+                    'text-pink-600',
+                  ][idx % 5]
+                }
               >
-                {company}
-              </div>
+                ToonzyAI
+              </span>
             ))}
           </div>
         </div>
@@ -170,27 +173,25 @@ export default function HomePage() {
       {/* CTA Section */}
       <section className="py-24 px-6 bg-white text-black">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-5xl md:text-7xl font-black mb-8">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-8">
             ГОТОВЫ СОЗДАТЬ
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-400 to-blue-400">
-              ЧТО-ТО НЕВЕРОЯТНОЕ?
-            </span>
+            <span className="block text-brand">ЧТО-ТО НЕВЕРОЯТНОЕ?</span>
           </h2>
           <p className="text-2xl font-bold mb-12">
             Присоединяйтесь к революции в создании цифровых аватаров
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button 
-              size="lg"
-              className="bg-white text-black hover:bg-gray-100 px-12 py-8 text-xl font-black shadow-2xl"
+              size="lg" 
+              className="px-10 py-6 text-lg"
               onClick={() => navigate('/register')}
             >
               НАЧАТЬ БЕСПЛАТНО 🚀
             </Button>
             <Button 
-              size="lg"
-              variant="outline"
-              className="border-4 border-black text-black hover:bg-black hover:text-white px-12 py-8 text-xl font-black transition-all"
+              size="lg" 
+              variant="outline" 
+              className="px-10 py-6 text-lg"
               onClick={() => alert('Функция скоро будет доступна!')}
             >
               СВЯЗАТЬСЯ С НАМИ
@@ -203,4 +204,4 @@ export default function HomePage() {
       <Footer />
     </div>
   );
-}
+} 

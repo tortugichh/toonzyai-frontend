@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useRegister } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
+import logoSrc from '@/assets/logo.svg';
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Имя пользователя должно содержать минимум 3 символа'),
@@ -51,27 +52,23 @@ function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2 mb-6">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">T</span>
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              ToonzyAI
-            </span>
+          <Link to="/" className="inline-flex items-center space-x-3 mb-6 hover:opacity-80">
+            <img src={logoSrc} alt="ToonzyAI logo" className="w-9 h-9" />
+            <span className="text-xl font-bold text-neutral-900">ToonzyAI</span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Создайте аккаунт</h1>
-          <p className="text-gray-600">Присоединяйтесь к сообществу создателей контента</p>
+          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Регистрация</h1>
+          <p className="text-neutral-600">Cоздайте новый аккаунт</p>
         </div>
 
-        <Card className="p-8 shadow-xl border-0 bg-white/90 backdrop-blur-sm">
+        <Card className="p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Username Field */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="username" className="block text-sm font-medium text-neutral-700 mb-2">
                 Имя пользователя
               </label>
               <Input
@@ -79,7 +76,7 @@ function RegisterPage() {
                 type="text"
                 placeholder="username"
                 {...register('username')}
-                className={`w-full ${errors.username ? 'border-red-500 focus:border-red-500' : ''}`}
+                className={errors.username ? 'border-red-500' : ''}
               />
               {errors.username && (
                 <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
@@ -88,7 +85,7 @@ function RegisterPage() {
 
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
                 Email адрес
               </label>
               <Input
@@ -96,7 +93,7 @@ function RegisterPage() {
                 type="email"
                 placeholder="example@email.com"
                 {...register('email')}
-                className={`w-full ${errors.email ? 'border-red-500 focus:border-red-500' : ''}`}
+                className={errors.email ? 'border-red-500' : ''}
               />
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
@@ -105,7 +102,7 @@ function RegisterPage() {
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
                 Пароль
               </label>
               <div className="relative">
@@ -114,7 +111,7 @@ function RegisterPage() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Минимум 8 символов"
                   {...register('password')}
-                  className={`w-full pr-10 ${errors.password ? 'border-red-500 focus:border-red-500' : ''}`}
+                  className={`w-full pr-10 ${errors.password ? 'border-red-500' : ''}`}
                 />
                 <button
                   type="button"
@@ -140,7 +137,7 @@ function RegisterPage() {
 
             {/* Confirm Password Field */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-neutral-700 mb-2">
                 Подтвердите пароль
               </label>
               <div className="relative">
@@ -149,7 +146,7 @@ function RegisterPage() {
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Повторите пароль"
                   {...register('confirmPassword')}
-                  className={`w-full pr-10 ${errors.confirmPassword ? 'border-red-500 focus:border-red-500' : ''}`}
+                  className={`w-full pr-10 ${errors.confirmPassword ? 'border-red-500' : ''}`}
                 />
                 <button
                   type="button"
@@ -201,7 +198,7 @@ function RegisterPage() {
             <Button
               type="submit"
               disabled={registerMutation.isPending}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-3 text-lg font-medium"
+              className="w-full py-3 text-lg"
             >
               {registerMutation.isPending ? (
                 <div className="flex items-center justify-center space-x-2">

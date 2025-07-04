@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import type { User } from '@/types/api';
 import logoSrc from '@/assets/logo.svg';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface HeaderProps {
   user?: User;
@@ -13,6 +13,41 @@ interface HeaderProps {
 export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Prevent background scrolling when mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      // Save current scroll position
+      const scrollY = window.scrollY;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      // Prevent layout shift from disappearing scrollbar
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      document.body.classList.add('overflow-hidden');
+    } else {
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.paddingRight = '';
+      document.body.classList.remove('overflow-hidden');
+      // Restore scroll position
+      if (scrollY) {
+        window.scrollTo(0, Math.abs(parseInt(scrollY)) || 0);
+      }
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, [menuOpen]);
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -25,8 +60,8 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
             </span>
           </Link>
           
-          {/* Desktop nav */}
-          <nav className="hidden md:flex space-x-10">
+          {/* Desktop nav for large screens */}
+          <nav className="hidden lg:flex space-x-10">
             <Link 
               to="/dashboard" 
               className="text-gray-700 hover:text-gray-900 transition-all duration-300 font-medium text-lg hover:scale-105 relative group"
@@ -56,9 +91,9 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
             </Link>
           </nav>
           
-          {/* Mobile hamburger */}
+          {/* Hamburger for small & medium screens */}
           <button
-            className="md:hidden flex items-center justify-center w-10 h-10 text-gray-700 hover:text-gray-900 focus:outline-none"
+            className="flex lg:hidden items-center justify-center w-10 h-10 text-gray-700 hover:text-gray-900 focus:outline-none"
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-label="Toggle navigation"
           >
@@ -77,9 +112,9 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
             </svg>
           </button>
 
-          {/* Mobile dropdown */}
+          {/* Dropdown for small & medium screens */}
           {menuOpen && (
-            <nav className="absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-lg md:hidden flex flex-col py-4 space-y-2 z-40">
+            <nav className="absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-lg lg:hidden flex flex-col py-4 space-y-2 z-40">
               <Link
                 to="/dashboard"
                 className="px-6 py-2 text-gray-700 hover:bg-gray-100 font-medium"
@@ -139,7 +174,8 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
             </nav>
           )}
 
-          <div className="flex items-center space-x-4">
+          {/* Auth buttons for large screens */}
+          <div className="hidden lg:flex items-center space-x-4">
             {user ? (
               <>
                 <div className="hidden sm:block text-right">

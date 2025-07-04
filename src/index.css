@@ -22,6 +22,7 @@ body {
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 /* Strong focus styles */
@@ -447,4 +448,14 @@ body::before { display: none; }
 .fade-in-up {
   opacity: 0;
   animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 12s linear infinite;
 }
