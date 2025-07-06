@@ -31,7 +31,7 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
   };
 
   const confirmDelete = () => {
-    onDelete(avatar.avatar_id);
+      onDelete(avatar.avatar_id);
   };
 
   const handleAnimate = () => {
@@ -122,24 +122,24 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
         
         <div className="flex">
           {normalizedStatus === 'completed' ? (
-            <Button
-              onClick={handleAnimate}
+              <Button
+                onClick={handleAnimate}
               className="flex-1 bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white text-sm py-2 font-medium transform-gpu transition-transform duration-300 hover:scale-105"
-            >
-              🎬 Создать анимацию
-            </Button>
+              >
+                🎬 Создать анимацию
+              </Button>
           ) : normalizedStatus === 'generating' ? (
-            <div className="flex-1 bg-yellow-100 text-yellow-700 text-sm py-2 px-4 rounded-md text-center">
-              ⚙️ Генерируется...
-            </div>
+              <div className="flex-1 bg-yellow-100 text-yellow-700 text-sm py-2 px-4 rounded-md text-center">
+                ⚙️ Генерируется...
+              </div>
           ) : normalizedStatus === 'failed' ? (
-            <div className="flex-1 bg-red-100 text-red-700 text-sm py-2 px-4 rounded-md text-center">
-              ❌ Ошибка генерации
-            </div>
+              <div className="flex-1 bg-red-100 text-red-700 text-sm py-2 px-4 rounded-md text-center">
+                ❌ Ошибка генерации
+              </div>
           ) : (
-            <div className="flex-1 bg-gray-100 text-gray-600 text-sm py-2 px-4 rounded-md text-center">
-              ⏳ В очереди...
-            </div>
+              <div className="flex-1 bg-gray-100 text-gray-600 text-sm py-2 px-4 rounded-md text-center">
+                ⏳ В очереди...
+              </div>
           )}
         </div>
       </div>

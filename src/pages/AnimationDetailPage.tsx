@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
 import { AnimationProject } from '@/components/common';
-import { useAnimationProject, useDeleteAnimationProject, useAssembleVideo } from '@/hooks/useAnimations';
+import { useAnimationProject, useDeleteAnimationProject, useAssembleVideo, useProjectProgressWS } from '@/hooks/useAnimations';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
 import Modal from '@/components/ui/Modal';
@@ -18,7 +18,8 @@ function AnimationDetailPage() {
   const deleteAnimationMutation = useDeleteAnimationProject();
   const assembleVideoMutation = useAssembleVideo();
   const logoutMutation = useLogout();
-
+  const projectProgressWS = useProjectProgressWS(id);
+  
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -35,11 +36,11 @@ function AnimationDetailPage() {
   };
 
   const confirmDelete = async () => {
-    try {
-      await deleteAnimationMutation.mutateAsync(id!);
-      navigate('/animations');
-    } catch (error) {
-      console.error('Delete error:', error);
+      try {
+        await deleteAnimationMutation.mutateAsync(id!);
+        navigate('/animations');
+      } catch (error) {
+        console.error('Delete error:', error);
     } finally {
       setDeleteModalOpen(false);
     }

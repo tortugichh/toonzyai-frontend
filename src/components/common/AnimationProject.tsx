@@ -119,17 +119,7 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
             controls 
             className="w-full max-w-2xl rounded shadow-lg"
           />
-          <div className="mt-3 flex gap-2">
-            <Button asChild>
-              <a 
-                href={project.final_video_url} 
-                download="animation.mp4"
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                📥 Скачать видео
-              </a>
-            </Button>
-          </div>
+          
         </Card>
       )}
 

@@ -470,6 +470,9 @@ class APIClient {
     project_id: string;
     updated_segments: Array<{ segment_number: number; prompt: string; status: string }>;
   }> {
+    if (segmentPrompt.trim().length < 10) {
+      throw new Error('Prompt must be at least 10 characters long');
+    }
     return this.request(`/animations/${projectId}/segments/prompts`, {
       method: 'PUT',
       body: JSON.stringify({

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useTaskProgress, useGenerateSegment, useSegmentProgressWS } from '@/hooks/useAnimations';
+import { useTaskProgress, useGenerateSegment, useSegmentProgressWS, useUpdateSegmentPrompt } from '@/hooks/useAnimations';
 import type { AnimationSegment } from '@/services/api';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
-import { toastError } from '@/utils/toast';
+import { toastError, toastSuccess } from '@/utils/toast';
 
 interface SegmentEditorProps {
   projectId: string;
@@ -14,45 +14,43 @@ interface SegmentEditorProps {
 }
 
 export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorProps) {
-  const [prompt, setPrompt] = useState(
-    segment.segment_prompt ||
-    segment.prompts?.segment_prompt ||
-    segment.prompts?.project_prompt ||
-    ''
-  );
+  const [prompt, setPrompt] = useState(segment.segment_prompt ?? '');
+  const [isEditing, setIsEditing] = useState(!segment.segment_prompt);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const updatePromptMutation = useUpdateSegmentPrompt();
   const generateSegmentMutation = useGenerateSegment();
 
   // live progress via WebSocket
   useSegmentProgressWS(segment.id, projectId);
 
-  const { status: taskStatus } = useTaskProgress(
-    (segment as any).task_id, 
-    (result) => {
-      onUpdate();
-      setIsGenerating(false);
-    }
-  );
-
-  const isPromptValid = prompt.trim().length >= 10;
-
-  const handleGenerate = async () => {
-    const effectivePrompt = prompt.trim();
-    if (!isPromptValid) {
-      toastError('Prompt must be at least 10 characters');
+  const handleGenerateClick = async () => {
+    if (prompt.trim().length < 10) {
+      toastError('Промпт должен содержать минимум 10 символов');
       return;
     }
+    setIsGenerating(true);
     try {
-      setIsGenerating(true);
+      // 1) сохраняем промпт если он новый
+      if (prompt !== segment.segment_prompt) {
+        await updatePromptMutation.mutateAsync({
+          projectId,
+          segmentNumber: segment.segment_number,
+          segmentPrompt: prompt.trim(),
+        });
+      }
+      // 2) запускаем генерацию
       await generateSegmentMutation.mutateAsync({
         projectId,
         segmentNumber: segment.segment_number,
-        segmentPrompt: effectivePrompt,
+        segmentPrompt: prompt.trim(),
       });
+      // прячем textarea, показываем текст
+      setIsEditing(false);
       onUpdate();
-    } catch (error: any) {
-      toastError('Ошибка запуска генерации: ' + (error as any).message);
+    } catch (error:any) {
+      toastError(error.message || 'Ошибка при генерации сегмента');
+    } finally {
       setIsGenerating(false);
     }
   };
@@ -60,9 +58,21 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
   const getStatusIcon = () => {
     switch (segment.status) {
       case 'completed': return '✅';
-      case 'in_progress': return '⏳';
+      case 'in_progress': return '🔄';
+      case 'pending': return '⏳';
       case 'failed': return '❌';
-      default: return '⏸️';
+      default: return '❓';
+    }
+  };
+  
+  const getStatusText = () => {
+    const progress = segment.progress ?? 0;
+    switch (segment.status) {
+      case 'completed': return 'Готово';
+      case 'in_progress': return `В процессе (${progress}%)`;
+      case 'pending': return 'В очереди';
+      case 'failed': return 'Ошибка';
+      default: return 'Неизвестно';
     }
   };
 
@@ -72,8 +82,6 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
     }
     return '📝 По умолчанию';
   };
-
-  const progress = (segment as any).progress ?? 0;
 
   return (
     <Card className="segment-editor p-4 mb-4 bg-white shadow-sm">
@@ -86,72 +94,79 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
         </span>
       </div>
 
-      <div className="prompt-section mb-4">
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Опишите что должно происходить в этом сегменте..."
-          rows={3}
-          className="prompt-input w-full p-2 border border-gray-300 rounded resize-vertical mb-3"
-        />
+      <div className="prompt-source mt-4">
+        {isEditing ? (
+          <textarea
+            className="prompt-input w-full p-2 border border-gray-300 rounded resize-vertical"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Введите детальное описание для этого сегмента..."
+            rows={4}
+          />
+        ) : (
+          <div className="prompt-display group relative">
+            <p className="text-gray-700 whitespace-pre-wrap pr-8">
+              {prompt || 'Промпт не задан'}
+            </p>
+            {/* Редактировать */}
+            {segment.status !== 'completed' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsEditing(true)}
+                className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+              >
+                ✏️
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Progress bar */}
       {segment.status === 'in_progress' && (
         <div className="mb-3">
           <div className="flex justify-between text-xs text-gray-600 mb-1">
-            <span>Прогресс</span><span>{progress}%</span>
+            <span>Прогресс</span><span>{segment.progress}%</span>
           </div>
           <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-            <div className="h-2 bg-blue-500" style={{width:`${progress}%`}} />
+            <div className="h-2 bg-blue-500" style={{width:`${segment.progress}%`}} />
           </div>
         </div>
       )}
 
-      <div className="generation-section">
-        <Button 
-          onClick={handleGenerate}
-          disabled={
-            isGenerating ||
-            segment.status === 'in_progress' ||
-            segment.status === 'completed' ||
-            generateSegmentMutation.isPending ||
-            !isPromptValid
-          }
-          title={segment.status === 'completed' ? 'Сегмент уже сгенерирован' : undefined}
-          className="btn-generate bg-blue-600 hover:bg-blue-700 text-white mb-3 disabled:opacity-50"
-        >
-          {isGenerating || generateSegmentMutation.isPending ? (
-            <div className="flex items-center gap-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              Генерация...
-            </div>
-          ) : (
-            '🎬 Генерировать видео'
-          )}
-        </Button>
-        
-        {segment.generated_video_url && (
-          <div className="video-preview">
-            <video 
-              src={segment.generated_video_url} 
-              controls 
-              className="segment-video w-full max-w-md rounded shadow-sm"
-            />
-          </div>
-        )}
+      {segment.status !== 'completed' && (
+        <div className="actions mt-4">
+          <Button
+            onClick={handleGenerateClick}
+            disabled={isGenerating || segment.status === 'in_progress' || !prompt.trim()}
+            className="btn-generate"
+          >
+            {isGenerating ? 'Генерация...' : '▶️ Сгенерировать видео'}
+          </Button>
+        </div>
+      )}
 
-        {segment.video_url && !segment.generated_video_url && (
-          <div className="video-preview">
-            <LazyLoadImage 
-              src={segment.start_frame_url}
-              alt={`Сегмент ${segment.segment_number}`}
-              effect="blur"
-              className="w-full max-w-md h-40 object-cover rounded"
-            />
-          </div>
-        )}
-      </div>
+      {segment.generated_video_url && (
+        <div className="video-preview">
+          <video 
+            src={segment.generated_video_url} 
+            controls 
+            className="segment-video w-full max-w-md rounded shadow-sm"
+          />
+        </div>
+      )}
+
+      {segment.video_url && !segment.generated_video_url && (
+        <div className="video-preview">
+          <LazyLoadImage 
+            src={segment.start_frame_url}
+            alt={`Сегмент ${segment.segment_number}`}
+            effect="blur"
+            className="w-full max-w-md h-40 object-cover rounded"
+          />
+        </div>
+      )}
     </Card>
   );
 } 

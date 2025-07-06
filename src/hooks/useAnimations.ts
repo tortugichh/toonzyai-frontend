@@ -33,49 +33,67 @@ export const useProjectProgressWS = (projectId: string | undefined) => {
     
     console.log('Creating WebSocket connection to:', wsUrl);
     
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
+    let retryCount = 0;
+    const maxRetries = 5;
+    const connect = () => {
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
 
-    ws.onopen = () => {
-      console.log('WebSocket connected successfully');
+      ws.onopen = () => {
+        retryCount = 0;
+        console.log('WebSocket connected successfully');
+      };
+
+      ws.onmessage = (event) => {
+        console.log('WebSocket message received:', event.data);
+        try {
+          const progressData = JSON.parse(event.data);
+          
+          // Update project status directly in React Query cache
+          queryClient.setQueryData(['animation-project', projectId], (oldData: any) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              status: progressData.status,
+              // Update project progress if available
+              ...(progressData.completed !== undefined && {
+                completedSegments: progressData.completed,
+                totalSegments: progressData.total,
+                progress: progressData.progress ?? 0
+              })
+            };
+          });
+
+          // Also invalidate project list to keep it fresh
+          queryClient.invalidateQueries({ queryKey: ['animation-projects'] });
+          
+          // Force a refetch of the entire project to get new segments
+          queryClient.invalidateQueries({ queryKey: ['animation-project', projectId] });
+          
+        } catch (error) {
+          console.error('Failed to parse WebSocket message:', error);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      
+      ws.onclose = (event) => {
+        console.log('WebSocket closed:', event.code, event.reason);
+        wsRef.current = null;
+        if (retryCount < maxRetries) {
+          const delay = Math.min(1000 * 2 ** retryCount, 30000); // up to 30s
+          retryCount += 1;
+          setTimeout(connect, delay);
+          console.log(`Reconnecting WebSocket in ${delay}ms (attempt ${retryCount})`);
+        } else {
+          console.warn('Max WebSocket reconnect attempts reached');
+        }
+      };
     };
 
-    ws.onmessage = (event) => {
-      console.log('WebSocket message received:', event.data);
-      try {
-        const progressData = JSON.parse(event.data);
-        
-        // Update project status directly in React Query cache
-        queryClient.setQueryData(['animation-project', projectId], (oldData: any) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            status: progressData.status,
-            // Update project progress if available
-            ...(progressData.completed !== undefined && {
-              completedSegments: progressData.completed,
-              totalSegments: progressData.total
-            })
-          };
-        });
-
-        // Also invalidate project list to keep it fresh
-        queryClient.invalidateQueries({ queryKey: ['animation-projects'] });
-        
-      } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
-      }
-    };
-
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      ws.close();
-    };
-    
-    ws.onclose = (event) => {
-      console.log('WebSocket closed:', event.code, event.reason);
-      wsRef.current = null;
-    };
+    connect();
 
     return () => {
       console.log('Cleaning up WebSocket');
@@ -105,62 +123,85 @@ export const useSegmentProgressWS = (segmentId: string | undefined, projectId?: 
     
     console.log('Creating WebSocket connection to:', wsUrl);
     
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
+    let retryCount = 0;
+    const maxRetries = 5;
+    const connect = () => {
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
 
-    ws.onopen = () => {
-      console.log('WebSocket connected successfully');
-    };
+      ws.onopen = () => {
+        retryCount = 0;
+        console.log('WebSocket connected successfully');
+      };
 
-    ws.onmessage = (event) => {
-      console.log('WebSocket message received:', event.data);
-      try {
-        const progressData = JSON.parse(event.data);
-        
-        // Update segment data directly in React Query cache
-        if (projectId) {
-          queryClient.setQueryData(['animation-project', projectId], (oldData: any) => {
+      ws.onmessage = (event) => {
+        console.log('WebSocket message received:', event.data);
+        try {
+          const progressData = JSON.parse(event.data);
+          
+          // Update segment data directly in React Query cache
+          if (projectId) {
+            queryClient.setQueryData(['animation-project', projectId], (oldData: any) => {
+              if (!oldData) return oldData;
+              
+              return {
+                ...oldData,
+                segments: oldData.segments.map((segment: any) => 
+                  segment.id === segmentId 
+                    ? { 
+                        ...segment, 
+                        status: progressData.status,
+                        progress: progressData.progress 
+                      }
+                    : segment
+                )
+              };
+            });
+          }
+          
+          // Also update individual segment cache if it exists
+          queryClient.setQueryData(['segment-details', segmentId], (oldData: any) => {
             if (!oldData) return oldData;
-            
             return {
               ...oldData,
-              segments: oldData.segments.map((segment: any) => 
-                segment.id === segmentId 
-                  ? { 
-                      ...segment, 
-                      status: progressData.status,
-                      progress: progressData.progress 
-                    }
-                  : segment
-              )
+              status: progressData.status,
+              progress: progressData.progress
             };
           });
+          
+          // Если сегмент завершён, рефечим проект, чтобы получить generated_video_url
+          if (progressData.status === 'completed' || progressData.status === 'failed') {
+            if (projectId) {
+              queryClient.invalidateQueries({ queryKey: ['animation-project', projectId] });
+            }
+            // Также рефечим детали сегмента по id
+            queryClient.invalidateQueries({ queryKey: ['segment-details', segmentId] });
+          }
+          
+        } catch (error) {
+          console.error('Failed to parse WebSocket message:', error);
         }
-        
-        // Also update individual segment cache if it exists
-        queryClient.setQueryData(['segment-details', segmentId], (oldData: any) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            status: progressData.status,
-            progress: progressData.progress
-          };
-        });
-        
-      } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
-      }
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      
+      ws.onclose = (event) => {
+        console.log('WebSocket closed:', event.code, event.reason);
+        wsRef.current = null;
+        if (retryCount < maxRetries) {
+          const delay = Math.min(1000 * 2 ** retryCount, 30000); // up to 30s
+          retryCount += 1;
+          setTimeout(connect, delay);
+          console.log(`Reconnecting WebSocket in ${delay}ms (attempt ${retryCount})`);
+        } else {
+          console.warn('Max WebSocket reconnect attempts reached');
+        }
+      };
     };
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      ws.close();
-    };
-    
-    ws.onclose = (event) => {
-      console.log('WebSocket closed:', event.code, event.reason);
-      wsRef.current = null;
-    };
+    connect();
 
     return () => {
       console.log('Cleaning up WebSocket');
@@ -222,25 +263,14 @@ export function useAnimationProject(projectId: string) {
     queryFn: () => apiClient.getAnimationProject(projectId),
     enabled: !!projectId,
     refetchInterval: (query) => {
-      const data = query.state.data;
-
+      const data = query.state.data as AnimationProject | undefined;
       if (!data) return false;
 
-      // 1. No segments yet but backend will create them asynchronously
-      if ((data.segments?.length ?? 0) === 0) return 3000;
-
-      const hasGenerating = data.segments.some((s: any) => s.status === 'in_progress' || s.status === 'pending');
-
-      // 2. Some segments still generating
-      if (hasGenerating) return 3000;
-
-      // 3. All segments completed but some videos not yet attached
-      const missingVideos = data.segments.some((s: any) => s.status === 'completed' && !s.video_url && !s.generated_video_url);
-      if (missingVideos) return 5000;
-
-      // 4. Otherwise stop polling
-      return false;
+      const isProcessing = ['pending', 'in_progress', 'assembling'].includes(data.status);
+      
+      return isProcessing ? 3000 : false;
     },
+    refetchIntervalInBackground: true,
   });
 }
 
@@ -380,46 +410,18 @@ export function useAssembleVideo() {
 
 // Хук для работы с сегментами (из документации)
 export function useSegments(projectId: string) {
-  const [segments, setSegments] = useState<AnimationSegment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    data: project,
+    isLoading,
+    refetch,
+  } = useAnimationProject(projectId);
 
-  const loadProject = useCallback(async () => {
-    try {
-      const project = await apiClient.getAnimationProject(projectId);
-      setSegments(project.segments);
-    } catch (error) {
-      console.error('Failed to load segments:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    if (projectId) {
-      loadProject();
-    }
-  }, [projectId, loadProject]);
+  const segments: AnimationSegment[] = project?.segments ?? [];
 
   const updateSegmentPrompt = async (segmentNumber: number, prompt: string) => {
     try {
       await apiClient.updateSegmentPrompt(projectId, segmentNumber, prompt);
-      
-      // Обновляем локальное состояние
-      setSegments(prev => 
-        prev.map(segment => 
-          segment.segment_number === segmentNumber 
-            ? { 
-                ...segment, 
-                segment_prompt: prompt, 
-                prompts: {
-                  ...segment.prompts,
-                  prompt_source: 'custom',
-                  segment_prompt: prompt
-                } as any
-              }
-            : segment
-        )
-      );
+      await refetch();
     } catch (error) {
       console.error('Failed to update segment prompt:', error);
       throw error;
@@ -429,20 +431,7 @@ export function useSegments(projectId: string) {
   const generateSegmentVideo = async (segmentNumber: number, prompt: string) => {
     try {
       const task = await apiClient.generateSegment(projectId, segmentNumber, prompt);
-      
-      // Обновляем статус сегмента
-      setSegments(prev =>
-        prev.map(segment =>
-          segment.segment_number === segmentNumber
-            ? { 
-                ...segment, 
-                status: 'in_progress',
-                // task_id будет в response, но не в типах интерфейса
-              } as any
-            : segment
-        )
-      );
-
+      await refetch();
       return task;
     } catch (error) {
       console.error('Failed to generate segment:', error);
@@ -452,10 +441,10 @@ export function useSegments(projectId: string) {
 
   return {
     segments,
-    loading,
+    loading: isLoading,
     updateSegmentPrompt,
     generateSegmentVideo,
-    refresh: loadProject
+    refresh: refetch,
   };
 }
 

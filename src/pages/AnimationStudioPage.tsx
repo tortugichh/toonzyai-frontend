@@ -67,10 +67,10 @@ function AnimationStudioPage() {
     <div className="animation-studio-page min-h-screen bg-gray-50">
       <Header user={user} onLogout={logoutMutation.mutateAsync} isLoggingOut={logoutMutation.isPending} />
       <div className="max-w-6xl mx-auto p-6">
-        {/* Header */}
-        <div className="studio-header flex items-center justify-between mb-8 flex-wrap gap-4">
-          <div className="flex items-center gap-4">
-            <Button onClick={() => navigate(-1)} variant="outline">← Назад</Button>
+        {/* Hero / Header */}
+        <div className="studio-header mb-8 bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] text-white rounded-xl p-6 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-1">
+            <Button onClick={() => navigate(-1)} variant="outline" className="border-white text-white hover:bg-white/10">← Назад</Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
                 🎬 Студия анимации
@@ -82,13 +82,13 @@ function AnimationStudioPage() {
           </div>
 
           {/* Avatar Filter */}
-          <div className="flex items-center gap-2 ml-auto">
-            <label htmlFor="avatarFilter" className="text-sm text-gray-700 hidden md:block">Фильтр по аватару:</label>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1 sm:flex-none">
+            <label htmlFor="avatarFilter" className="text-sm hidden md:block">Фильтр по аватару:</label>
             <select
               id="avatarFilter"
               value={avatarFilter}
               onChange={(e) => setAvatarFilter(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-white/70 w-full sm:w-auto"
             >
               <option value="all">Все аватары</option>
               {availableAvatars.map(av => (
@@ -99,7 +99,7 @@ function AnimationStudioPage() {
           
           <Button 
             onClick={() => setShowCreateForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3"
+            className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] hover:opacity-90 text-white px-6 py-3 transform-gpu hover:scale-105 transition w-full sm:w-auto"
           >
             ➕ Новый проект
           </Button>
@@ -132,7 +132,7 @@ function AnimationStudioPage() {
             </Button>
           </Card>
         ) : (
-          <div className="projects-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="projects-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredProjects.map(project => (
               <ProjectCard 
                 key={project.id}
@@ -143,33 +143,6 @@ function AnimationStudioPage() {
             ))}
           </div>
         )}
-
-        {/* Features Info */}
-        <div className="features-info mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="feature-card p-6 text-center">
-            <div className="text-3xl mb-3">🎯</div>
-            <h3 className="font-semibold mb-2">Точный контроль</h3>
-            <p className="text-sm text-gray-600">
-              Настраивайте промпт для каждого сегмента индивидуально
-            </p>
-          </Card>
-          
-          <Card className="feature-card p-6 text-center">
-            <div className="text-3xl mb-3">⚡</div>
-            <h3 className="font-semibold mb-2">Быстрая генерация</h3>
-            <p className="text-sm text-gray-600">
-              Автоматическое отслеживание прогресса и обновления в реальном времени
-            </p>
-          </Card>
-          
-          <Card className="feature-card p-6 text-center">
-            <div className="text-3xl mb-3">🎬</div>
-            <h3 className="font-semibold mb-2">Финальная сборка</h3>
-            <p className="text-sm text-gray-600">
-              Автоматическая сборка всех сегментов в единое видео
-            </p>
-          </Card>
-        </div>
       </div>
       {/* Delete Confirm Modal */}
       <Modal

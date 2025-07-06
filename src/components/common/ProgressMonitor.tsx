@@ -14,7 +14,7 @@ export default function ProgressMonitor({ project, onRefresh, autoRefresh = true
 
   useEffect(() => {
     if (!isAuto) return;
-    const id = setInterval(onRefresh, 5000);
+    const id = setInterval(onRefresh, 15000);
     return () => clearInterval(id);
   }, [isAuto, onRefresh]);
 

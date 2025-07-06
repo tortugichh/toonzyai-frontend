@@ -132,12 +132,12 @@ function AnimationPage() {
 
   const confirmDeleteAnimation = async () => {
     if (!deleteAnimationId) return;
-    try {
+      try {
       await deleteAnimationMutation.mutateAsync(deleteAnimationId);
-      setSuccessMessage('Анимация удалена');
-      refetch();
-    } catch (error) {
-      console.error('Delete animation error:', error);
+        setSuccessMessage('Анимация удалена');
+        refetch();
+      } catch (error) {
+        console.error('Delete animation error:', error);
     } finally {
       setDeleteAnimationId(null);
     }

@@ -102,7 +102,7 @@ function DashboardPage() {
                 <span className="text-3xl text-white">👤</span>
               </div>
               <h3 className="text-5xl font-bold text-black">
-                {avatarsLoading ? '...' : avatars?.avatars?.length || 0}
+                  {avatarsLoading ? '...' : avatars?.avatars?.length || 0}
               </h3>
               <p className="text-sm text-gray-600 uppercase tracking-wide font-medium">Всего аватаров</p>
             </div>
@@ -117,7 +117,7 @@ function DashboardPage() {
                 <span className="text-3xl text-white">🎭</span>
               </div>
               <h3 className="text-5xl font-bold text-black">
-                {animationsLoading ? '...' : animations?.length || 0}
+                  {animationsLoading ? '...' : animations?.length || 0}
               </h3>
               <p className="text-sm text-gray-600 uppercase tracking-wide font-medium">Анимации</p>
             </div>
@@ -132,7 +132,7 @@ function DashboardPage() {
                 <span className="text-3xl text-white">📊</span>
               </div>
               <h3 className="text-5xl font-bold text-black">
-                {(avatars?.avatars?.length || 0) + (animations?.length || 0)}
+                  {(avatars?.avatars?.length || 0) + (animations?.length || 0)}
               </h3>
               <p className="text-sm text-gray-600 uppercase tracking-wide font-medium">Всего проектов</p>
             </div>

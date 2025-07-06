@@ -50,7 +50,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
   }, [menuOpen]);
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+    <header className="backdrop-blur-xl bg-white/80 border-b border-white/20 sticky top-0 z-50 shadow-lg/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20 relative">
           <Link to="/dashboard" className="flex items-center space-x-3">
@@ -114,33 +114,33 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
 
           {/* Dropdown for small & medium screens */}
           {menuOpen && (
-            <nav className="absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-lg lg:hidden flex flex-col py-4 space-y-2 z-40">
+            <nav className="absolute top-full left-0 w-full backdrop-blur-xl bg-white/90 border-t border-white/20 shadow-lg lg:hidden flex flex-col py-4 space-y-2 z-40">
               <Link
                 to="/dashboard"
-                className="px-6 py-2 text-gray-700 hover:bg-gray-100 font-medium"
+                className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
                 onClick={() => setMenuOpen(false)}
               >
                 Панель управления
               </Link>
               <Link
                 to="/avatars"
-                className="px-6 py-2 text-gray-700 hover:bg-gray-100 font-medium"
+                className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
                 onClick={() => setMenuOpen(false)}
               >
                 Аватары
               </Link>
               <Link
                 to="/animations"
-                className="px-6 py-2 text-gray-700 hover:bg-gray-100 font-medium"
+                className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
                 onClick={() => setMenuOpen(false)}
               >
                 Анимации
               </Link>
-              <div className="border-t border-gray-200 my-2"></div>
+              <div className="border-t border-white/20 my-2"></div>
               {user ? (
                 <Button
                   variant="ghost"
-                  className="mx-6 justify-start"
+                  className="mx-6 justify-start hover:bg-white/50"
                   onClick={() => {
                     setMenuOpen(false);
                     onLogout();
@@ -152,7 +152,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
                 <>
                   <Button
                     variant="ghost"
-                    className="mx-6 justify-start"
+                    className="mx-6 justify-start hover:bg-white/50"
                     onClick={() => {
                       setMenuOpen(false);
                       navigate('/login');
@@ -178,19 +178,19 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
           <div className="hidden lg:flex items-center space-x-4">
             {user ? (
               <>
-                <div className="hidden sm:block text-right">
+              <div className="hidden sm:block text-right">
                   <p className="text-sm text-gray-700">Привет, {user.username}!</p>
-                  <p className="text-xs text-gray-500">{user.email}</p>
-                </div>
-                <Button 
-                  variant="outline" 
-                  onClick={onLogout}
-                  disabled={isLoggingOut}
+                <p className="text-xs text-gray-500">{user.email}</p>
+              </div>
+            <Button 
+              variant="outline" 
+              onClick={onLogout}
+              disabled={isLoggingOut}
                   className="bg-gradient-to-r from-primary to-secondary-dark text-white px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:scale-105 relative overflow-hidden group"
-                >
+            >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
                   <span className="relative z-10">
-                  {isLoggingOut ? 'Выход...' : 'Выйти'}
+              {isLoggingOut ? 'Выход...' : 'Выйти'}
                   </span>
                 </Button>
               </>
@@ -208,7 +208,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
                   className="bg-gradient-to-r from-primary to-secondary-dark text-white px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:scale-105"
                 >
                   Начать бесплатно
-                </Button>
+            </Button>
               </>
             )}
           </div>
