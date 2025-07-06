@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
+import { API_BASE_URL } from '@/constants';
 
 interface BackendStatusProps {
   onStatusChange?: (isOnline: boolean) => void;
@@ -14,8 +15,8 @@ export default function BackendStatus({ onStatusChange }: BackendStatusProps) {
   const checkBackendStatus = async () => {
     setIsChecking(true);
     try {
-      // Используем только Vite proxy (без CORS проблем)
-      const response = await fetch('/health', {
+      const healthUrl = API_BASE_URL ? `${API_BASE_URL.replace(/\/api\/v1$/, '')}/health` : '/health';
+      const response = await fetch(healthUrl, {
         method: 'GET',
       });
       
@@ -88,7 +89,7 @@ export default function BackendStatus({ onStatusChange }: BackendStatusProps) {
           <div>
             <p className="text-gray-800 font-medium">Сервер недоступен</p>
             <p className="text-gray-600 text-sm">
-              Backend сервер не отвечает на localhost:8000
+              Backend сервер не отвечает: {API_BASE_URL || 'localhost:8000'}
             </p>
             {lastCheck && (
               <p className="text-gray-500 text-xs mt-1">
