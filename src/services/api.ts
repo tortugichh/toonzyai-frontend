@@ -3,11 +3,13 @@
  * Полная реализация согласно BACKEND_API_DOCUMENTATION.md
  */
 
-// Для всех API запросов используем прокси Vite
-const API_BASE = '/api/v1';
+import { API_BASE_URL } from '@/constants';
 
-// Для медиа-ресурсов также используем прокси, чтобы избежать проблем с CORS
-const MEDIA_API_BASE = '/api/v1';
+// Базовый путь API – полноценный URL в продакшене, либо прокси-путь в dev
+const API_BASE = API_BASE_URL || '/api/v1';
+
+// Для медиа-ресурсов также используем тот же origin
+const MEDIA_API_BASE = API_BASE_URL || '/api/v1';
 
 // ============ TYPES ============
 export interface User {

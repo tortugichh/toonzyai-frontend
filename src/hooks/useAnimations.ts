@@ -8,9 +8,19 @@ import {
   type AnimationSegment
 } from '@/services/api';
 import { toastError } from '@/utils/toast';
+import { IS_PRODUCTION } from '@/constants';
 
 // ======== WEBSOCKET HELPERS =========
+const WS_ORIGIN = import.meta.env.VITE_API_ORIGIN ?? 'https://api.toonzyai.me';
+
 const createWSUrl = (path: string) => {
+  if (IS_PRODUCTION) {
+    // Меняем схему на wss/ws в зависимости от origin
+    const url = new URL(WS_ORIGIN);
+    url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${url.origin}${path}`;
+  }
+  // В dev оставляем хост Vite (прокси)
   const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
   return `${proto}://${window.location.host}${path}`;
 };
