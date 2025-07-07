@@ -6,7 +6,7 @@
 import { API_BASE_URL } from '@/constants';
 
 // Базовый путь API – полноценный URL в продакшене, либо прокси-путь в dev
-const API_BASE = API_BASE_URL || '/api/v1';
+export const API_BASE = API_BASE_URL || '/api/v1';
 
 // Для медиа-ресурсов также используем тот же origin
 const MEDIA_API_BASE = API_BASE_URL || '/api/v1';
@@ -94,6 +94,57 @@ export interface AnimationSegment {
     description: string;
   };
 }
+
+// Interfaces for Story Generation
+export interface StoryCreateRequest {
+  prompt: string;
+}
+
+export interface StoryCreateResponse {
+  task_id: string;
+}
+
+export interface StoryScene {
+  id: number;
+  description: string;
+}
+
+export interface StoryStyle {
+  summary: string;
+  positive_keywords: string;
+  negative_keywords: string;
+}
+
+export interface StoryCharacter {
+  name: string;
+  description: string;
+  attire: string;
+}
+
+export interface StoryEnvironment {
+  scene_id: number;
+  environment_description: string;
+}
+
+export interface StoryResult {
+  title: string;
+  scenes: StoryScene[];
+  style: { style: StoryStyle };
+  characters: { characters: StoryCharacter[] };
+  environments: { environments: StoryEnvironment[] };
+}
+
+export type StoryStatusResponse =
+  | {
+      task_id: string;
+      status: 'PENDING' | 'RETRY' | 'FAILURE';
+      error: string | null;
+    }
+  | ({
+      task_id: string;
+      status: 'SUCCESS';
+      error: null;
+    } & StoryResult);
 
 export interface AnimationProject {
   id: string;
@@ -626,14 +677,17 @@ class APIClient {
     });
   }
 
-  // ============ UTILITY METHODS ============
-  // Health check is exposed at the root level (/health) without /api/v1 prefix.
-  async checkHealth(): Promise<{ status: string; version?: string }> {
-    const response = await fetch('/health');
-    if (!response.ok) {
-      throw await APIError.fromResponse(response);
-    }
-    return response.json();
+  // ============ Story Generation API ============
+
+  async createStory(prompt: string): Promise<StoryCreateResponse> {
+    return this.request<StoryCreateResponse>('/stories/', {
+      method: 'POST',
+      body: JSON.stringify({ prompt }),
+    });
+  }
+
+  async getStoryStatus(taskId: string): Promise<StoryStatusResponse> {
+    return this.request<StoryStatusResponse>(`/stories/${taskId}`);
   }
 
   async generateSegmentById(segmentId: string, segmentPrompt: string) {
@@ -651,6 +705,16 @@ class APIClient {
 
   async getSegmentDetailsById(segmentId: string) {
     return this.request<AnimationSegment>(`/segments/${segmentId}`);
+  }
+
+  // ============ UTILITY METHODS ============
+  // Health check is exposed at the root level (/health) without /api/v1 prefix.
+  async checkHealth(): Promise<{ status: string; version?: string }> {
+    const response = await fetch('/health');
+    if (!response.ok) {
+      throw await APIError.fromResponse(response);
+    }
+    return response.json();
   }
 }
 

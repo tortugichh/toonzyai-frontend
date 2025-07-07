@@ -14,6 +14,7 @@ import AnimationPage from '@/pages/AnimationPage';
 import AnimationDetailPage from '@/pages/AnimationDetailPage';
 import AnimationStudioPage from '@/pages/AnimationStudioPage';
 import ProjectPage from '@/pages/ProjectPage';
+import { StoryGeneratorPage } from '@/pages/StoryGeneratorPage';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -94,6 +95,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <ProjectPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/story-generator"
+          element={
+            <ProtectedRoute>
+              <StoryGeneratorPage />
             </ProtectedRoute>
           }
         />

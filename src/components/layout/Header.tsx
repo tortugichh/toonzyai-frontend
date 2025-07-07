@@ -89,6 +89,15 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
               </span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-light to-secondary-light group-hover:w-full transition-all duration-300"></span>
             </Link>
+            <Link 
+              to="/story-generator" 
+              className="text-gray-700 hover:text-gray-900 transition-all duration-300 font-medium text-lg hover:scale-105 relative group"
+            >
+              <span className="relative z-10">
+                Генератор Историй
+              </span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-light to-secondary-light group-hover:w-full transition-all duration-300"></span>
+            </Link>
           </nav>
           
           {/* Hamburger for small & medium screens */}
@@ -135,6 +144,13 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
                 onClick={() => setMenuOpen(false)}
               >
                 Анимации
+              </Link>
+              <Link
+                to="/story-generator"
+                className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
+                onClick={() => setMenuOpen(false)}
+              >
+                Генератор Историй
               </Link>
               <div className="border-t border-white/20 my-2"></div>
               {user ? (
