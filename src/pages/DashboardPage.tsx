@@ -179,8 +179,7 @@ function DashboardPage() {
                   <p className="text-gray-700 mb-6 leading-relaxed">Создайте своего первого персонажа</p>
                   <Button 
                     onClick={handleCreateAvatar}
-                    size="lg"
-                    className="bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white px-6 py-3 rounded-xl hover:opacity-90 transition transform-gpu hover:scale-105 shadow-lg"
+                    className="relative w-full sm:w-56 bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white px-6 py-3 rounded-xl hover:opacity-90 transition transform-gpu hover:scale-105 shadow-lg"
                   >
                     <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
                     <span className="relative z-10">
@@ -245,17 +244,20 @@ function DashboardPage() {
                   </Card>
                 ))
               ) : (
-                <Card className="p-8 bg-gray-50 border border-gray-200 rounded-xl shadow-card text-center">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl">🎬</span>
+                <Card className="p-12 bg-white border border-gray-200 rounded-xl shadow-card group hover:shadow-lg transition-shadow duration-300 text-center">
+                  <div className="w-20 h-20 bg-blue-100 from-primary-light to-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:rotate-12 transition-transform duration-500">
+                    <span className="text-3xl text-white">🎬</span>
                   </div>
-                  <h3 className="text-lg font-medium text-black mb-2">Нет анимаций</h3>
-                  <p className="text-gray-700 mb-4">Создайте свою первую анимацию</p>
+                  <h3 className="text-2xl font-bold text-black mb-4">Нет аватаров</h3>
+                  <p className="text-gray-700 mb-6 leading-relaxed">Создайте свою первую анимацию</p>
                   <Button 
                     onClick={handleCreateAnimation}
-                    className="bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white px-6 py-3 rounded-xl hover:opacity-90 transition transform-gpu hover:scale-105 shadow-lg"
+                    className="relative w-full sm:w-56 bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white px-6 py-3 rounded-xl hover:opacity-90 transition transform-gpu hover:scale-105 shadow-lg"
                   >
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+                    <span className="relative z-10">
                     Создать анимацию
+                    </span>
                   </Button>
                 </Card>
               )}

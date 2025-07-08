@@ -209,7 +209,7 @@ function AvatarsPage() {
             </p>
             <Button
               onClick={() => setShowCreateForm(true)}
-              className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] hover:opacity-90 text-white px-8 py-3 text-lg transform-gpu hover:scale-105 transition"
+              className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] w-full sm:w-auto hover:opacity-90 text-white px-8 py-3 text-md sm:text-lg transform-gpu hover:scale-105 transition"
             >
               ✨ Создать первого аватара
             </Button>

@@ -183,17 +183,7 @@ function RegisterPage() {
               </div>
             )}
 
-            {/* Terms and Privacy */}
-            <div className="text-xs text-gray-500 text-center">
-              Регистрируясь, вы соглашаетесь с{' '}
-              <a href="#" className="text-purple-600 hover:text-purple-500">
-                Условиями использования
-              </a>{' '}
-              и{' '}
-              <a href="#" className="text-purple-600 hover:text-purple-500">
-                Политикой конфиденциальности
-              </a>
-            </div>
+           
 
             {/* Submit Button */}
             <Button
