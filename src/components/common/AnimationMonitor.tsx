@@ -125,14 +125,7 @@ export default function AnimationMonitor({
               Обновлено: {formatLastUpdate(lastUpdate)}
             </div>
             <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setAutoRefresh(!autoRefresh)}
-                className={autoRefresh ? 'bg-green-50 text-green-700 border-green-200' : ''}
-              >
-                {autoRefresh ? '🔄 Авто' : '⏸️ Ручной'}
-              </Button>
+              
               <Button
                 variant="outline"
                 size="sm"

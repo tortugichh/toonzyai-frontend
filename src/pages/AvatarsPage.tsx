@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
 import { AvatarCard } from '@entities/avatar';
 import { CreateAvatarForm } from '@/components/forms';
+import { ContentModerationModal } from '@/components/common/ContentModerationModal';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import { useAvatars, useCreateAvatar, useDeleteAvatar } from '@/hooks/useAvatars';
 import type { CreateAvatarRequest } from '@/types/api';
@@ -40,6 +41,15 @@ function AvatarsPage() {
   const navigate = useNavigate();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [moderationModal, setModerationModal] = useState<{
+    isOpen: boolean;
+    reasons: string[];
+    suggestedFix: string;
+  }>({
+    isOpen: false,
+    reasons: [],
+    suggestedFix: ''
+  });
   
   const { data: user } = useCurrentUser();
   const { data: avatars, isLoading, refetch } = useAvatars();
@@ -64,8 +74,43 @@ function AvatarsPage() {
       refetch();
       // Скрываем уведомление через 5 секунд
       setTimeout(() => setShowSuccess(false), 5000);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Create avatar error:', error);
+      
+      // Получаем raw detail из APIError.details или из response.data.detail
+      let errorData = (error as any)?.details;
+      // Если вложенный detail
+      if (errorData && typeof errorData === 'object' && 'detail' in errorData) {
+        errorData = (errorData as any).detail;
+      }
+      
+      // Если не найдено, пробуем path для Axios
+      if (!errorData) {
+        errorData = (error as any)?.response?.data?.detail;
+      }
+      // Распаковываем вложенный detail, если есть
+      if (errorData && typeof errorData === 'object' && 'detail' in errorData) {
+        errorData = (errorData as any).detail;
+      }
+      
+      // Если detail - строка, пробуем распарсить как JSON
+      if (typeof errorData === 'string') {
+        try {
+          errorData = JSON.parse(errorData);
+        } catch {
+          // остаемся с оригиналом
+        }
+      }
+      
+      console.log('Parsed error data:', errorData);
+      
+      if (errorData?.error === 'content_policy_violation') {
+        setModerationModal({
+          isOpen: true,
+          reasons: Array.isArray(errorData.reasons) ? errorData.reasons : ['Неподходящий контент'],
+          suggestedFix: typeof errorData.suggested_fix === 'string' ? errorData.suggested_fix : 'Попробуйте изменить описание'
+        });
+      }
     }
   };
 
@@ -76,6 +121,19 @@ function AvatarsPage() {
     } catch (error) {
       console.error('Delete avatar error:', error);
     }
+  };
+
+  // Функция для тестирования модального окна модерации
+  const handleTestModerationModal = () => {
+    setModerationModal({
+      isOpen: true,
+      reasons: [
+        'Обнаружен контент с элементами насилия',
+        'Неподходящее описание внешности',
+        'Нарушение правил сообщества'
+      ],
+      suggestedFix: 'Попробуйте описать персонажа в позитивном ключе, избегая упоминания насилия, травм или неподходящего контента. Сосредоточьтесь на внешности, одежде и позитивных эмоциях.'
+    });
   };
 
   return (
@@ -101,6 +159,15 @@ function AvatarsPage() {
               className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] hover:opacity-90 text-white px-6 py-3 transform-gpu hover:scale-105 transition"
             >
               ✨ Создать аватар
+            </Button>
+            {/* Кнопка для тестирования модального окна модерации */}
+            <Button
+              onClick={handleTestModerationModal}
+              variant="outline"
+              className="px-4 py-3 border-orange-300 text-orange-600 hover:bg-orange-50"
+              title="Тест модального окна модерации"
+            >
+              🚫 Тест
             </Button>
           </div>
         </div>
@@ -167,7 +234,7 @@ function AvatarsPage() {
             onSubmit={handleCreateAvatar}
             onCancel={() => setShowCreateForm(false)}
             isLoading={createAvatarMutation.isPending}
-            error={createAvatarMutation.error?.message || null}
+            error={null}
           />
         )}
 
@@ -216,6 +283,18 @@ function AvatarsPage() {
           </Card>
         )}
       </div>
+
+      {/* Content Moderation Modal */}
+      <ContentModerationModal
+        isOpen={moderationModal.isOpen}
+        onClose={() => setModerationModal({ isOpen: false, reasons: [], suggestedFix: '' })}
+        reasons={moderationModal.reasons}
+        suggestedFix={moderationModal.suggestedFix}
+        onRetry={() => {
+          setModerationModal({ isOpen: false, reasons: [], suggestedFix: '' });
+          // Форма остается открытой для повторной попытки
+        }}
+      />
     </div>
   );
 }

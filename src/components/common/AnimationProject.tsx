@@ -67,7 +67,7 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
 
       {/* Project Status */}
       <Card className="project-status p-4 mb-6 bg-blue-50 border-blue-200">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h3 className="font-semibold text-blue-900">Статус проекта</h3>
             <p className="text-blue-700">
@@ -83,7 +83,7 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
             <Button 
               onClick={handleAssembleVideo}
               disabled={assembleVideoMutation.isPending}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="bg-purple-600 hover:bg-purple-700 text-white w-full sm:w-auto"
             >
               {assembleVideoMutation.isPending ? (
                 <div className="flex items-center gap-2">
@@ -97,14 +97,7 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
           )}
         </div>
 
-        {hasSegmentsInProgress && (
-          <div className="mt-3 p-3 bg-yellow-100 border border-yellow-300 rounded">
-            <p className="text-yellow-800 text-sm">
-              ⚡ Некоторые сегменты находятся в процессе генерации. 
-              Статус обновляется автоматически.
-            </p>
-          </div>
-        )}
+        
       </Card>
 
       {/* Global Progress Monitor */}

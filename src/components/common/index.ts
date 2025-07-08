@@ -15,4 +15,5 @@ export { SegmentEditor } from './SegmentEditor';
 export { AnimationProject } from './AnimationProject';
 export { CreateProject } from './CreateProject';
 export { ErrorBoundary } from './ErrorBoundary';
-export { default as ProgressMonitor } from './ProgressMonitor'; 
+export { default as ProgressMonitor } from './ProgressMonitor';
+export { ContentModerationModal } from './ContentModerationModal'; 

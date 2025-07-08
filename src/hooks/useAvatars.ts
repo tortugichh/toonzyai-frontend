@@ -39,7 +39,12 @@ export function useCreateAvatar() {
       }
     },
     onError: (error) => {
-      toastError(error);
+      console.error('Create avatar error in hook:', error);
+      // НЕ показываем toast для ошибок модерации, они обрабатываются в UI
+      const errorData = (error as any)?.details || (error as any)?.response?.data?.detail;
+      if (errorData?.error !== 'content_policy_violation') {
+        toastError(getErrorMessage(error));
+      }
     },
   });
 }
@@ -109,7 +114,8 @@ export function useDeleteAvatar() {
       queryClient.invalidateQueries({ queryKey: ['avatars'] });
     },
     onError: (error) => {
-      toastError(error);
+      console.error('Delete avatar error in hook:', error);
+      toastError(getErrorMessage(error));
     },
   });
 }

@@ -28,9 +28,7 @@ export default function ProgressMonitor({ project, onRefresh, autoRefresh = true
     <Card className="p-4 mb-6 bg-white/80">
       <div className="flex justify-between items-center mb-2">
         <h4 className="font-semibold">Прогресс проекта</h4>
-        <Button size="sm" variant="outline" onClick={() => setIsAuto((v) => !v)}>
-          {isAuto ? '⏸️ Авто' : '🔄 Авто'}
-        </Button>
+        
       </div>
       <div className="mb-2 w-full h-3 bg-gray-200 rounded-full overflow-hidden">
         <div className="h-3 bg-green-500" style={{ width: `${percent}%` }} />
