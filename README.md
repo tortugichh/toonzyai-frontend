@@ -1,4 +1,5 @@
 # ToonzyAI – Фронтенд
+[Сайт проекта](https://toonzyai.me) • [Бекенд репозиторий](https://github.com/tortugichh/toonzyAI-backend)
 
 Этот каталог содержит клиентскую часть ToonzyAI, написанную на **React + TypeScript** c использованием **Vite**, **TailwindCSS** и **React Query**.
 
