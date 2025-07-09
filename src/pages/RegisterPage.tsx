@@ -10,6 +10,7 @@ import { useRegister } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
 import { toastSuccess } from '@/utils/toast';
 import logoSrc from '@/assets/logo.svg';
+import { apiClient } from '@/services/api';
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Имя пользователя должно содержать минимум 3 символа'),
@@ -41,11 +42,16 @@ function RegisterPage() {
     try {
       const { confirmPassword, ...registerData } = data;
       console.log('Sending registration data:', registerData);
+      // 1) Регистрируем пользователя
       await registerMutation.mutateAsync(registerData);
-      
-      // Регистрация успешна, но нужно войти в систему
-      toastSuccess('Регистрация прошла успешно! Теперь войдите в свой аккаунт.');
-      navigate('/login');
+
+      // 2) Автоматически логинимся теми же данными
+      const tokens = await apiClient.login(registerData.username, registerData.password);
+      localStorage.setItem('access_token', tokens.access_token);
+      localStorage.setItem('refresh_token', tokens.refresh_token);
+
+      toastSuccess('Добро пожаловать в ToonzyAI!');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Registration error:', error);
       console.error('Detailed error:', getErrorMessage(error));

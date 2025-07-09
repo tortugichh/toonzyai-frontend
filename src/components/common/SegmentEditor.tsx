@@ -21,8 +21,9 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
   const updatePromptMutation = useUpdateSegmentPrompt();
   const generateSegmentMutation = useGenerateSegment();
 
-  // live progress via WebSocket
-  useSegmentProgressWS(segment.id, projectId);
+  // live progress via WebSocket (только если сегмент не завершён)
+  const skipWS = segment.status === 'completed' || segment.status === 'failed';
+  useSegmentProgressWS(segment.id, projectId, skipWS);
 
   const handleGenerateClick = async () => {
     if (prompt.trim().length < 10) {

@@ -35,10 +35,13 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
   }
 
   const handleAssembleVideo = async () => {
+    console.log('[UI] ▶️ Assemble video button clicked', { projectId });
     try {
-      await assembleVideoMutation.mutateAsync(projectId);
+      const resp = await assembleVideoMutation.mutateAsync(projectId);
+      console.log('[UI] ✅ Assemble video API response', resp);
       refetch();
     } catch (error: any) {
+      console.error('[UI] ❌ Assemble video error', error);
       toastError('Ошибка сборки видео: ' + error.message);
     }
   };

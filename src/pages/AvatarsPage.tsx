@@ -161,14 +161,7 @@ function AvatarsPage() {
               ✨ Создать аватар
             </Button>
             {/* Кнопка для тестирования модального окна модерации */}
-            <Button
-              onClick={handleTestModerationModal}
-              variant="outline"
-              className="px-4 py-3 border-orange-300 text-orange-600 hover:bg-orange-50"
-              title="Тест модального окна модерации"
-            >
-              🚫 Тест
-            </Button>
+            
           </div>
         </div>
 

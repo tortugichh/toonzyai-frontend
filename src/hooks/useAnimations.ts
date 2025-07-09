@@ -115,12 +115,17 @@ export const useProjectProgressWS = (projectId: string | undefined) => {
   }, [projectId, queryClient]);
 };
 
-export const useSegmentProgressWS = (segmentId: string | undefined, projectId?: string) => {
+export const useSegmentProgressWS = (
+  segmentId: string | undefined,
+  projectId?: string,
+  skip?: boolean,
+) => {
   const queryClient = useQueryClient();
   const wsRef = useRef<WebSocket | null>(null);
+  const doneRef = useRef<boolean>(false);
 
   useEffect(() => {
-    if (!segmentId) return;
+    if (!segmentId || skip) return;
     
     // Prevent double connections
     if (wsRef.current) {
@@ -179,13 +184,15 @@ export const useSegmentProgressWS = (segmentId: string | undefined, projectId?: 
             };
           });
           
-          // Если сегмент завершён, рефечим проект, чтобы получить generated_video_url
+          // Если сегмент завершён — рефечим данные и останавливаем WS, без повторного подключения
           if (progressData.status === 'completed' || progressData.status === 'failed') {
             if (projectId) {
               queryClient.invalidateQueries({ queryKey: ['animation-project', projectId] });
             }
-            // Также рефечим детали сегмента по id
             queryClient.invalidateQueries({ queryKey: ['segment-details', segmentId] });
+
+            doneRef.current = true; // помечаем как завершённое наблюдение
+            ws.close();
           }
           
         } catch (error) {
@@ -200,7 +207,7 @@ export const useSegmentProgressWS = (segmentId: string | undefined, projectId?: 
       ws.onclose = (event) => {
         console.log('WebSocket closed:', event.code, event.reason);
         wsRef.current = null;
-        if (retryCount < maxRetries) {
+        if (!doneRef.current && retryCount < maxRetries) {
           const delay = Math.min(1000 * 2 ** retryCount, 30000); // up to 30s
           retryCount += 1;
           setTimeout(connect, delay);
@@ -220,7 +227,8 @@ export const useSegmentProgressWS = (segmentId: string | undefined, projectId?: 
         wsRef.current = null;
       }
     };
-  }, [segmentId, projectId, queryClient]);
+  // reset flag when segmentId changes
+  }, [segmentId, projectId, skip, queryClient]);
 };
 
 // ============ QUERY-BASED HOOKS ============
@@ -405,12 +413,17 @@ export function useAssembleVideo() {
 
   return useMutation({
     mutationFn: (projectId: string) => apiClient.assembleVideo(projectId),
+    onMutate: (projectId) => {
+      console.log('[Hook] 🏗️  assembleVideo onMutate', { projectId });
+    },
     onSuccess: (_, projectId) => {
+      console.log('[Hook] ✅ assembleVideo onSuccess', { projectId });
       queryClient.invalidateQueries({ 
         queryKey: ['animation-project', projectId] 
       });
     },
     onError: (error) => {
+      console.error('[Hook] ❌ assembleVideo onError', error);
       toastError(error);
     },
   });

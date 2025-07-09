@@ -23,7 +23,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
   const [formData, setFormData] = useState<FormData>({
     title: '',
     avatarId: '',
-    totalSegments: 3,
+    totalSegments: 0, // 0 означает «не выбрано»
     prompt: ''
   });
 
@@ -43,6 +43,11 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
       return;
     }
 
+    if (segmentsError) {
+      toastError('Выберите количество сегментов');
+      return;
+    }
+
     try {
       const project = await createProjectMutation.mutateAsync({
         name: formData.title.trim(),
@@ -58,12 +63,10 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
   };
 
   const handleInputChange = (field: keyof FormData, value: string | number) => {
-    // Ensure totalSegments stays in 1-10 range and is an integer
     if (field === 'totalSegments') {
-      let v = typeof value === 'number' ? value : parseInt(value as string, 10);
-      if (isNaN(v)) v = 1;
-      if (v < 1) v = 1;
-      if (v > 10) v = 10;
+      // value из <select> всегда строка
+      let v = parseInt(value as string, 10);
+      if (isNaN(v)) v = 0; // «не выбрано»
       setFormData(prev => ({ ...prev, totalSegments: v }));
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
@@ -73,7 +76,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
   const isSubmitting = createProjectMutation.isPending;
   const avatars = avatarsResponse?.avatars || [];
 
-  const segmentsError = formData.totalSegments < 1 || formData.totalSegments > 10;
+  const segmentsError = formData.totalSegments < 1 || formData.totalSegments > 5;
 
   // Validation helpers
   const promptError = formData.prompt.trim().length > 0 && formData.prompt.trim().length < 10;
@@ -161,20 +164,24 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Количество сегментов
           </label>
-          <Input
-            type="number"
-            min="1"
-            max="10"
-            value={formData.totalSegments}
+          <select
+            value={formData.totalSegments || ''}
             onChange={(e) => handleInputChange('totalSegments', e.target.value)}
             disabled={isSubmitting}
-            className={`w-full ${segmentsError ? 'border-red-500 focus:border-red-500' : ''}`}
-          />
+            className={`rounded px-3 py-2 w-full bg-white border ${segmentsError ? 'border-red-500 focus:border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          >
+            <option value="" disabled>
+              -- выберите --
+            </option>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
           {segmentsError && (
-            <p className="text-red-500 text-xs mt-1">Количество сегментов должно быть от 1 до 10</p>
+            <p className="text-red-500 text-xs mt-1">Количество сегментов должно быть от 1 до 5</p>
           )}
           <p className="text-xs text-gray-500 mt-1">
-            Рекомендуется 3-5 сегментов для оптимального качества
+            Допустимо от 1 до 5 сегментов. Рекомендуется 3&nbsp;–&nbsp;5 для оптимального качества.
           </p>
         </div>
 
