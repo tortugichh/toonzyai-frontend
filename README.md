@@ -68,5 +68,5 @@ COPY --from=build /app/dist /usr/share/nginx/html
 ## CI / Deployment
 Предлагаемый флоу - Vercel:
 1. Подключите репозиторий.
-2. В `Build Command` - `npm run build`, `Output Directory` — `dist`.
+2. В `Build Command` - `npm run build`, `Output Directory` - `dist`.
 3. Добавьте переменные окружения (начинаются с `VITE_`). 
