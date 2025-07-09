@@ -49,7 +49,7 @@ src/
 
 ## Google Analytics
 Аналитика подключена в `index.html` тегом `gtag.js`. Measurement ID берётся напрямую из скрипта.
-Если хотите переключать средами — оставьте тег, но удалите строку из `index.html` и задайте `VITE_GA_ID`.
+Если хотите переключать средами - оставьте тег, но удалите строку из `index.html` и задайте `VITE_GA_ID`.
 
 Событие конверсии `sign_up` отправляется после успешной регистрации (**`src/utils/analytics.ts`** + вызов в `RegisterPage.tsx`).
 
@@ -66,7 +66,7 @@ COPY --from=build /app/dist /usr/share/nginx/html
 ```
 
 ## CI / Deployment
-Предлагаемый флоу – Vercel:
+Предлагаемый флоу - Vercel:
 1. Подключите репозиторий.
-2. В `Build Command` — `npm run build`, `Output Directory` — `dist`.
+2. В `Build Command` - `npm run build`, `Output Directory` — `dist`.
 3. Добавьте переменные окружения (начинаются с `VITE_`). 
