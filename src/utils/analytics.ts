@@ -53,3 +53,12 @@ export const trackPageView = (page_path: string, page_title?: string) => {
     });
   }
 }; 
+
+// Функция GA4 для отслеживания регистрации (конверсия sign_up)
+export const trackSignUp = (method: string = 'email') => {
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', 'sign_up', {
+      method,
+    });
+  }
+}; 

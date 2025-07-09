@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { useRegister } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
 import { toastSuccess } from '@/utils/toast';
+import { trackSignUp } from '@/utils/analytics';
 import logoSrc from '@/assets/logo.svg';
 import { apiClient } from '@/services/api';
 
@@ -49,6 +50,9 @@ function RegisterPage() {
       const tokens = await apiClient.login(registerData.username, registerData.password);
       localStorage.setItem('access_token', tokens.access_token);
       localStorage.setItem('refresh_token', tokens.refresh_token);
+
+      // 3) Отправляем событие Google Analytics о регистрации
+      trackSignUp('email');
 
       toastSuccess('Добро пожаловать в ToonzyAI!');
       navigate('/dashboard');
