@@ -301,6 +301,42 @@ class TokenManager {
       this.isRefreshing = false;
     }
   }
+
+  async getValidAccessToken(): Promise<string | null> {
+    let token = this.getAccessToken();
+    
+    if (!token) {
+      return null;
+    }
+
+    // Try to use the current token first
+    try {
+      // Quick validation: check if token is expired by trying a simple API call
+      const response = await fetch(`${API_BASE}/auth/verify-token`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        return token; // Token is valid
+      }
+
+      if (response.status === 401) {
+        // Token is expired, try to refresh
+        const newToken = await this.refreshAccessToken();
+        return newToken;
+      }
+    } catch (error) {
+      console.error('Token validation failed:', error);
+    }
+
+    // If validation failed for other reasons, try refresh anyway
+    const newToken = await this.refreshAccessToken();
+    return newToken;
+  }
 }
 
 // ============ API CLIENT ============
@@ -715,6 +751,10 @@ class APIClient {
       throw await APIError.fromResponse(response);
     }
     return response.json();
+  }
+
+  async getValidAccessToken(): Promise<string | null> {
+    return this.tokenManager.getValidAccessToken();
   }
 }
 
