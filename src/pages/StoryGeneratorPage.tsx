@@ -10,6 +10,8 @@ import type { AnimationSegment } from '@/services/storyApi';
 import { SegmentEditor } from '@/components/common/SegmentEditor';
 import { useAnimationProject, useProjectProgressWS, useAssembleVideo } from '@/hooks/useAnimations';
 import { Header } from '@/components/layout/Header';
+import { useCurrentUser } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import HTMLFlipBook from 'react-pageflip';
 
 const POLLING_INTERVAL = 3000; // 3 seconds
@@ -32,13 +34,82 @@ function ErrorBlock({ message }: { message: string }) {
 }
 
 function StoryBook({ story }: { story: any }) {
+  // Универсальный парсинг мультиагентного результата
   const script: any = story.script ?? story;
   const title = script.title ?? 'Generated Story';
   const scenes: any[] = script.scenes ?? [];
+  const styleBlock = story.style?.style ?? story.style ?? null;
+  const environmentsBlock = story.environments?.environments ?? story.environments ?? [];
   const charactersBlock = story.characters;
   const characterList = Array.isArray(charactersBlock)
     ? charactersBlock
     : charactersBlock?.characters ?? [];
+
+  // Собираем страницы книги в массив
+  const pages = [
+    // Обложка
+    <div key="cover" className="storybook-page flex flex-col items-center justify-center bg-gradient-to-br from-yellow-100 to-yellow-300 p-8 border-4 border-yellow-400 rounded-lg shadow-inner relative">
+      <h1 className="text-4xl font-extrabold mb-4 text-yellow-900 drop-shadow-lg fancy-title">{title}</h1>
+      <div className="w-40 h-40 bg-gray-200 rounded mb-4 flex items-center justify-center text-gray-400 border-2 border-yellow-300">Плейсхолдер обложки</div>
+      <div className="text-lg text-yellow-800 italic">Сказка, сгенерированная ToonzyAI</div>
+      <div className="absolute bottom-2 right-4 text-xs text-yellow-700 opacity-60">Обложка</div>
+    </div>,
+    // Страница с персонажами
+    <div key="chars" className="storybook-page bg-gradient-to-br from-blue-50 to-blue-200 p-8 border-4 border-blue-300 rounded-lg shadow-inner relative">
+      <h2 className="text-2xl font-bold mb-4 text-blue-900 fancy-title">Персонажи</h2>
+      <ul className="space-y-2">
+        {characterList.length === 0 && <li className="text-gray-500">Нет персонажей</li>}
+        {characterList.map((char: any, idx: number) => (
+          <li key={char.name || idx} className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 border-2 border-blue-200">
+              <span role="img" aria-label="avatar">👤</span>
+            </div>
+            <div>
+              <div className="font-bold text-blue-800">{char.name || 'Без имени'}</div>
+              <div className="text-sm text-blue-700">{char.description || '—'} {char.attire ? `(${char.attire})` : ''}</div>
+              {char.role && <div className="text-xs text-blue-500">Роль: {char.role}</div>}
+            </div>
+          </li>
+        ))}
+      </ul>
+      <div className="absolute bottom-2 right-4 text-xs text-blue-700 opacity-60">Стр. 2</div>
+    </div>,
+    // Страница со стилем (если есть)
+    styleBlock && (
+      <div key="style" className="storybook-page bg-gradient-to-br from-pink-50 to-pink-200 p-8 border-4 border-pink-300 rounded-lg shadow-inner relative">
+        <h2 className="text-2xl font-bold mb-4 text-pink-900 fancy-title">Визуальный стиль</h2>
+        <div className="mb-2"><b>Описание:</b> {styleBlock.summary}</div>
+        <div className="mb-2"><b>Ключевые слова:</b> {styleBlock.positive_keywords}</div>
+        <div className="mb-2"><b>Избегать:</b> {styleBlock.negative_keywords}</div>
+        <div className="absolute bottom-2 right-4 text-xs text-pink-700 opacity-60">Стиль</div>
+      </div>
+    ),
+    // Страницы-сцены или страница "Нет сцен"
+    ...(scenes.length === 0
+      ? [<div key="no-scenes" className="storybook-page bg-gradient-to-br from-white to-yellow-50 p-8 border-4 border-yellow-200 rounded-lg shadow-inner flex flex-col justify-center items-center relative">
+          <div className="text-lg text-gray-500">Нет сцен для отображения</div>
+        </div>]
+      : scenes.map((scene: any, idx: number) => (
+          <div key={scene.id || scene.scene_id || idx} className="storybook-page bg-gradient-to-br from-white to-yellow-50 p-8 border-4 border-yellow-200 rounded-lg shadow-inner flex flex-col justify-between relative">
+            <div>
+              <div className="w-full h-48 bg-gray-100 rounded mb-4 flex items-center justify-center text-gray-400 border-2 border-yellow-100">Плейсхолдер для картинки</div>
+              <div className="text-lg text-gray-800 whitespace-pre-line fancy-text">{scene.description || scene.environment_description || JSON.stringify(scene)}</div>
+              {environmentsBlock && environmentsBlock[idx] && environmentsBlock[idx].environment_description && (
+                <div className="text-sm text-green-700 mt-2">Окружение: {environmentsBlock[idx].environment_description}</div>
+              )}
+            </div>
+            <div className="absolute bottom-2 right-4 text-xs text-yellow-700 opacity-60">Стр. {idx + 3 + (styleBlock ? 1 : 0)}</div>
+          </div>
+        ))
+    ),
+    // Концовка
+    <div key="end" className="storybook-page flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-green-200 p-8 border-4 border-green-300 rounded-lg shadow-inner relative">
+      <h2 className="text-2xl font-bold mb-4 text-green-900 fancy-title">Конец</h2>
+      <div className="w-32 h-32 bg-gray-200 rounded mb-4 flex items-center justify-center text-gray-400 border-2 border-green-200">Плейсхолдер</div>
+      <div className="text-lg text-green-800">Спасибо за чтение!</div>
+      <div className="absolute bottom-2 right-4 text-xs text-green-700 opacity-60">Конец</div>
+    </div>
+  ].filter(Boolean); // убираем null/undefined
 
   return (
     <div className="storybook-container flex justify-center my-8 fade-in">
@@ -67,60 +138,32 @@ function StoryBook({ story }: { story: any }) {
         swipeDistance={30}
         clickEventForward={true}
       >
-        {/* Обложка */}
-        <div className="storybook-page flex flex-col items-center justify-center bg-gradient-to-br from-yellow-100 to-yellow-300 p-8 border-4 border-yellow-400 rounded-lg shadow-inner relative">
-          <h1 className="text-4xl font-extrabold mb-4 text-yellow-900 drop-shadow-lg fancy-title">{title}</h1>
-          <div className="w-40 h-40 bg-gray-200 rounded mb-4 flex items-center justify-center text-gray-400 border-2 border-yellow-300">Плейсхолдер обложки</div>
-          <div className="text-lg text-yellow-800 italic">Сказка, сгенерированная ToonzyAI</div>
-          <div className="absolute bottom-2 right-4 text-xs text-yellow-700 opacity-60">Обложка</div>
-        </div>
-        {/* Страница с персонажами */}
-        <div className="storybook-page bg-gradient-to-br from-blue-50 to-blue-200 p-8 border-4 border-blue-300 rounded-lg shadow-inner relative">
-          <h2 className="text-2xl font-bold mb-4 text-blue-900 fancy-title">Персонажи</h2>
-          <ul className="space-y-2">
-            {characterList.length === 0 && <li className="text-gray-500">Нет персонажей</li>}
-            {characterList.map((char: any, idx: number) => (
-              <li key={char.name || idx} className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 border-2 border-blue-200">IMG</div>
-                <div>
-                  <div className="font-bold text-blue-800">{char.name}</div>
-                  <div className="text-sm text-blue-700">{char.description || '—'} {char.attire ? `(${char.attire})` : ''}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <div className="absolute bottom-2 right-4 text-xs text-blue-700 opacity-60">Стр. 2</div>
-        </div>
-        {/* Страницы-сцены */}
-        {scenes.map((scene: any, idx: number) => (
-          <div key={scene.id || scene.scene_id || idx} className="storybook-page bg-gradient-to-br from-white to-yellow-50 p-8 border-4 border-yellow-200 rounded-lg shadow-inner flex flex-col justify-between relative">
-            <div>
-              <div className="w-full h-48 bg-gray-100 rounded mb-4 flex items-center justify-center text-gray-400 border-2 border-yellow-100">Плейсхолдер для картинки</div>
-              <div className="text-lg text-gray-800 whitespace-pre-line fancy-text">{scene.description || scene.environment_description || JSON.stringify(scene)}</div>
-            </div>
-            <div className="absolute bottom-2 right-4 text-xs text-yellow-700 opacity-60">Стр. {idx + 3}</div>
-          </div>
-        ))}
-        {/* Концовка */}
-        <div className="storybook-page flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-green-200 p-8 border-4 border-green-300 rounded-lg shadow-inner relative">
-          <h2 className="text-2xl font-bold mb-4 text-green-900 fancy-title">Конец</h2>
-          <div className="w-32 h-32 bg-gray-200 rounded mb-4 flex items-center justify-center text-gray-400 border-2 border-green-200">Плейсхолдер</div>
-          <div className="text-lg text-green-800">Спасибо за чтение!</div>
-          <div className="absolute bottom-2 right-4 text-xs text-green-700 opacity-60">Конец</div>
-        </div>
+        {pages}
       </HTMLFlipBook>
     </div>
   );
 }
 
 export function StoryGeneratorPage() {
+  const { data: user, isLoading } = useCurrentUser();
+  const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [story, setStory] = useState<StoryResult | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [finalUrl, setFinalUrl] = useState<string | null>(null);
   const [showBook, setShowBook] = useState(false);
+
+  // Новые состояния для структурированных полей
+  const [genre, setGenre] = useState('');
+  const [style, setStyle] = useState('');
+  const [theme, setTheme] = useState('');
+  const [bookStyle, setBookStyle] = useState('');
+  const [wishes, setWishes] = useState('');
+  const [characters, setCharacters] = useState<Array<{ name: string; description?: string; role?: string }>>([
+    { name: '', description: '', role: '' },
+  ]);
 
   useEffect(() => {
     if (story) {
@@ -130,12 +173,34 @@ export function StoryGeneratorPage() {
     }
   }, [story]);
 
+  if (isLoading) {
+    return <Loader text="Проверка авторизации..." />;
+  }
+  if (!user) {
+    return (
+      <div className="container mx-auto p-4">
+        <Card className="max-w-xl mx-auto mt-16">
+          <CardHeader>
+            <CardTitle>Требуется авторизация</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center gap-4 py-6">
+              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-3xl text-amber-500 border border-amber-200 mb-2">🔒</div>
+              <div className="text-lg text-amber-800 mb-2 text-center">Чтобы сгенерировать книгу, пожалуйста, войдите в свой аккаунт</div>
+              <Button onClick={() => navigate('/login')} className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded">Войти</Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const pollStatus = async (taskId: string) => {
     try {
       const result = await getStoryStatus(taskId);
       if (result.status === 'SUCCESS') {
         setStory(result);
-        setIsLoading(false);
+        setIsGenerating(false);
         setError(null);
         // alert('Story generated successfully!'); // Удалено
       } else if (result.status === 'PENDING' || result.status === 'RETRY') {
@@ -143,34 +208,50 @@ export function StoryGeneratorPage() {
       } else {
         const errorMessage = result.error || 'Failed to generate story.';
         setError(errorMessage);
-        setIsLoading(false);
+        setIsGenerating(false);
         // alert(`Error: ${errorMessage}`); // Удалено
       }
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
-      setIsLoading(false);
+      setIsGenerating(false);
       // alert(`Polling Error: ${errorMessage}`); // Удалено
     }
   };
 
+  const handleCharacterChange = (idx: number, field: string, value: string) => {
+    setCharacters((prev) => {
+      const updated = [...prev];
+      updated[idx] = { ...updated[idx], [field]: value };
+      return updated;
+    });
+  };
+  const addCharacter = () => setCharacters((prev) => [...prev, { name: '', description: '', role: '' }]);
+  const removeCharacter = (idx: number) => setCharacters((prev) => prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!prompt) return;
-
-    setIsLoading(true);
+    // Собираем объект запроса
+    const req = {
+      prompt,
+      genre,
+      style,
+      theme,
+      book_style: bookStyle,
+      wishes,
+      characters: characters.filter((c) => c.name.trim()),
+    };
+    setIsGenerating(true);
     setError(null);
     setStory(null);
-
     try {
-      const { task_id } = await createStory(prompt);
+      const { task_id } = await createStory(req);
       console.log(`Task started with ID: ${task_id}`);
       pollStatus(task_id);
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
-      setIsLoading(false);
-      // alert(`Submission Error: ${errorMessage}`); // Удалено
+      setIsGenerating(false);
     }
   };
 
@@ -257,62 +338,78 @@ export function StoryGeneratorPage() {
 
   return (
     <>
-      <Header user={undefined} onLogout={() => {}} />
+      <Header user={user} onLogout={() => {}} />
       <div className="container mx-auto p-4">
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
-            <CardTitle>Story Generator</CardTitle>
+            <CardTitle>Создать интерактивную книгу</CardTitle>
           </CardHeader>
           <CardContent>
+            {error && <ErrorBlock message={error} />}
             <form onSubmit={handleSubmit} className="space-y-4">
               <Input
-                placeholder="Enter a prompt for your story..."
+                placeholder="Краткий сюжет или идея (prompt)"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                disabled={isLoading}
+                required
               />
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Генерируем...' : 'Сгенерировать историю'}
-              </Button>
-            </form>
-
-            {error && <ErrorBlock message={error} />}
-
-            {isLoading && <Loader text="Генерируем книгу..." />}
-
-            {story && showBook && (
-              <StoryBook story={story} />
-            )}
-
-            {story && !projectId && !isLoading && (
-              <Button className="mt-4" onClick={startVideoGeneration}>Сгенерировать видео</Button>
-            )}
-
-            {projectData && (
-              <div className="mt-6 space-y-4">
-                <h3 className="font-bold text-lg">Сегменты видео</h3>
-                {projectData.segments.map((seg: any) => (
-                  <SegmentEditor 
-                    key={seg.segment_number}
-                    projectId={projectId!}
-                    segment={seg}
-                    onUpdate={refetchProject}
-                  />
-                ))}
-
-                {/* Assemble */}
-                {projectData.segments.length > 0 && projectData.segments.every((s: any) => s.status === 'completed') && !finalUrl && (
-                  <Button onClick={handleAssemble} className="mt-4">📽️ Собрать финальное видео</Button>
-                )}
-
-                {finalUrl && (
-                  <div className="mt-4">
-                    <h3 className="font-bold">Финальное видео</h3>
-                    <video src={finalUrl} controls className="w-full" />
+              <Input
+                placeholder="Жанр (например, сказка, sci-fi)"
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
+              />
+              <Input
+                placeholder="Стиль или настроение (магический, весёлый, ... )"
+                value={style}
+                onChange={(e) => setStyle(e.target.value)}
+              />
+              <Input
+                placeholder="Тема (дружба, приключения, ... )"
+                value={theme}
+                onChange={(e) => setTheme(e.target.value)}
+              />
+              <Input
+                placeholder="Визуальный стиль книги (яркая, винтажная, ... )"
+                value={bookStyle}
+                onChange={(e) => setBookStyle(e.target.value)}
+              />
+              <Input
+                placeholder="Особые пожелания (опционально)"
+                value={wishes}
+                onChange={(e) => setWishes(e.target.value)}
+              />
+              <div>
+                <div className="font-semibold mb-2">Персонажи:</div>
+                {characters.map((char, idx) => (
+                  <div key={idx} className="flex gap-2 mb-2 items-center">
+                    <Input
+                      placeholder="Имя персонажа"
+                      value={char.name}
+                      onChange={(e) => handleCharacterChange(idx, 'name', e.target.value)}
+                      className="w-32"
+                    />
+                    <Input
+                      placeholder="Описание"
+                      value={char.description}
+                      onChange={(e) => handleCharacterChange(idx, 'description', e.target.value)}
+                      className="w-48"
+                    />
+                    <Input
+                      placeholder="Роль (главный, друг...)"
+                      value={char.role}
+                      onChange={(e) => handleCharacterChange(idx, 'role', e.target.value)}
+                      className="w-32"
+                    />
+                    <Button type="button" variant="destructive" size="sm" onClick={() => removeCharacter(idx)} disabled={characters.length === 1}>–</Button>
                   </div>
-                )}
+                ))}
+                <Button type="button" variant="secondary" size="sm" onClick={addCharacter}>+ Добавить персонажа</Button>
               </div>
-            )}
+              <Button type="submit" disabled={isGenerating} className="w-full">Сгенерировать книгу</Button>
+            </form>
+            {/* Простой вывод результата */}
+            {isGenerating && <Loader text="Генерируем книгу..." />}
+            {story && <StoryBook story={story} />}
           </CardContent>
         </Card>
       </div>

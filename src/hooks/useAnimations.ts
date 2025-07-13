@@ -192,11 +192,11 @@ export const useSegmentProgressWS = (
       }
       
       const wsUrl = createWSUrl(`/api/ws/progress/segment/${segmentId}?token=${token}`);
-      
-      console.log('Creating WebSocket connection to:', wsUrl);
-      
-      let retryCount = 0;
-      const maxRetries = 5;
+    
+    console.log('Creating WebSocket connection to:', wsUrl);
+    
+    let retryCount = 0;
+    const maxRetries = 5;
       const connect = async () => {
         // Refresh token on each retry attempt  
         const currentToken = retryCount === 0 ? token : await apiClient.getValidAccessToken();
@@ -207,88 +207,88 @@ export const useSegmentProgressWS = (
         
         const currentWsUrl = createWSUrl(`/api/ws/progress/segment/${segmentId}?token=${currentToken}`);
         const ws = new WebSocket(currentWsUrl);
-        wsRef.current = ws;
+      wsRef.current = ws;
 
-        ws.onopen = () => {
-          retryCount = 0;
-          console.log('WebSocket connected successfully');
-        };
+      ws.onopen = () => {
+        retryCount = 0;
+        console.log('WebSocket connected successfully');
+      };
 
-        ws.onmessage = (event) => {
-          console.log('WebSocket message received:', event.data);
-          try {
-            const progressData = JSON.parse(event.data);
-            
-            // Update segment data directly in React Query cache
-            if (projectId) {
-              queryClient.setQueryData(['animation-project', projectId], (oldData: any) => {
-                if (!oldData) return oldData;
-                
-                return {
-                  ...oldData,
-                  segments: oldData.segments.map((segment: any) => 
-                    segment.id === segmentId 
-                      ? { 
-                          ...segment, 
-                          status: progressData.status,
-                          progress: progressData.progress 
-                        }
-                      : segment
-                  )
-                };
-              });
-            }
-            
-            // Also update individual segment cache if it exists
-            queryClient.setQueryData(['segment-details', segmentId], (oldData: any) => {
+      ws.onmessage = (event) => {
+        console.log('WebSocket message received:', event.data);
+        try {
+          const progressData = JSON.parse(event.data);
+          
+          // Update segment data directly in React Query cache
+          if (projectId) {
+            queryClient.setQueryData(['animation-project', projectId], (oldData: any) => {
               if (!oldData) return oldData;
+              
               return {
                 ...oldData,
-                status: progressData.status,
-                progress: progressData.progress
+                segments: oldData.segments.map((segment: any) => 
+                  segment.id === segmentId 
+                    ? { 
+                        ...segment, 
+                        status: progressData.status,
+                        progress: progressData.progress 
+                      }
+                    : segment
+                )
               };
             });
-            
-            // Если сегмент завершён — рефечим данные и останавливаем WS, без повторного подключения
-            if (progressData.status === 'completed' || progressData.status === 'failed') {
-              if (projectId) {
-                queryClient.invalidateQueries({ queryKey: ['animation-project', projectId] });
-              }
-              queryClient.invalidateQueries({ queryKey: ['segment-details', segmentId] });
-
-              doneRef.current = true; // помечаем как завершённое наблюдение
-              ws.close();
-            }
-            
-          } catch (error) {
-            console.error('Failed to parse WebSocket message:', error);
           }
-        };
+          
+          // Also update individual segment cache if it exists
+          queryClient.setQueryData(['segment-details', segmentId], (oldData: any) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              status: progressData.status,
+              progress: progressData.progress
+            };
+          });
+          
+          // Если сегмент завершён — рефечим данные и останавливаем WS, без повторного подключения
+          if (progressData.status === 'completed' || progressData.status === 'failed') {
+            if (projectId) {
+              queryClient.invalidateQueries({ queryKey: ['animation-project', projectId] });
+            }
+            queryClient.invalidateQueries({ queryKey: ['segment-details', segmentId] });
 
-        ws.onerror = (error) => {
-          console.error('WebSocket error:', error);
-        };
-        
-        ws.onclose = (event) => {
-          console.log('WebSocket closed:', event.code, event.reason);
-          wsRef.current = null;
-          if (!doneRef.current && retryCount < maxRetries) {
+            doneRef.current = true; // помечаем как завершённое наблюдение
+            ws.close();
+          }
+          
+        } catch (error) {
+          console.error('Failed to parse WebSocket message:', error);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      
+      ws.onclose = (event) => {
+        console.log('WebSocket closed:', event.code, event.reason);
+        wsRef.current = null;
+        if (!doneRef.current && retryCount < maxRetries) {
             // For 4401 (auth error), try to refresh token before retry
             if (event.code === 4401) {
               console.log('WebSocket authentication failed, will refresh token on retry');
             }
             
-            const delay = Math.min(1000 * 2 ** retryCount, 30000); // up to 30s
-            retryCount += 1;
-            setTimeout(connect, delay);
-            console.log(`Reconnecting WebSocket in ${delay}ms (attempt ${retryCount})`);
-          } else {
-            console.warn('Max WebSocket reconnect attempts reached');
-          }
-        };
+          const delay = Math.min(1000 * 2 ** retryCount, 30000); // up to 30s
+          retryCount += 1;
+          setTimeout(connect, delay);
+          console.log(`Reconnecting WebSocket in ${delay}ms (attempt ${retryCount})`);
+        } else {
+          console.warn('Max WebSocket reconnect attempts reached');
+        }
       };
+    };
 
-      connect();
+    connect();
     };
     
     connectWithValidToken();

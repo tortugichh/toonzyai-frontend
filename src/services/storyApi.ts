@@ -12,7 +12,8 @@ const API_BASE = '/api/v1';
 // for simplicity in this isolated file.
 // A proper implementation would involve refactoring api.ts to allow for this.
 
-async function request<T>(
+// Переименовываю функцию request в requestFn
+const requestFn = async function<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
@@ -38,18 +39,32 @@ async function request<T>(
     return {} as T;
   }
   return response.json();
+};
+
+
+export interface StoryCreateRequest {
+  prompt?: string;
+  genre?: string;
+  style?: string;
+  theme?: string;
+  book_style?: string;
+  characters?: Array<{
+    name: string;
+    description?: string;
+    role?: string;
+  }>;
+  wishes?: string;
 }
 
-
-export async function createStory(prompt: string): Promise<StoryCreateResponse> {
-  return request<StoryCreateResponse>('/stories/', {
+export async function createStory(request: StoryCreateRequest): Promise<StoryCreateResponse> {
+  return requestFn<StoryCreateResponse>('/stories/', {
     method: 'POST',
-    body: JSON.stringify({ prompt }),
+    body: JSON.stringify(request),
   });
 }
 
 export async function getStoryStatus(taskId: string): Promise<StoryStatusResponse> {
-  return request<StoryStatusResponse>(`/stories/${taskId}`);
+  return requestFn<StoryStatusResponse>(`/stories/${taskId}`);
 }
 
 export interface CreateAnimationProjectPayload {
@@ -74,27 +89,27 @@ export interface AnimationSegment {
 }
 
 export async function createAnimationProject(payload: CreateAnimationProjectPayload): Promise<AnimationProject> {
-  return request<AnimationProject>('/animations/', {
+  return requestFn<AnimationProject>('/animations/', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
 }
 
 export async function generateSegment(projectId: string, segmentNumber: number, segmentPrompt: string) {
-  return request(`/animations/${projectId}/segments/${segmentNumber}/generate`, {
+  return requestFn(`/animations/${projectId}/segments/${segmentNumber}/generate`, {
     method: 'POST',
     body: JSON.stringify({ segment_prompt: segmentPrompt }),
   });
 }
 
 export async function getSegmentDetails(projectId: string, segmentNumber: number): Promise<AnimationSegment> {
-  return request<AnimationSegment>(`/animations/${projectId}/segments/${segmentNumber}`);
+  return requestFn<AnimationSegment>(`/animations/${projectId}/segments/${segmentNumber}`);
 }
 
 export async function getAnimationProject(projectId: string): Promise<AnimationProject> {
-  return request<AnimationProject>(`/animations/${projectId}`);
+  return requestFn<AnimationProject>(`/animations/${projectId}`);
 }
 
 export async function assembleVideo(projectId: string) {
-  return request(`/animations/${projectId}/assemble`, { method: 'POST' });
+  return requestFn(`/animations/${projectId}/assemble`, { method: 'POST' });
 } 
