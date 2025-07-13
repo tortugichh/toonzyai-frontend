@@ -160,6 +160,7 @@ export interface AnimationProject {
   created_at: string;
   updated_at: string;
   segments: AnimationSegment[];
+  animation_type: 'sequential' | 'independent'; // <--- добавлено!
 }
 
 export interface GenerateSegmentResponse {
@@ -518,7 +519,8 @@ class APIClient {
     name: string,
     sourceAvatarId: string,
     totalSegments: number,
-    animationPrompt?: string
+    animationPrompt?: string,
+    animationType?: 'sequential' | 'independent'
   ): Promise<AnimationProject> {
     return this.request<AnimationProject>('/animations/', {
       method: 'POST',
@@ -527,6 +529,7 @@ class APIClient {
         source_avatar_id: sourceAvatarId,
         total_segments: totalSegments,
         animation_prompt: animationPrompt || null,
+        animation_type: animationType || 'independent',
       }),
     });
   }

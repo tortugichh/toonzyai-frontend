@@ -316,11 +316,13 @@ export function useCreateAnimationProject() {
       sourceAvatarId: string;
       totalSegments: number;
       animationPrompt?: string;
+      animationType?: 'sequential' | 'independent';
     }) => apiClient.createAnimationProject(
       data.name,
       data.sourceAvatarId,
       data.totalSegments,
-      data.animationPrompt
+      data.animationPrompt,
+      data.animationType
     ),
     onSuccess: (newProject) => {
       // Invalidate and refetch the projects list

@@ -17,6 +17,7 @@ interface FormData {
   avatarId: string;
   totalSegments: number;
   prompt: string;
+  animationType: 'sequential' | 'independent';
 }
 
 export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps) {
@@ -24,7 +25,8 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
     title: '',
     avatarId: '',
     totalSegments: 0, // 0 означает «не выбрано»
-    prompt: ''
+    prompt: '',
+    animationType: 'independent',
   });
 
   const { data: avatarsResponse, isLoading: avatarsLoading } = useAvatars();
@@ -53,7 +55,8 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
         name: formData.title.trim(),
         sourceAvatarId: formData.avatarId,
         totalSegments: formData.totalSegments,
-        animationPrompt: formData.prompt.trim() || undefined
+        animationPrompt: formData.prompt.trim() || undefined,
+        animationType: formData.animationType,
       });
       
       onProjectCreated(project);
@@ -185,7 +188,40 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
           </p>
         </div>
 
-       
+        {/* Animation Type Selection */}
+        <div className="form-group">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Тип анимации
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="animationType"
+                value="independent"
+                checked={formData.animationType === 'independent'}
+                onChange={() => handleInputChange('animationType', 'independent')}
+                disabled={isSubmitting}
+              />
+              Несвязанные кадры
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="animationType"
+                value="sequential"
+                checked={formData.animationType === 'sequential'}
+                onChange={() => handleInputChange('animationType', 'sequential')}
+                disabled={isSubmitting}
+              />
+              Логически связанная анимация
+            </label>
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            <b>Логически связанная</b>: следующий кадр можно сгенерировать только после завершения предыдущего.<br/>
+            <b>Несвязанные кадры</b>: можно генерировать любые кадры в любом порядке.
+          </p>
+        </div>
 
         {/* Action Buttons */}
         <div className="form-actions flex gap-3 pt-4">

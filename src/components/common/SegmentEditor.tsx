@@ -11,9 +11,11 @@ interface SegmentEditorProps {
   projectId: string;
   segment: AnimationSegment;
   onUpdate: () => void;
+  animationType?: 'sequential' | 'independent';
+  isNextAllowed?: boolean;
 }
 
-export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorProps) {
+export function SegmentEditor({ projectId, segment, onUpdate, animationType, isNextAllowed = true }: SegmentEditorProps) {
   const [prompt, setPrompt] = useState(segment.segment_prompt ?? '');
   const [isEditing, setIsEditing] = useState(!segment.segment_prompt);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -140,11 +142,14 @@ export function SegmentEditor({ projectId, segment, onUpdate }: SegmentEditorPro
         <div className="actions mt-4">
           <Button
             onClick={handleGenerateClick}
-            disabled={isGenerating || segment.status === 'in_progress' || !prompt.trim()}
+            disabled={isGenerating || segment.status === 'in_progress' || !prompt.trim() || (animationType === 'sequential' && !isNextAllowed)}
             className="btn-generate"
           >
             {isGenerating ? 'Генерация...' : '▶️ Сгенерировать видео'}
           </Button>
+          {animationType === 'sequential' && !isNextAllowed && (
+            <div className="text-xs text-blue-600 mt-2">Доступно только после завершения предыдущего сегмента</div>
+          )}
         </div>
       )}
 

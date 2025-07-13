@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,8 +9,109 @@ import { getErrorMessage } from '@/utils/errorHandler';
 import type { AnimationSegment } from '@/services/storyApi';
 import { SegmentEditor } from '@/components/common/SegmentEditor';
 import { useAnimationProject, useProjectProgressWS, useAssembleVideo } from '@/hooks/useAnimations';
+import { Header } from '@/components/layout/Header';
+import HTMLFlipBook from 'react-pageflip';
 
 const POLLING_INTERVAL = 3000; // 3 seconds
+
+function Loader({ text = 'Генерируем книгу...' }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mb-6"></div>
+      <div className="text-xl text-blue-700 font-semibold animate-pulse">{text}</div>
+    </div>
+  );
+}
+
+function ErrorBlock({ message }: { message: string }) {
+  return (
+    <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4 text-center">
+      {message}
+    </div>
+  );
+}
+
+function StoryBook({ story }: { story: any }) {
+  const script: any = story.script ?? story;
+  const title = script.title ?? 'Generated Story';
+  const scenes: any[] = script.scenes ?? [];
+  const charactersBlock = story.characters;
+  const characterList = Array.isArray(charactersBlock)
+    ? charactersBlock
+    : charactersBlock?.characters ?? [];
+
+  return (
+    <div className="storybook-container flex justify-center my-8 fade-in">
+      <HTMLFlipBook
+        width={400}
+        height={600}
+        minWidth={300}
+        maxWidth={600}
+        minHeight={400}
+        maxHeight={800}
+        className="storybook-flipbook shadow-2xl rounded-lg"
+        style={{}}
+        startPage={0}
+        size="fixed"
+        drawShadow={true}
+        flippingTime={600}
+        useMouseEvents={true}
+        showCover={true}
+        mobileScrollSupport={true}
+        usePortrait={true}
+        startZIndex={1}
+        autoSize={false}
+        maxShadowOpacity={0.5}
+        showPageCorners={true}
+        disableFlipByClick={false}
+        swipeDistance={30}
+        clickEventForward={true}
+      >
+        {/* Обложка */}
+        <div className="storybook-page flex flex-col items-center justify-center bg-gradient-to-br from-yellow-100 to-yellow-300 p-8 border-4 border-yellow-400 rounded-lg shadow-inner relative">
+          <h1 className="text-4xl font-extrabold mb-4 text-yellow-900 drop-shadow-lg fancy-title">{title}</h1>
+          <div className="w-40 h-40 bg-gray-200 rounded mb-4 flex items-center justify-center text-gray-400 border-2 border-yellow-300">Плейсхолдер обложки</div>
+          <div className="text-lg text-yellow-800 italic">Сказка, сгенерированная ToonzyAI</div>
+          <div className="absolute bottom-2 right-4 text-xs text-yellow-700 opacity-60">Обложка</div>
+        </div>
+        {/* Страница с персонажами */}
+        <div className="storybook-page bg-gradient-to-br from-blue-50 to-blue-200 p-8 border-4 border-blue-300 rounded-lg shadow-inner relative">
+          <h2 className="text-2xl font-bold mb-4 text-blue-900 fancy-title">Персонажи</h2>
+          <ul className="space-y-2">
+            {characterList.length === 0 && <li className="text-gray-500">Нет персонажей</li>}
+            {characterList.map((char: any, idx: number) => (
+              <li key={char.name || idx} className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 border-2 border-blue-200">IMG</div>
+                <div>
+                  <div className="font-bold text-blue-800">{char.name}</div>
+                  <div className="text-sm text-blue-700">{char.description || '—'} {char.attire ? `(${char.attire})` : ''}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="absolute bottom-2 right-4 text-xs text-blue-700 opacity-60">Стр. 2</div>
+        </div>
+        {/* Страницы-сцены */}
+        {scenes.map((scene: any, idx: number) => (
+          <div key={scene.id || scene.scene_id || idx} className="storybook-page bg-gradient-to-br from-white to-yellow-50 p-8 border-4 border-yellow-200 rounded-lg shadow-inner flex flex-col justify-between relative">
+            <div>
+              <div className="w-full h-48 bg-gray-100 rounded mb-4 flex items-center justify-center text-gray-400 border-2 border-yellow-100">Плейсхолдер для картинки</div>
+              <div className="text-lg text-gray-800 whitespace-pre-line fancy-text">{scene.description || scene.environment_description || JSON.stringify(scene)}</div>
+            </div>
+            <div className="absolute bottom-2 right-4 text-xs text-yellow-700 opacity-60">Стр. {idx + 3}</div>
+          </div>
+        ))}
+        {/* Концовка */}
+        <div className="storybook-page flex flex-col items-center justify-center bg-gradient-to-br from-green-100 to-green-200 p-8 border-4 border-green-300 rounded-lg shadow-inner relative">
+          <h2 className="text-2xl font-bold mb-4 text-green-900 fancy-title">Конец</h2>
+          <div className="w-32 h-32 bg-gray-200 rounded mb-4 flex items-center justify-center text-gray-400 border-2 border-green-200">Плейсхолдер</div>
+          <div className="text-lg text-green-800">Спасибо за чтение!</div>
+          <div className="absolute bottom-2 right-4 text-xs text-green-700 opacity-60">Конец</div>
+        </div>
+      </HTMLFlipBook>
+    </div>
+  );
+}
 
 export function StoryGeneratorPage() {
   const [prompt, setPrompt] = useState('');
@@ -19,6 +120,15 @@ export function StoryGeneratorPage() {
   const [story, setStory] = useState<StoryResult | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
   const [finalUrl, setFinalUrl] = useState<string | null>(null);
+  const [showBook, setShowBook] = useState(false);
+
+  useEffect(() => {
+    if (story) {
+      setTimeout(() => setShowBook(true), 400); // плавное появление
+    } else {
+      setShowBook(false);
+    }
+  }, [story]);
 
   const pollStatus = async (taskId: string) => {
     try {
@@ -27,20 +137,20 @@ export function StoryGeneratorPage() {
         setStory(result);
         setIsLoading(false);
         setError(null);
-        alert('Story generated successfully!');
+        // alert('Story generated successfully!'); // Удалено
       } else if (result.status === 'PENDING' || result.status === 'RETRY') {
         setTimeout(() => pollStatus(taskId), POLLING_INTERVAL);
       } else {
         const errorMessage = result.error || 'Failed to generate story.';
         setError(errorMessage);
         setIsLoading(false);
-        alert(`Error: ${errorMessage}`);
+        // alert(`Error: ${errorMessage}`); // Удалено
       }
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
       setIsLoading(false);
-      alert(`Polling Error: ${errorMessage}`);
+      // alert(`Polling Error: ${errorMessage}`); // Удалено
     }
   };
 
@@ -60,7 +170,7 @@ export function StoryGeneratorPage() {
       const errorMessage = getErrorMessage(err);
       setError(errorMessage);
       setIsLoading(false);
-      alert(`Submission Error: ${errorMessage}`);
+      // alert(`Submission Error: ${errorMessage}`); // Удалено
     }
   };
 
@@ -96,7 +206,8 @@ export function StoryGeneratorPage() {
         }
 
         if (attempts === maxAttempts) {
-          alert('Avatar generation is taking too long. Please try again later.');
+          // alert('Avatar generation is taking too long. Please try again later.'); // Удалено
+          setError('Avatar generation is taking too long. Please try again later.');
           return;
         }
       } else {
@@ -114,7 +225,8 @@ export function StoryGeneratorPage() {
       // Segments will be created asynchronously by backend. We now rely on SegmentEditor UI for individual generation.
     } catch (err) {
       const errorMessage = getErrorMessage(err);
-      alert(`Error starting video generation: ${errorMessage}`);
+      // alert(`Error starting video generation: ${errorMessage}`); // Удалено
+      setError(`Error starting video generation: ${errorMessage}`);
     }
   };
 
@@ -138,133 +250,98 @@ export function StoryGeneratorPage() {
         }
       }, 5000);
     } catch (e: any) {
-      alert(e.message || 'Ошибка сборки видео');
+      // alert(e.message || 'Ошибка сборки видео'); // Удалено
+      setError(e.message || 'Ошибка сборки видео');
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Story Generator</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              placeholder="Enter a prompt for your story..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              disabled={isLoading}
-            />
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Generating...' : 'Generate Story'}
-            </Button>
-          </form>
+    <>
+      <Header user={undefined} onLogout={() => {}} />
+      <div className="container mx-auto p-4">
+        <Card className="max-w-2xl mx-auto">
+          <CardHeader>
+            <CardTitle>Story Generator</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                placeholder="Enter a prompt for your story..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                disabled={isLoading}
+              />
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? 'Генерируем...' : 'Сгенерировать историю'}
+              </Button>
+            </form>
 
-          {error && <p className="text-red-500 mt-4">{error}</p>}
+            {error && <ErrorBlock message={error} />}
 
-          {story && (() => {
-            const script: any = (story as any).script ?? story;
-            const title = script.title ?? 'Generated Story';
-            const scenes: any[] = script.scenes ?? [];
-            const styleSummary = (story as any).style?.style?.summary ?? (story as any).style?.summary ?? '';
-            const charactersBlock = (story as any).characters;
-            const characterList = Array.isArray(charactersBlock)
-              ? charactersBlock
-              : charactersBlock?.characters ?? [];
-            const environmentsBlock = (story as any).environments;
-            const environmentList = Array.isArray(environmentsBlock)
-              ? environmentsBlock
-              : environmentsBlock?.environments ?? [];
-            return (
-              <Card className="mt-6">
-                <CardHeader>
-                  <CardTitle>{title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="font-bold">Style Summary</h3>
-                      <p>{styleSummary}</p>
-                    </div>
-                    <div>
-                      <h3 className="font-bold">Scenes</h3>
-                      <ul className="list-disc pl-5 space-y-2">
-                        {scenes.map((scene) => (
-                          <li key={scene.id || scene.scene_id}>{scene.description || scene.environment_description || JSON.stringify(scene)}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <h3 className="font-bold">Characters</h3>
-                      {(() => {
-                        const typedList = characterList as StoryCharacter[];
-                        return (
-                          <ul className="list-disc pl-5 space-y-2">
-                            {typedList.map((char, idx) => (
-                              <li key={char.name || idx}>
-                                <strong>{char.name}:</strong> {char.description || '—'} {char.attire ? `(${char.attire})` : ''}
-                              </li>
-                            ))}
-                          </ul>
-                        );
-                      })()}
-                    </div>
-                    {environmentList.length > 0 && (
-                      <div>
-                        <h3 className="font-bold">Environments</h3>
-                        <ul className="list-disc pl-5 space-y-2">
-                          {environmentList.map((env: any, idx: number) => (
-                            <li key={env.scene_id || idx}>{env.environment_description || JSON.stringify(env)}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+            {isLoading && <Loader text="Генерируем книгу..." />}
 
-                    <details className="mt-4">
-                      <summary className="cursor-pointer font-medium text-sm text-gray-600">Raw JSON</summary>
-                      <pre className="mt-2 whitespace-pre-wrap text-xs bg-gray-100 p-2 rounded max-h-96 overflow-auto">
-                        {JSON.stringify(story, null, 2)}
-                      </pre>
-                    </details>
+            {story && showBook && (
+              <StoryBook story={story} />
+            )}
+
+            {story && !projectId && !isLoading && (
+              <Button className="mt-4" onClick={startVideoGeneration}>Сгенерировать видео</Button>
+            )}
+
+            {projectData && (
+              <div className="mt-6 space-y-4">
+                <h3 className="font-bold text-lg">Сегменты видео</h3>
+                {projectData.segments.map((seg: any) => (
+                  <SegmentEditor 
+                    key={seg.segment_number}
+                    projectId={projectId!}
+                    segment={seg}
+                    onUpdate={refetchProject}
+                  />
+                ))}
+
+                {/* Assemble */}
+                {projectData.segments.length > 0 && projectData.segments.every((s: any) => s.status === 'completed') && !finalUrl && (
+                  <Button onClick={handleAssemble} className="mt-4">📽️ Собрать финальное видео</Button>
+                )}
+
+                {finalUrl && (
+                  <div className="mt-4">
+                    <h3 className="font-bold">Финальное видео</h3>
+                    <video src={finalUrl} controls className="w-full" />
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })()}
-
-          {story && !projectId && (
-            <Button className="mt-4" onClick={startVideoGeneration}>Generate Video</Button>
-          )}
-
-          {projectData && (
-            <div className="mt-6 space-y-4">
-              <h3 className="font-bold text-lg">Сегменты видео</h3>
-              {projectData.segments.map((seg: any) => (
-                <SegmentEditor 
-                  key={seg.segment_number}
-                  projectId={projectId!}
-                  segment={seg}
-                  onUpdate={refetchProject}
-                />
-              ))}
-
-              {/* Assemble */}
-              {projectData.segments.length > 0 && projectData.segments.every((s: any) => s.status === 'completed') && !finalUrl && (
-                <Button onClick={handleAssemble} className="mt-4">📽️ Собрать финальное видео</Button>
-              )}
-
-              {finalUrl && (
-                <div className="mt-4">
-                  <h3 className="font-bold">Финальное видео</h3>
-                  <video src={finalUrl} controls className="w-full" />
-                </div>
-              )}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+      <style>{`
+        .storybook-page {
+          font-family: 'Georgia', 'Times New Roman', serif;
+          box-shadow: 0 2px 12px 0 rgba(0,0,0,0.08);
+          transition: box-shadow 0.3s;
+        }
+        .storybook-page .fancy-title {
+          font-family: 'Caveat', 'Pacifico', cursive;
+          letter-spacing: 1px;
+        }
+        .storybook-page .fancy-text {
+          font-size: 1.15rem;
+          line-height: 1.7;
+        }
+        .storybook-flipbook {
+          background: repeating-linear-gradient(135deg, #f9f6f2 0 10px, #f3e9d2 10px 20px);
+        }
+        .fade-in {
+          animation: fadeInBook 0.7s ease;
+        }
+        @keyframes fadeInBook {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: none; }
+        }
+      `}</style>
+    </>
   );
 }
 

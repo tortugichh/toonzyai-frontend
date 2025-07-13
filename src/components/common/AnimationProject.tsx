@@ -68,6 +68,22 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
         </div>
       </div>
 
+      {/* Animation type info */}
+      <Card className="mb-4 p-4 border-2 border-dashed border-blue-400 bg-blue-50">
+        <div className="flex items-center gap-3">
+          {project.animation_type === 'sequential' ? (
+            <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-semibold text-sm">Логическая цепочка кадров</span>
+          ) : (
+            <span className="px-3 py-1 rounded-full bg-gray-400 text-white font-semibold text-sm">Независимые кадры</span>
+          )}
+          <span className="text-gray-700 text-sm">
+            {project.animation_type === 'sequential'
+              ? 'Следующий сегмент можно создать только после завершения предыдущего.'
+              : 'Можно создавать и генерировать любые сегменты в любом порядке.'}
+          </span>
+        </div>
+      </Card>
+
       {/* Project Status */}
       <Card className="project-status p-4 mb-6 bg-blue-50 border-blue-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -135,7 +151,7 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
           <div className="segments-list space-y-4">
             {segments
               .sort((a, b) => a.segment_number - b.segment_number)
-              .map(segment => (
+              .map((segment, idx) => (
                 <SegmentEditor 
                   key={`${segment.id}-${segment.segment_number}`}
                   projectId={projectId}
@@ -144,6 +160,8 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
                     refresh();
                     refetch();
                   }}
+                  animationType={project.animation_type}
+                  isNextAllowed={project.animation_type !== 'sequential' || idx === 0 || segments[idx-1]?.status === 'completed'}
                 />
               ))
             }
