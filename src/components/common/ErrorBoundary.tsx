@@ -1,4 +1,5 @@
 import React from 'react';
+import { ActionIcon } from '@/components/ui/icons';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -40,7 +41,8 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                 onClick={() => window.location.reload()}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
               >
-                🔄 Перезагрузить страницу
+                <ActionIcon action="refresh" className="w-4 h-4 mr-2" />
+              Перезагрузить страницу
               </button>
               <button
                 onClick={() => this.setState({ hasError: false, error: null })}

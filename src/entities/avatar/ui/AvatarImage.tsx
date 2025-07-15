@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '@/services/api';
 import type { Avatar } from '../model';
+import { ContentIcon } from '@/components/ui/icons';
 
 interface AvatarImageProps {
   avatar: Pick<Avatar, 'avatar_id' | 'image_url' | 'status'>;
@@ -36,7 +37,9 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
 
   const imgUrl = blobUrl || avatar.image_url;
   if ((hasError || isLoading) && showPlaceholder) {
-    return <div className={`bg-gray-100 flex items-center justify-center ${className}`}>🎭</div>;
+    return <div className={`bg-gray-100 flex items-center justify-center ${className}`}>
+    <ContentIcon type="avatar" className="w-8 h-8 text-gray-400" />
+  </div>;
   }
   if (!imgUrl) return null;
   return <img src={imgUrl} alt="avatar" className={className} onLoad={()=>setImageLoaded(true)} style={{display:imageLoaded?'block':'none'}}/>;

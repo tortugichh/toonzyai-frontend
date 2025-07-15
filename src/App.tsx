@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { QUERY_STALE_TIME, QUERY_CACHE_TIME, IS_DEVELOPMENT } from '@/constants';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useCurrentUser } from '@/hooks/useAuth';
+import { useCurrentUser, simpleLogout } from '@/hooks/useAuth';
 import { ErrorBoundary } from '@/components/common';
 import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/LoginPage';
@@ -15,6 +15,11 @@ import AnimationDetailPage from '@/pages/AnimationDetailPage';
 import AnimationStudioPage from '@/pages/AnimationStudioPage';
 import ProjectPage from '@/pages/ProjectPage';
 import { StoryGeneratorPage } from '@/pages/StoryGeneratorPage';
+
+// Emergency logout function available in console
+if (typeof window !== 'undefined') {
+  (window as any).emergencyLogout = simpleLogout;
+}
 
 // Create a client
 const queryClient = new QueryClient({

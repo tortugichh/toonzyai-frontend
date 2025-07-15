@@ -1,6 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { ContentIcon, ActionIcon } from '@/components/ui/icons';
 import { Header } from '@/components/layout/Header';
 import { BackendStatus } from '@/components/common';
 import { AvatarCard } from '@entities/avatar';
@@ -71,7 +72,7 @@ function DashboardPage() {
                 onClick={handleCreateAvatar}>
             <div className="flex items-center space-x-4">
               <div className="w-16 h-16 bg-gradient-to-br from-primary-light to-primary rounded-lg flex items-center justify-center shadow group-hover:scale-105 transition-transform duration-300">
-                <span className="text-3xl">🎨</span>
+                <ContentIcon type="palette" className="w-8 h-8 text-purple-600" />
               </div>
               <div className="relative z-10">
                 <h3 className="text-2xl font-bold mb-3 group-hover:text-primary-light transition-colors duration-300">Создать аватар</h3>
@@ -84,7 +85,7 @@ function DashboardPage() {
                 onClick={handleCreateAnimation}>
             <div className="flex items-center space-x-4">
               <div className="w-16 h-16 bg-gradient-to-br from-secondary-light to-secondary rounded-lg flex items-center justify-center shadow group-hover:scale-105 transition-transform duration-300">
-                <span className="text-3xl">🎬</span>
+                <ContentIcon type="video" className="w-8 h-8 text-purple-600" />
               </div>
               <div className="relative z-10">
                 <h3 className="text-2xl font-bold mb-3 group-hover:text-secondary-light transition-colors duration-300">Создать анимацию</h3>
@@ -114,7 +115,7 @@ function DashboardPage() {
           <Card className="p-8 bg-gray-50 border border-gray-200 rounded-xl shadow-card group relative hover:shadow-lg">
             <div className="flex flex-col items-center space-y-4">
               <div className="w-16 h-16 bg-gradient-to-br from-secondary-light to-secondary rounded-2xl flex items-center justify-center shadow">
-                <span className="text-3xl text-white">🎭</span>
+                <ContentIcon type="avatar" className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-5xl font-bold text-black">
                   {animationsLoading ? '...' : animations?.length || 0}
@@ -173,7 +174,7 @@ function DashboardPage() {
               ) : (
                 <Card className="p-12 bg-white border border-gray-200 rounded-xl shadow-card group hover:shadow-lg transition-shadow duration-300 text-center">
                   <div className="w-20 h-20 bg-gradient-to-br from-primary-light to-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:rotate-12 transition-transform duration-500">
-                    <span className="text-3xl text-white">🎨</span>
+                    <ContentIcon type="palette" className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-black mb-4">Нет аватаров</h3>
                   <p className="text-gray-700 mb-6 leading-relaxed">Создайте своего первого персонажа</p>
@@ -215,7 +216,7 @@ function DashboardPage() {
                   <Card key={animation.id} className="p-4 bg-white rounded-xl shadow-card hover:shadow-lg transition-shadow">
                     <div className="flex items-center space-x-4">
                       <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <span className="text-xl">🎬</span>
+                        <ContentIcon type="video" className="w-5 h-5" />
                       </div>
                       <div className="flex-1">
                         <h4 className="font-medium text-gray-900 mb-1">
@@ -246,7 +247,7 @@ function DashboardPage() {
               ) : (
                 <Card className="p-12 bg-white border border-gray-200 rounded-xl shadow-card group hover:shadow-lg transition-shadow duration-300 text-center">
                   <div className="w-20 h-20 bg-blue-100 from-primary-light to-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:rotate-12 transition-transform duration-500">
-                    <span className="text-3xl text-white">🎬</span>
+                    <ContentIcon type="video" className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-black mb-4">Нет аватаров</h3>
                   <p className="text-gray-700 mb-6 leading-relaxed">Создайте свою первую анимацию</p>

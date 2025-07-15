@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { StatusIcon, ActionIcon, ContentIcon } from '@/components/ui/icons';
 import AvatarImage from './AvatarImage';
 import type { Avatar } from '@/services/api';
 
@@ -60,7 +61,7 @@ export function AvatarSelector({
   if (avatars.length === 0) {
     return (
       <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-        <span className="text-3xl mb-3 block">🎨</span>
+        <ContentIcon type="palette" className="w-8 h-8 mb-3 mx-auto text-gray-400" />
         <p className="text-gray-600 mb-2">Нет готовых аватаров</p>
         <p className="text-sm text-gray-500 mb-4">
           Сначала создайте аватар, чтобы его можно было анимировать
@@ -71,7 +72,8 @@ export function AvatarSelector({
             variant="outline"
             className="text-purple-600 hover:text-purple-700 border-purple-300"
           >
-            ✨ Создать аватар
+            <ActionIcon action="create" className="w-4 h-4 mr-2" />
+            Создать аватар
           </Button>
         )}
       </div>
@@ -83,7 +85,7 @@ export function AvatarSelector({
       {/* Info */}
       <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
         <div className="flex items-center space-x-2">
-          <span className="text-blue-600">ℹ️</span>
+          <StatusIcon status="info" className="w-4 h-4" />
           <p className="text-sm text-blue-800">
             {completedCount > 0 ? (
               <>
@@ -203,7 +205,10 @@ export function AvatarSelector({
                 ? 'text-green-600'
                 : 'text-yellow-600'
             }>
-              {avatars.find(a => a.avatar_id === selectedAvatarId)?.status?.toLowerCase?.().trim() === 'completed' ? '✓' : '⚠️'}
+              {avatars.find(a => a.avatar_id === selectedAvatarId)?.status?.toLowerCase?.().trim() === 'completed' ? 
+              <StatusIcon status="completed" className="w-4 h-4" /> : 
+              <StatusIcon status="warning" className="w-4 h-4" />
+            }
             </span>
             <div className="flex-1">
               <p className={`text-sm font-medium ${
@@ -218,7 +223,8 @@ export function AvatarSelector({
               </p>
               {avatars.find(a => a.avatar_id === selectedAvatarId)?.status?.toLowerCase?.().trim() !== 'completed' && (
                 <p className="text-xs text-yellow-700 mt-1">
-                  ⚠️ Этот аватар ещё не готов ({getStatusText(avatars.find(a => a.avatar_id === selectedAvatarId)?.status!)}). 
+                  <StatusIcon status="warning" className="w-3 h-3 mr-1" />
+                  Этот аватар ещё не готов ({getStatusText(avatars.find(a => a.avatar_id === selectedAvatarId)?.status!)}). 
                   Анимация может не запуститься.
                 </p>
               )}

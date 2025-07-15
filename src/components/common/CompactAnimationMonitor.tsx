@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { StatusIcon, ActionIcon } from '@/components/ui/icons';
 import type { AnimationProject } from '@/services/api';
 
 interface CompactAnimationMonitorProps {
@@ -32,12 +33,12 @@ export default function CompactAnimationMonitor({
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'PENDING': return '⏳';
-      case 'IN_PROGRESS': return '🔄';
-      case 'ASSEMBLING': return '🔧';
-      case 'COMPLETED': return '✅';
-      case 'FAILED': return '❌';
-      default: return '❓';
+      case 'PENDING': return <StatusIcon status="pending" className="w-4 h-4" />;
+      case 'IN_PROGRESS': return <StatusIcon status="inProgress" className="w-4 h-4" />;
+      case 'ASSEMBLING': return <StatusIcon status="assembling" className="w-4 h-4" />;
+      case 'COMPLETED': return <StatusIcon status="completed" className="w-4 h-4" />;
+      case 'FAILED': return <StatusIcon status="failed" className="w-4 h-4" />;
+      default: return <StatusIcon status="unknown" className="w-4 h-4" />;
     }
   };
 
@@ -86,7 +87,7 @@ export default function CompactAnimationMonitor({
               onClick={() => setAutoRefresh(!autoRefresh)}
               className={`text-xs ${autoRefresh ? 'bg-green-50 text-green-700' : ''}`}
             >
-              {autoRefresh ? '🔄' : '⏸️'}
+              {autoRefresh ? <ActionIcon action="refresh" className="w-4 h-4" /> : <ActionIcon action="pause" className="w-4 h-4" />}
             </Button>
           )}
         </div>
@@ -116,19 +117,25 @@ export default function CompactAnimationMonitor({
               {inProgressSegments > 0 && ` (${inProgressSegments} в работе)`}
             </>
           )}
-          {animation.status === 'assembling' && '🎬 Сборка финального видео'}
+          {animation.status === 'assembling' && (
+          <>
+            <ActionIcon action="loading" className="w-4 h-4 mr-2" animate />
+            Сборка финального видео
+          </>
+        )}
         </div>
       )}
 
       {animation.status === 'completed' && (
         <div className="text-xs text-green-600">
-          🎉 Анимация готова к просмотру
+          Анимация готова к просмотру
         </div>
       )}
 
       {animation.status === 'failed' && (
         <div className="text-xs text-red-600">
-          ❌ Ошибка при обработке
+                      <StatusIcon status="failed" className="w-4 h-4 mr-2" />
+            Ошибка при обработке
         </div>
       )}
     </Card>

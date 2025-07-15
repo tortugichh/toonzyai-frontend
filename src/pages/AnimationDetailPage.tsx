@@ -113,7 +113,9 @@ function AnimationDetailPage() {
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Card className="p-8 text-center bg-white/90 backdrop-blur-sm border-0 shadow-lg">
-            <span className="text-4xl mb-4 block">❌</span>
+            <svg className="w-16 h-16 text-red-500 mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Анимация не найдена</h2>
             <p className="text-gray-600 mb-6">
               {error ? getErrorMessage(error) : 'Анимация не существует или была удалена'}

@@ -339,20 +339,20 @@ export function StoryGeneratorPage() {
   return (
     <>
       <Header user={user} onLogout={() => {}} />
-      <div className="container mx-auto p-4">
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
+    <div className="container mx-auto p-4">
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
             <CardTitle>Создать интерактивную книгу</CardTitle>
-          </CardHeader>
-          <CardContent>
+        </CardHeader>
+        <CardContent>
             {error && <ErrorBlock message={error} />}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
                 placeholder="Краткий сюжет или идея (prompt)"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
                 required
-              />
+            />
               <Input
                 placeholder="Жанр (например, сказка, sci-fi)"
                 value={genre}
@@ -378,7 +378,7 @@ export function StoryGeneratorPage() {
                 value={wishes}
                 onChange={(e) => setWishes(e.target.value)}
               />
-              <div>
+                    <div>
                 <div className="font-semibold mb-2">Персонажи:</div>
                 {characters.map((char, idx) => (
                   <div key={idx} className="flex gap-2 mb-2 items-center">
@@ -404,15 +404,15 @@ export function StoryGeneratorPage() {
                   </div>
                 ))}
                 <Button type="button" variant="secondary" size="sm" onClick={addCharacter}>+ Добавить персонажа</Button>
-              </div>
+                </div>
               <Button type="submit" disabled={isGenerating} className="w-full">Сгенерировать книгу</Button>
             </form>
             {/* Простой вывод результата */}
             {isGenerating && <Loader text="Генерируем книгу..." />}
             {story && <StoryBook story={story} />}
-          </CardContent>
-        </Card>
-      </div>
+        </CardContent>
+      </Card>
+    </div>
       <style>{`
         .storybook-page {
           font-family: 'Georgia', 'Times New Roman', serif;

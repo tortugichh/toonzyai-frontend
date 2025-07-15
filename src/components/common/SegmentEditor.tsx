@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { StatusIcon, ActionIcon } from '@/components/ui/icons';
 import { useTaskProgress, useGenerateSegment, useSegmentProgressWS, useUpdateSegmentPrompt } from '@/hooks/useAnimations';
 import type { AnimationSegment } from '@/services/api';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
@@ -60,11 +61,11 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
 
   const getStatusIcon = () => {
     switch (segment.status) {
-      case 'completed': return '✅';
-      case 'in_progress': return '🔄';
-      case 'pending': return '⏳';
-      case 'failed': return '❌';
-      default: return '❓';
+      case 'completed': return <StatusIcon status="completed" className="w-4 h-4" />;
+      case 'in_progress': return <StatusIcon status="inProgress" className="w-4 h-4" />;
+      case 'pending': return <StatusIcon status="pending" className="w-4 h-4" />;
+      case 'failed': return <StatusIcon status="failed" className="w-4 h-4" />;
+      default: return <StatusIcon status="unknown" className="w-4 h-4" />;
     }
   };
   
@@ -81,7 +82,7 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
 
   const getPromptSource = () => {
     if (segment.prompts?.prompt_source === 'custom') {
-      return '🎯 Пользовательский';
+      return 'Пользовательский';
     }
     return '📝 По умолчанию';
   };
@@ -119,7 +120,7 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
                 onClick={() => setIsEditing(true)}
                 className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
               >
-                ✏️
+                <ActionIcon action="edit" className="w-4 h-4" />
               </Button>
             )}
           </div>
@@ -145,7 +146,17 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
             disabled={isGenerating || segment.status === 'in_progress' || !prompt.trim() || (animationType === 'sequential' && !isNextAllowed)}
             className="btn-generate"
           >
-            {isGenerating ? 'Генерация...' : '▶️ Сгенерировать видео'}
+            {isGenerating ? (
+          <>
+            <ActionIcon action="loading" className="w-4 h-4 mr-2" animate />
+            Генерация...
+          </>
+        ) : (
+          <>
+            <ActionIcon action="play" className="w-4 h-4 mr-2" />
+            Сгенерировать видео
+          </>
+        )}
           </Button>
           {animationType === 'sequential' && !isNextAllowed && (
             <div className="text-xs text-blue-600 mt-2">Доступно только после завершения предыдущего сегмента</div>

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { apiClient } from '@/services/api';
 import { toastError, toastSuccess } from '@/utils/toast';
 import type { LoginRequest, RegisterRequest } from '@/types/api';
@@ -64,18 +65,54 @@ export function useLogout() {
 
   return useMutation({
     mutationFn: async () => {
+      console.log('[LOGOUT] Starting logout process...');
+      
       // Сначала вызываем API logout, затем очищаем локальное хранилище
       try {
+        console.log('[LOGOUT] Calling API logout...');
         await apiClient.logout();
-      } finally {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        queryClient.clear();
-        // Перенаправляем на страницу логина
-        window.location.replace('/login');
+        console.log('[LOGOUT] API logout successful');
+      } catch (error) {
+        console.error('[LOGOUT] API logout failed:', error);
+        // Продолжаем выход даже если API недоступен
       }
+      
+      // Очищаем данные
+      console.log('[LOGOUT] Clearing local storage and cache...');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      queryClient.clear();
+    },
+    onSuccess: () => {
+      console.log('[LOGOUT] Logout mutation completed successfully');
+      toastSuccess('Вы успешно вышли из системы');
+      
+      // Перенаправляем на страницу логина
+      console.log('[LOGOUT] Redirecting to login...');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 500); // Небольшая задержка для показа toast
+    },
+    onError: (error) => {
+      console.error('[LOGOUT] Logout mutation failed:', error);
+      // Всё равно очищаем данные и перенаправляем
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      queryClient.clear();
+      
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 100);
     },
   });
+}
+
+// Утилитарная функция для простого выхода без хуков
+export function simpleLogout() {
+  console.log('[SIMPLE_LOGOUT] Performing simple logout...');
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  window.location.href = '/login';
 }
 
 // Новый хук для проверки токена

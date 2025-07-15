@@ -21,7 +21,7 @@ export const FinalCtaSection = () => {
             className="px-10 py-6 text-lg"
             onClick={() => navigate('/register')}
           >
-            НАЧАТЬ БЕСПЛАТНО 🚀
+            НАЧАТЬ БЕСПЛАТНО
           </Button>
           <Button 
             size="lg" 

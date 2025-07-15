@@ -653,6 +653,84 @@ body::before { display: none; }
   animation: pulse-slow 3s ease-in-out infinite;
 }
 
+/* Infinite animation utilities */
+.animate-infinite {
+  animation-iteration-count: infinite;
+}
+
+/* Spin infinite animation */
+@keyframes spin-infinite {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-infinite {
+  animation: spin-infinite 1s linear infinite;
+}
+
+/* Pulse infinite animation */
+@keyframes pulse-infinite {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-infinite {
+  animation: pulse-infinite 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Bounce infinite animation */
+@keyframes bounce-infinite {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.animate-bounce-infinite {
+  animation: bounce-infinite 1s infinite;
+}
+
+/* Wiggle infinite animation */
+@keyframes wiggle {
+  0%, 7% {
+    transform: rotateZ(0);
+  }
+  15% {
+    transform: rotateZ(-15deg);
+  }
+  20% {
+    transform: rotateZ(10deg);
+  }
+  25% {
+    transform: rotateZ(-10deg);
+  }
+  30% {
+    transform: rotateZ(6deg);
+  }
+  35% {
+    transform: rotateZ(-4deg);
+  }
+  40%, 100% {
+    transform: rotateZ(0);
+  }
+}
+
+.animate-wiggle {
+  animation: wiggle 2s ease-in-out infinite;
+}
+
 /* Mobile-first responsive utilities */
 @media (max-width: 640px) {
   .text-responsive {

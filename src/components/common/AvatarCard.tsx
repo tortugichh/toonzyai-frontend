@@ -1,6 +1,7 @@
 import type { Avatar } from '../../services/api';
 import { Card } from '../ui/card';
 import { Button } from '../ui/button';
+import { ActionIcon, ContentIcon } from '../ui/icons';
 import { useNavigate } from 'react-router-dom';
 import AvatarImage from './AvatarImage';
 import Modal from '../ui/Modal';
@@ -126,19 +127,23 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
                 onClick={handleAnimate}
               className="flex-1 bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white text-sm py-2 font-medium transform-gpu transition-transform duration-300 hover:scale-105"
               >
-                🎬 Создать анимацию
+                <ContentIcon type="video" className="w-4 h-4 mr-2" />
+                Создать анимацию
               </Button>
           ) : normalizedStatus === 'generating' ? (
-              <div className="flex-1 bg-yellow-100 text-yellow-700 text-sm py-2 px-4 rounded-md text-center">
-                ⚙️ Генерируется...
+              <div className="flex-1 bg-yellow-100 text-yellow-700 text-sm py-2 px-4 rounded-md text-center flex items-center justify-center">
+                <ActionIcon action="loading" className="w-4 h-4 mr-2" animate />
+                Генерируется...
               </div>
           ) : normalizedStatus === 'failed' ? (
-              <div className="flex-1 bg-red-100 text-red-700 text-sm py-2 px-4 rounded-md text-center">
-                ❌ Ошибка генерации
+              <div className="flex-1 bg-red-100 text-red-700 text-sm py-2 px-4 rounded-md text-center flex items-center justify-center">
+                <ActionIcon action="delete" className="w-4 h-4 mr-2" />
+                Ошибка генерации
               </div>
           ) : (
-              <div className="flex-1 bg-gray-100 text-gray-600 text-sm py-2 px-4 rounded-md text-center">
-                ⏳ В очереди...
+              <div className="flex-1 bg-gray-100 text-gray-600 text-sm py-2 px-4 rounded-md text-center flex items-center justify-center">
+                <ActionIcon action="loading" className="w-4 h-4 mr-2" />
+                В очереди...
               </div>
           )}
         </div>

@@ -1,5 +1,6 @@
 import type { Avatar } from '../model';
 import { Card, Button } from '@shared/ui';
+import { ActionIcon, ContentIcon } from '@/components/ui/icons';
 import { useNavigate } from 'react-router-dom';
 import AvatarImage from './AvatarImage';
 import Modal from '@/components/ui/Modal';
@@ -89,10 +90,28 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
         </div>
         <div className="flex">
           {normalizedStatus === 'completed' ? (
-            <Button onClick={handleAnimate} className="flex-1 bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white text-sm py-2 font-medium transform-gpu transition-transform duration-300 hover:scale-105">🎬 Создать анимацию</Button>
+            <Button onClick={handleAnimate} className="flex-1 bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white text-sm py-2 font-medium transform-gpu transition-transform duration-300 hover:scale-105">
+              <ContentIcon type="video" className="w-4 h-4 mr-2" />
+              Создать анимацию
+            </Button>
           ) : (
-            <div className="flex-1 bg-gray-100 text-gray-600 text-sm py-2 px-4 rounded-md text-center">
-              {normalizedStatus === 'generating' ? '⚙️ Генерируется...' : normalizedStatus === 'failed' ? '❌ Ошибка генерации' : '⏳ В очереди...'}
+                          <div className="flex-1 bg-gray-100 text-gray-600 text-sm py-2 px-4 rounded-md text-center flex items-center justify-center">
+                {normalizedStatus === 'generating' ? (
+                  <>
+                    <ActionIcon action="loading" className="w-4 h-4 mr-2" animate />
+                    Генерируется...
+                  </>
+                ) : normalizedStatus === 'failed' ? (
+                  <>
+                    <ActionIcon action="delete" className="w-4 h-4 mr-2" />
+                    Ошибка генерации
+                  </>
+                ) : (
+                  <>
+                    <ActionIcon action="loading" className="w-4 h-4 mr-2" />
+                    В очереди...
+                  </>
+                )}
             </div>
           )}
         </div>

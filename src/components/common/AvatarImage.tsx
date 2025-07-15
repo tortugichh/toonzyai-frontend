@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { StatusIcon } from '../ui/icons';
 import { apiClient } from '../../services/api';
 
 interface AvatarImageProps {
@@ -18,7 +19,7 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
   const [isLoading, setIsLoading] = useState(true);
 
   // Добавляем подробное логирование
-  console.log(`🖼️ AvatarImage для ${avatar.avatar_id}:`, {
+  console.log(`[AvatarImage] для ${avatar.avatar_id}:`, {
     status: avatar.status,
     hasImageUrl: !!avatar.image_url,
     imageUrl: avatar.image_url,
@@ -41,7 +42,7 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
         
         // Используем новый метод с правильной аутентификацией
         const blob = await apiClient.getAvatarImageBlob(avatar.avatar_id);
-        console.log('✅ Изображение загружено через новый метод:', blob.size, 'байт');
+        console.log('[SUCCESS] Изображение загружено через новый метод:', blob.size, 'байт');
         
         if (blob.size === 0) {
           throw new Error('Получен пустой файл');
@@ -49,7 +50,7 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
 
         const url = URL.createObjectURL(blob);
         setBlobUrl(url);
-        console.log('🎯 Blob URL создан:', url);
+        console.log('[SUCCESS] Blob URL создан:', url);
         console.log('📊 Состояние после создания URL:', { isLoading, hasError, url });
         
       } catch (error: any) {
@@ -118,7 +119,9 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
     return (
       <div className={`bg-gray-200 rounded-lg flex items-center justify-center ${className}`}>
         <div className="text-center p-4">
-          <div className="text-4xl mb-2">⚠️</div>
+                      <div className="mb-2">
+              <StatusIcon status="warning" className="w-10 h-10 text-yellow-500" />
+            </div>
           <p className="text-gray-500 text-sm">
             {avatar.status === 'completed' ? 'Ошибка загрузки' : 'Генерируется...'}
           </p>

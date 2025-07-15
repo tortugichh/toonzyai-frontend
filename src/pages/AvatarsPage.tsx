@@ -158,7 +158,7 @@ function AvatarsPage() {
               onClick={() => setShowCreateForm(true)}
               className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] hover:opacity-90 text-white px-6 py-3 transform-gpu hover:scale-105 transition"
             >
-              ✨ Создать аватар
+              Создать аватар
             </Button>
             {/* Кнопка для тестирования модального окна модерации */}
             
@@ -175,12 +175,14 @@ function AvatarsPage() {
           <Card className="mb-8 p-4 bg-blue-50 border-blue-200 border">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-sm">🎬</span>
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16l13-8L7 4z" />
+                </svg>
               </div>
               <div>
                 <p className="text-blue-800 font-medium">Готовые аватары можно анимировать!</p>
                 <p className="text-blue-600 text-sm">
-                  Нажмите кнопку "🎬 Создать анимацию" на карточке готового аватара или перейдите в раздел{' '}
+                  Нажмите кнопку "Создать анимацию" на карточке готового аватара или перейдите в раздел{' '}
                   <Button
                     variant="link"
                     onClick={() => navigate('/animations')}
@@ -258,7 +260,9 @@ function AvatarsPage() {
         ) : (
           <Card className="p-12 text-center bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <div className="w-24 h-24 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-4xl">🎨</span>
+              <svg className="w-16 h-16 text-blue-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5a2 2 0 00-2 2v12a4 4 0 004 4h2V3z" />
+              </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               У вас пока нет аватаров
@@ -271,7 +275,7 @@ function AvatarsPage() {
               onClick={() => setShowCreateForm(true)}
               className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] w-full sm:w-auto hover:opacity-90 text-white px-8 py-3 text-md sm:text-lg transform-gpu hover:scale-105 transition"
             >
-              ✨ Создать первого аватара
+              Создать первого аватара
             </Button>
           </Card>
         )}

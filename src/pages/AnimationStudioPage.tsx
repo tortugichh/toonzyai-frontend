@@ -9,6 +9,7 @@ import type { AnimationProject as AnimationProjectType } from '@/services/api';
 import { Header } from '@/components/layout/Header';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import Modal from '@/components/ui/Modal';
+import AvatarImage from '@/components/common/AvatarImage';
 
 function AnimationStudioPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -20,6 +21,11 @@ function AnimationStudioPage() {
   const navigate = useNavigate();
   const { data: user } = useCurrentUser();
   const logoutMutation = useLogout();
+
+  const handleLogout = () => {
+    console.log('[STUDIO] Logout button clicked');
+    logoutMutation.mutate();
+  };
   const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
   const [deleteProjectName, setDeleteProjectName] = useState<string>('');
   
@@ -49,7 +55,7 @@ function AnimationStudioPage() {
   if (showCreateForm) {
     return (
       <>
-        <Header user={user} onLogout={logoutMutation.mutateAsync} isLoggingOut={logoutMutation.isPending} />
+        <Header user={user} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
       <CreateProject 
         onProjectCreated={(project) => {
           setShowCreateForm(false);
@@ -65,7 +71,7 @@ function AnimationStudioPage() {
   // Main studio page - project list
   return (
     <div className="animation-studio-page min-h-screen bg-gray-50">
-      <Header user={user} onLogout={logoutMutation.mutateAsync} isLoggingOut={logoutMutation.isPending} />
+      <Header user={user} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
       <div className="max-w-6xl mx-auto p-6">
         {/* Hero / Header */}
         <div className="studio-header mb-8 bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] text-white rounded-xl p-6 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-4">
@@ -73,7 +79,7 @@ function AnimationStudioPage() {
             <Button onClick={() => navigate(-1)} variant="outline" className="border-white text-white hover:bg-white/10">← Назад</Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                🎬 Студия анимации
+                Студия анимации
               </h1>
               <p className="text-gray-600 mt-2">
                 Создавайте анимации с уникальными промптами для каждого сегмента
@@ -108,13 +114,17 @@ function AnimationStudioPage() {
         {/* Projects List */}
         {isLoading ? (
           <div className="loading text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <div className="animate-spin-infinite rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600 text-lg">Загрузка проектов...</p>
           </div>
         ) : projects.length === 0 ? (
           <Card className="welcome-card text-center py-12">
             <div className="mb-6">
-              <div className="text-6xl mb-4">🎭</div>
+                              <div className="text-purple-500 mb-4">
+                  <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16l13-8L7 4z" />
+                  </svg>
+                </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 Добро пожаловать в ToonzyAI Studio!
               </h2>
@@ -128,7 +138,7 @@ function AnimationStudioPage() {
               onClick={() => setShowCreateForm(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
             >
-              🚀 Создать первый проект
+                              Создать первый проект
             </Button>
           </Card>
         ) : (
@@ -184,11 +194,11 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
   const getStatusText = (status: string) => {
     const s = status?.toLowerCase?.().trim();
     switch (s) {
-      case 'completed': return '✅ Завершен';
-      case 'in_progress': return '⏳ В процессе';
-      case 'assembling': return '🎬 Сборка';
-      case 'failed': return '❌ Ошибка';
-      default: return '⏸️ Ожидает';
+              case 'completed': return 'Завершен';
+        case 'in_progress': return 'В процессе';
+        case 'assembling': return 'Сборка';
+        case 'failed': return 'Ошибка';
+        default: return 'Ожидает';
     }
   };
 
@@ -219,25 +229,14 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
         <div className="flex items-start gap-4 mb-4">
           {/* Avatar Image */}
           <div className="avatar-container flex-shrink-0">
-            {p.source_avatar_url ? (
-              <img 
-                src={p.source_avatar_url}
-                alt="Avatar"
+            <AvatarImage
+              avatar={{
+                avatar_id: p.source_avatar_id,
+                status: 'completed' // Assume avatar is completed if used in project
+              }}
                 className="w-12 h-12 object-cover rounded-lg border-2 border-gray-200"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  const fallback = img.nextElementSibling as HTMLDivElement;
-                  img.style.display = 'none';
-                  if (fallback) fallback.style.display = 'flex';
-                }}
-              />
-            ) : null}
-            <div 
-              className="w-12 h-12 bg-gray-100 rounded-lg border-2 border-gray-200 flex items-center justify-center text-gray-400"
-              style={{ display: p.source_avatar_url ? 'none' : 'flex' }}
-            >
-              🎭
-            </div>
+              showPlaceholder={true}
+            />
           </div>
           
           {/* Project Info */}
@@ -276,15 +275,76 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
           </div>
         </div>
 
-        {/* Final Video Preview */}
-        {p.final_video_url && (
+        {/* Video Thumbnail - Only show when final video exists */}
+        {p.final_video_url ? (
+          <div className="mb-4 relative">
+            <div className="relative w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
+              {/* Avatar as background */}
+              <AvatarImage
+                avatar={{
+                  avatar_id: p.source_avatar_id,
+                  status: 'completed'
+                }}
+                className="w-full h-full object-cover"
+                showPlaceholder={true}
+              />
+              
+              {/* Semi-transparent overlay */}
+              <div className="absolute inset-0 bg-opacity-30 flex items-center justify-center">
+                {/* Play button */}
+                <div className="w-12 h-12 bg-white bg-opacity-90 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all cursor-pointer">
+                  <svg className="w-6 h-6 text-gray-800 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7L8 5z" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Status badge in top-right corner */}
+              <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                Готово
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* No video placeholder - show progress or status instead */
           <div className="mb-4">
-            <video 
-              src={p.final_video_url}
-              className="w-full h-24 object-cover rounded bg-gray-100"
-              muted
-              poster="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggNVYxOUwxOSAxMkw4IDVaIiBmaWxsPSIjNjM2NjcwIi8+Cjwvc3ZnPgo="
-            />
+            <div className="w-full h-20 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 flex items-center justify-center">
+              <div className="text-center text-gray-500">
+                {p.status === 'pending' && (
+                  <>
+                    <svg className="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm">Ожидает обработки</p>
+                  </>
+                )}
+                {p.status === 'in_progress' && (
+                  <>
+                    <svg className="w-8 h-8 mx-auto mb-2 text-blue-400 animate-spin-infinite" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <p className="text-sm">Создание сегментов...</p>
+                  </>
+                )}
+                {p.status === 'assembling' && (
+                  <>
+                    <svg className="w-8 h-8 mx-auto mb-2 text-orange-400 animate-pulse-infinite" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                    <p className="text-sm">Сборка финального видео...</p>
+                  </>
+                )}
+                {p.status === 'failed' && (
+                  <>
+                    <svg className="w-8 h-8 mx-auto mb-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <p className="text-sm">Ошибка создания</p>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         )}
 

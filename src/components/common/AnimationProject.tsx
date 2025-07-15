@@ -125,7 +125,7 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
       {/* Final Video */}
       {project.final_video_url && (
         <Card className="final-video p-4 mb-6 bg-green-50 border-green-200">
-          <h3 className="font-semibold text-green-900 mb-3">🎊 Финальное видео готово!</h3>
+          <h3 className="font-semibold text-green-900 mb-3">Финальное видео готово!</h3>
           <video 
             src={project.final_video_url} 
             controls 

@@ -68,9 +68,9 @@ export function DebugTokenInfo() {
           <strong className="text-yellow-400">Статус:</strong>
           <div className="mt-1">
             {accessToken && refreshToken ? (
-              <span className="text-green-400">✅ Авторизован</span>
+              <span className="text-green-400">Авторизован</span>
             ) : (
-              <span className="text-red-400">❌ Не авторизован</span>
+                              <span className="text-red-400">Не авторизован</span>
             )}
           </div>
         </div>

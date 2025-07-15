@@ -79,7 +79,11 @@ export function ErrorDisplay({ error, retry }: { error: unknown; retry?: () => v
     <div className="error-display p-4 bg-red-50 border border-red-200 rounded-lg">
       <div className="flex items-start">
         <div className="flex-shrink-0">
-          <span className="text-2xl">❌</span>
+                          <div className="text-red-500 mb-2">
+                  <svg className="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
         </div>
         <div className="ml-3 flex-1">
           <h3 className="text-sm font-medium text-red-800">
