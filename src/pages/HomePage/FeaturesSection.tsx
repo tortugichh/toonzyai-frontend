@@ -5,9 +5,9 @@ import { Card } from '@/components/ui/card';
 // Чекпойнты для слайдера
 const checkpoints = [
   { value: 0, label: 'Начало', features: 0 },
-  { value: 33, label: 'ИИ-Генерация', features: 1 },
-  { value: 66, label: 'Обработка', features: 2 },
-  { value: 100, label: 'Анимация', features: 3 }
+  { value: 33, label: 'История', features: 1 },
+  { value: 66, label: 'Видео', features: 2 },
+  { value: 100, label: 'Результат', features: 3 }
 ];
 
 export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
@@ -37,27 +37,27 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
   const visibleFeatures = currentCheckpoint.features;
 
   return (
-    <section ref={ref} className="relative py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+    <section ref={ref} className="relative py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
         {/* Декоративные элементы */}
         <div className="absolute top-10 left-4 sm:left-10 w-16 h-16 sm:w-20 sm:h-20 bg-orange-200/30 rounded-full blur-xl" />
         <div className="absolute bottom-10 right-4 sm:right-10 w-24 h-24 sm:w-32 sm:h-32 bg-orange-300/20 rounded-full blur-2xl" />
         
         <motion.div
-          className="text-center mb-12 sm:mb-16"
+          className="text-center mb-8 sm:mb-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4 px-2">
-            Процесс создания{' '}
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4 px-2">
+            От идеи до{' '}
             <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-              анимации
+              видео-истории
             </span>
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4">
-            Узнайте, как ToonzyAI превращает ваши идеи в потрясающие анимации
+          <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-3xl mx-auto px-4">
+            Узнайте, как ToonzyAI превращает ваши идеи в увлекательные видео-истории
           </p>
           
           {/* Прогресс индикатор */}
@@ -78,7 +78,7 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
           </div>
           
           <p className="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8 px-2">
-            {currentCheckpoint.label} ({checkpointIndex + 1}/4 этапа) • ({visibleFeatures}/3 блока)
+            {currentCheckpoint.label} ({checkpointIndex + 1}/4 шага) • ({visibleFeatures}/3 функции)
           </p>
         </motion.div>
 
@@ -155,24 +155,43 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
               }}
               transition={{ duration: 0.5 }}
             >
-              <Card className="relative p-4 sm:p-6 h-full bg-gradient-to-br from-white to-orange-50/50 border border-orange-100 hover:shadow-xl hover:shadow-orange-500/10 transition-all duration-300 overflow-hidden group">
-                {/* Декоративный элемент */}
-                <div className="absolute top-0 right-0 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-orange-400/20 to-transparent rounded-bl-3xl" />
+              <Card className="relative p-5 sm:p-7 h-full bg-gradient-to-br from-white/90 via-white/95 to-orange-50/60 backdrop-blur-sm border border-orange-200/50 hover:border-orange-300/70 hover:shadow-2xl hover:shadow-orange-500/15 transition-all duration-500 overflow-hidden group hover:-translate-y-1">
+                {/* Декоративные элементы */}
+                <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-orange-400/15 via-amber-300/10 to-transparent rounded-bl-3xl" />
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-orange-300/30 to-amber-400/30 rounded-full blur-sm group-hover:scale-150 transition-transform duration-500" />
                 
-                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                  <div className="p-2 sm:p-3 bg-gradient-to-r from-orange-400 to-orange-600 rounded-lg sm:rounded-xl text-white shadow-lg">
-                    <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">ИИ-Генерация</h3>
+                <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-5">
+                  <motion.div 
+                    className="p-3 sm:p-4 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 rounded-xl text-white shadow-lg group-hover:shadow-xl group-hover:shadow-orange-500/30 transition-all duration-300"
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    transition={{ type: "spring", stiffness: 300 }}
+                  >
+                    <motion.svg 
+                      className="w-5 h-5 sm:w-7 sm:h-7" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                      animate={{ 
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{ 
+                        duration: 3, 
+                        repeat: Infinity, 
+                        ease: "easeInOut" 
+                      }}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </motion.svg>
+                  </motion.div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-orange-700 transition-colors duration-300">Создание персонажа</h3>
                 </div>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Мощные алгоритмы искусственного интеллекта создают уникальные персонажи и сцены на основе ваших описаний.
+                <p className="text-base sm:text-lg text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                  Создайте своего персонажа с любой внешностью.
                 </p>
                 
-                {/* Hover эффект */}
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-400/5 to-orange-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {/* Hover эффекты */}
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-400/8 via-amber-300/5 to-orange-600/8 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Card>
             </motion.div>
 
@@ -193,14 +212,13 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <div className="p-2 sm:p-3 bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg sm:rounded-xl text-white shadow-lg">
                     <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V1a1 1 0 011-1h2a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1V1a1 1 0 011-1h2a1 1 0 011 1v3m0 0h10M9 7h6m-6 4h6m-6 4h6" />
                     </svg>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Обработка</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Создание видео</h3>
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Автоматическая обработка и оптимизация контента с применением передовых техник компьютерного зрения.
+                  Превращаем вашу историю в красивые видео с помощью новейших технологий от Google.
                 </p>
                 
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -224,13 +242,13 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
                 <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <div className="p-2 sm:p-3 bg-gradient-to-r from-purple-400 to-purple-600 rounded-lg sm:rounded-xl text-white shadow-lg">
                     <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1a3 3 0 000-6h-1m4 6V4a3 3 0 000 6m-4 0h6m-6 0v10a1 1 0 001 1h4a1 1 0 001-1V10m-6 0a1 1 0 001-1V4a1 1 0 00-1-1H5a1 1 0 00-1 1v5a1 1 0 001 1z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Анимация</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Готовый результат</h3>
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Создание плавных, профессиональных анимаций с естественными движениями и выразительной мимикой.
+                  Получите готовую анимацию, которую можно сразу смотреть и делиться с друзьями.
                 </p>
                 
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-400/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

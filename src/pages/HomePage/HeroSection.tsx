@@ -17,15 +17,19 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative text-center py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8">
+    <section className="relative text-center py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      {/* Декоративные элементы */}
+      <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-orange-300/20 to-amber-300/20 rounded-full blur-xl animate-pulse" />
+      <div className="absolute bottom-32 right-16 w-32 h-32 bg-gradient-to-r from-yellow-300/15 to-orange-400/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
+      
       <motion.div
-        className="max-w-4xl mx-auto"
+        className="max-w-5xl mx-auto relative z-10"
         variants={wordContainer}
         initial="hidden"
         animate="visible"
       >
         <motion.h1 
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight px-2"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 md:mb-6 leading-tight px-2"
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ 
@@ -82,7 +86,7 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
         </motion.h1>
         
         <motion.p 
-          className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-4"
+          className="text-base sm:text-lg md:text-xl text-gray-600 mb-4 sm:mb-6 md:mb-8 max-w-3xl mx-auto px-4"
           variants={wordVariant}
         >
           ToonzyAI превращает ваши идеи в профессиональные анимации за считанные минуты. 

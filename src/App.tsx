@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { QUERY_STALE_TIME, QUERY_CACHE_TIME, IS_DEVELOPMENT } from '@/constants';
+import { createSecureOnError } from '@/utils/globalErrorHandler';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useCurrentUser, simpleLogout } from '@/hooks/useAuth';
 import { ErrorBoundary } from '@/components/common';
@@ -15,6 +16,7 @@ import AnimationDetailPage from '@/pages/AnimationDetailPage';
 import AnimationStudioPage from '@/pages/AnimationStudioPage';
 import ProjectPage from '@/pages/ProjectPage';
 import { StoryGeneratorPage } from '@/pages/StoryGeneratorPage';
+import StoryDetailPage from '@/pages/StoryDetailPage';
 
 // Emergency logout function available in console
 if (typeof window !== 'undefined') {
@@ -29,6 +31,8 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       staleTime: QUERY_STALE_TIME,
       gcTime: QUERY_CACHE_TIME, // В новых версиях React Query используется gcTime вместо cacheTime
+    },
+    mutations: {
     },
   },
 });
@@ -108,6 +112,22 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <StoryGeneratorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stories"
+          element={
+            <ProtectedRoute>
+              <StoryGeneratorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stories/:id"
+          element={
+            <ProtectedRoute>
+              <StoryDetailPage />
             </ProtectedRoute>
           }
         />

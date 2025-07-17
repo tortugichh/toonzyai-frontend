@@ -4,6 +4,7 @@
  */
 
 import { API_BASE_URL } from '@/constants';
+import { secureLogger, sanitizeApiError } from '@/utils/secureLogging';
 
 // Базовый путь API – полноценный URL в продакшене, либо прокси-путь в dev
 export const API_BASE = API_BASE_URL || '/api/v1';
@@ -126,12 +127,19 @@ export interface StoryEnvironment {
   environment_description: string;
 }
 
+export interface StoryIllustration {
+  scene_id: number;
+  image_prompt: string;
+  image_url: string | null;
+}
+
 export interface StoryResult {
   title: string;
   scenes: StoryScene[];
   style: { style: StoryStyle };
   characters: { characters: StoryCharacter[] };
   environments: { environments: StoryEnvironment[] };
+  illustrations: { illustrations: StoryIllustration[] };
 }
 
 export type StoryStatusResponse =
@@ -293,7 +301,7 @@ class TokenManager {
         throw new Error('Refresh failed');
       }
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      secureLogger.error('Token refresh failed:', sanitizeApiError(error));
       this.clearTokens();
       this.failedQueue.forEach(resolve => resolve(null));
       this.failedQueue = [];
@@ -331,7 +339,7 @@ class TokenManager {
         return newToken;
       }
     } catch (error) {
-      console.error('Token validation failed:', error);
+      secureLogger.error('Token validation failed:', sanitizeApiError(error));
     }
 
     // If validation failed for other reasons, try refresh anyway

@@ -19,5 +19,13 @@ export default tseslint.config([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Запрещаем прямое использование console в продакшен коде
+      'no-console': ['warn', { 
+        allow: [] // Не разрешаем никакие console методы
+      }],
+      // Предупреждение о использовании debugger
+      'no-debugger': 'warn',
+    },
   },
 ])

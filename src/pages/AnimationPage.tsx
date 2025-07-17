@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Header } from '@/components/layout/Header';
-import { AnimationSegments, VideoPreview, AvatarSelector, BackendStatus, CompactAnimationMonitor } from '@/components/common';
+import { AnimationSegments, VideoPreview, AvatarSelector, CompactAnimationMonitor } from '@/components/common';
 import { 
   useCreateAnimationProject, 
   useAnimationProjects, 
@@ -195,9 +195,7 @@ function AnimationPage() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Backend Status Check */}
-        <div className="mb-6">
-          <BackendStatus />
-        </div>
+      
 
         {/* Debug авторизации */}
         {process.env.NODE_ENV === 'development' && (

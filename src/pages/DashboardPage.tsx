@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ContentIcon, ActionIcon } from '@/components/ui/icons';
 import { Header } from '@/components/layout/Header';
-import { BackendStatus } from '@/components/common';
 import { AvatarCard } from '@entities/avatar';
 import { useAvatars } from '@/hooks/useAvatars';
 import { useAnimationProjects } from '@/hooks/useAnimations';
@@ -49,9 +48,7 @@ function DashboardPage() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Backend Status */}
-        <div className="mb-6">
-          <BackendStatus />
-        </div>
+        
 
         {/* Welcome Section */}
         <div className="mb-12 text-center">
@@ -59,7 +56,7 @@ function DashboardPage() {
             🏠 Панель управления
           </div>
           <h1 className="text-4xl md:text-6xl font-black mb-6 gradient-text-animated">
-            Добро пожаловать, {user?.username}! 👋
+            Добро пожаловать, {user?.username}! 
           </h1>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
             Управляйте своими аватарами и анимациями из единого центра
