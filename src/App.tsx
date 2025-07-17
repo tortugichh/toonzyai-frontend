@@ -124,7 +124,7 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/stories/:id"
+          path="/stories/id"
           element={
             <ProtectedRoute>
               <StoryDetailPage />
