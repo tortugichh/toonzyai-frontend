@@ -47,22 +47,22 @@ export default function PromptPlanner({ project, onSaved }: PromptPlannerProps) 
 
   return (
     <Card className="p-6 mb-6">
-      <h3 className="text-lg font-semibold mb-4">Планировщик промптов</h3>
+      <h3 className="text-lg font-semibold mb-4">Prompt Planner</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: project.total_segments }, (_, idx) => {
           const num = idx + 1;
           return (
             <div key={num} className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 block">Сегмент {num}</label>
+              <label className="text-sm font-medium text-gray-700 block">Segment {num}</label>
               <textarea
                 value={prompts[num]}
                 onChange={(e) => handleChange(num, e.target.value)}
                 rows={3}
-                placeholder="Описание (≥10 симв.)"
+                placeholder="Description (≥10 chars)"
                 className={`w-full p-2 border rounded bg-white ${prompts[num].trim().length<10?'border-red-400':'border-gray-300'}`}
               />
               {prompts[num].trim().length<10 && (
-                <p className="text-xs text-red-500">Минимум 10 символов</p>
+                <p className="text-xs text-red-500">Minimum 10 characters</p>
               )}
             </div>
           );
@@ -70,7 +70,7 @@ export default function PromptPlanner({ project, onSaved }: PromptPlannerProps) 
       </div>
       <div className="mt-4 flex justify-end">
         <Button onClick={handleSave} disabled={!allValid || isPending} className="bg-green-600 hover:bg-green-700">
-          {isPending ? 'Сохранение...' : '💾 Сохранить промпты'}
+          {isPending ? 'Saving...' : '💾 Save Prompts'}
         </Button>
       </div>
     </Card>

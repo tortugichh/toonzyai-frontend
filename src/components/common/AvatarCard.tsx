@@ -3,10 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ContentIcon } from '@/components/ui/icons';
 import { ActionIcon } from '@/components/ui/icons';
-import { AvatarImage } from './AvatarImage';
+import AvatarImage from './AvatarImage';
 import Modal from '@/components/ui/Modal';
 import { useNavigate } from 'react-router-dom';
-import { Avatar } from '@/types/api';
+import type { Avatar } from '@/types/api';
 
 interface AvatarCardProps {
   avatar: Avatar;

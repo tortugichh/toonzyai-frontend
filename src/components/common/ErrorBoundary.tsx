@@ -27,30 +27,39 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   render() {
     if (this.state.hasError) {
       return (
-        <div className="error-fallback min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg text-center">
-            <div className="text-6xl mb-4">😵</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Что-то пошло не так
-            </h2>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
+            <div className="text-red-500 text-6xl mb-4">⚠️</div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              Something went wrong
+            </h1>
             <p className="text-gray-600 mb-6">
-              {this.state.error?.message || 'Произошла неожиданная ошибка'}
+              We're sorry, but something unexpected happened. Please try refreshing the page.
             </p>
             <div className="space-y-3">
-              <button 
+              <button
                 onClick={() => window.location.reload()}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
               >
-                <ActionIcon action="refresh" className="w-4 h-4 mr-2" />
-              Перезагрузить страницу
+                Refresh Page
               </button>
               <button
-                onClick={() => this.setState({ hasError: false, error: null })}
-                className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded transition-colors"
+                onClick={() => window.history.back()}
+                className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors"
               >
-                🔙 Попробовать снова
+                Go Back
               </button>
             </div>
+            {process.env.NODE_ENV === 'development' && this.state.error && (
+              <details className="mt-6 text-left">
+                <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
+                  Show error details (development only)
+                </summary>
+                <pre className="mt-2 text-xs bg-gray-100 p-3 rounded overflow-auto max-h-40">
+                  {this.state.error.toString()}
+                </pre>
+              </details>
+            )}
           </div>
         </div>
       );

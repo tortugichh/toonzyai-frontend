@@ -23,7 +23,7 @@ export default function HomePage() {
       <AnimatedBackground />
 
       {/* Reusable Header Component */}
-      <Header onLogout={() => {}} />
+      <Header user={null} onLogout={() => {}} />
 
       {/* Hero Section */}
       <HeroSection scrollToFeatures={scrollToFeatures} />

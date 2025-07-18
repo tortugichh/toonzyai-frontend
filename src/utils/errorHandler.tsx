@@ -1,6 +1,6 @@
 /**
- * Error Handling Utilities
- * Согласно FRONTEND_INTEGRATION_GUIDE.md
+ * Error handling utilities for API calls
+ * According to FRONTEND_INTEGRATION_GUIDE.md
  */
 
 import React from 'react';
@@ -22,28 +22,28 @@ export async function handleAPIRequest<T>(requestFn: () => Promise<T>): Promise<
     return await requestFn();
   } catch (error: any) {
     if (error.status === 401) {
-      // Токен истек или недействителен
+      // Token expired or invalid
       window.location.href = '/login';
       throw error;
     }
     
     if (error.status === 403) {
-      throw new APIError('Доступ запрещен', 403, 'FORBIDDEN');
+      throw new APIError('Access denied', 403, 'FORBIDDEN');
     }
     
     if (error.status === 422) {
-      throw new APIError('Неверные данные', 422, 'VALIDATION_ERROR');
+      throw new APIError('Invalid data', 422, 'VALIDATION_ERROR');
     }
     
     if (error.status >= 500) {
-      throw new APIError('Ошибка сервера', error.status, 'SERVER_ERROR');
+      throw new APIError('Server error', error.status, 'SERVER_ERROR');
     }
     
     throw error;
   }
 }
 
-// Функция для получения понятного сообщения об ошибке
+// Function to get a user-friendly error message
 export function getErrorMessage(error: unknown): string {
   if (error instanceof APIError) {
     return error.message;
@@ -61,17 +61,17 @@ export function getErrorMessage(error: unknown): string {
     return String((error as any).detail);
   }
   
-  return 'Произошла неожиданная ошибка';
+  return 'An unexpected error occurred';
 }
 
-// Типы для обработки ошибок
+// Types for error handling
 export interface ErrorDisplayProps {
   error: unknown;
   retry?: () => void;
   fallback?: React.ComponentType;
 }
 
-// Компонент для отображения ошибок
+// Component for displaying errors
 export function ErrorDisplay({ error, retry }: { error: unknown; retry?: () => void }) {
   const message = getErrorMessage(error);
   
@@ -87,7 +87,7 @@ export function ErrorDisplay({ error, retry }: { error: unknown; retry?: () => v
         </div>
         <div className="ml-3 flex-1">
           <h3 className="text-sm font-medium text-red-800">
-            Произошла ошибка
+            An error occurred
           </h3>
           <p className="mt-1 text-sm text-red-700">
             {message}
@@ -98,7 +98,7 @@ export function ErrorDisplay({ error, retry }: { error: unknown; retry?: () => v
                 onClick={retry}
                 className="text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded transition-colors"
               >
-                Попробовать снова
+                Try again
               </button>
             </div>
           )}
@@ -108,12 +108,12 @@ export function ErrorDisplay({ error, retry }: { error: unknown; retry?: () => v
   );
 }
 
-// Хук для обработки ошибок в компонентах
+// Hook for error handling in components
 export function useErrorHandler() {
   const handleError = (error: unknown, context?: string) => {
     console.error(`Error in ${context || 'component'}:`, error);
     
-    // Можно добавить отправку ошибок в сервис аналитики
+    // You can add error reporting to an analytics service
     // sendErrorToAnalytics(error, context);
   };
   

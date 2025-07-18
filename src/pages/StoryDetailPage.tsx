@@ -40,11 +40,11 @@ function StoryDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-        <Header user={user} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
+        <Header user={user ?? null} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-16">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-amber-600 mx-auto mb-6"></div>
-            <div className="text-xl text-amber-700 font-semibold animate-pulse">Загрузка истории...</div>
+            <div className="text-xl text-amber-700 font-semibold animate-pulse">Loading story...</div>
           </div>
         </div>
       </div>
@@ -54,18 +54,18 @@ function StoryDetailPage() {
   if (error || !storyData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-        <Header user={user} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
+        <Header user={user ?? null} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Card className="p-8 text-center bg-white/90 backdrop-blur-sm border-0 shadow-lg">
             <svg className="w-16 h-16 text-red-500 mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">История не найдена</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Story not found</h2>
             <p className="text-gray-600 mb-6">
-              {error ? getErrorMessage(error) : 'История не существует или была удалена'}
+              {error ? getErrorMessage(error) : 'Story does not exist or has been deleted'}
             </p>
             <Button onClick={() => navigate('/stories')}>
-              ← Вернуться к историям
+              ← Back to stories
             </Button>
           </Card>
         </div>
@@ -76,7 +76,7 @@ function StoryDetailPage() {
   if (storyData.status === 'PENDING' || storyData.status === 'RETRY') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-        <Header user={user} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
+        <Header user={user ?? null} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
             <Button
@@ -84,19 +84,19 @@ function StoryDetailPage() {
               onClick={() => navigate('/stories')}
               className="text-gray-600 hover:text-gray-800"
             >
-              ← Назад к историям
+              ← Back to stories
             </Button>
           </div>
           
           <Card className="p-8 text-center bg-white/90 backdrop-blur-sm border-0 shadow-lg">
             <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-amber-600 mx-auto mb-6"></div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">История генерируется</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Story is generating</h2>
             <p className="text-gray-600 mb-6">
-              Пожалуйста, подождите. Создание уникальной истории может занять несколько минут.
+              Please wait. Creating a unique story can take several minutes.
             </p>
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
               <p className="text-amber-700 text-sm">
-                💡 Статус: {storyData.status === 'PENDING' ? 'В очереди' : 'Генерируется'}
+                �� Status: {storyData.status === 'PENDING' ? 'In queue' : 'Generating'}
               </p>
             </div>
           </Card>
@@ -108,7 +108,7 @@ function StoryDetailPage() {
   if (storyData.status === 'FAILURE') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-        <Header user={user} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
+        <Header user={user ?? null} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
             <Button
@@ -116,7 +116,7 @@ function StoryDetailPage() {
               onClick={() => navigate('/stories')}
               className="text-gray-600 hover:text-gray-800"
             >
-              ← Назад к историям
+              ← Back to stories
             </Button>
           </div>
           
@@ -124,16 +124,16 @@ function StoryDetailPage() {
             <svg className="w-16 h-16 text-red-500 mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Ошибка генерации</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Generation error</h2>
             <p className="text-gray-600 mb-6">
-              Произошла ошибка при создании истории. Попробуйте создать новую.
+              An error occurred during story creation. Please try creating a new one.
             </p>
             <div className="flex gap-3 justify-center">
               <Button onClick={() => navigate('/stories')}>
-                ← К историям
+                ← To stories
               </Button>
               <Button onClick={() => navigate('/stories')} className="bg-amber-600 hover:bg-amber-700 text-white">
-                Создать новую историю
+                Create new story
               </Button>
             </div>
           </Card>
@@ -145,7 +145,7 @@ function StoryDetailPage() {
   // Story is ready - show the book
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
-      <Header user={user} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
+      <Header user={user ?? null} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
           <Button
@@ -153,7 +153,7 @@ function StoryDetailPage() {
             onClick={() => navigate('/stories')}
             className="text-gray-600 hover:text-gray-800"
           >
-            ← Назад к историям
+            ← Back to stories
           </Button>
         </div>
         
@@ -203,13 +203,13 @@ function StoryBook({ story }: { story: StoryResult }) {
 
     // Добавляем контекстные переходы и детали
     const transitions = [
-      "Между тем", "Тем временем", "В это время", "Неожиданно", "Вдруг", 
-      "Внезапно", "После этого", "Затем", "В следующий момент"
+      "Between the meanwhile", "In the meanwhile", "In this time", "Unexpectedly", "Suddenly", 
+      "Suddenly", "After this", "Then", "In the next moment"
     ];
     
     const descriptiveWords = [
-      "удивительный", "невероятный", "волшебный", "таинственный", "прекрасный",
-      "загадочный", "интересный", "захватывающий", "необычный", "чудесный"
+      "amazing", "unbelievable", "magical", "mysterious", "beautiful",
+      "mysterious", "interesting", "captivating", "unusual", "wonderful"
     ];
 
     let expandedText = originalText;
@@ -223,14 +223,14 @@ function StoryBook({ story }: { story: StoryResult }) {
     // Добавляем описательные детали
     if (expandedText.length < 150) {
       const adjective = descriptiveWords[Math.floor(Math.random() * descriptiveWords.length)];
-      expandedText += ` Это был поистине ${adjective} момент в истории.`;
+      expandedText += ` This was truly a ${adjective} moment in the story.`;
     }
 
     // Добавляем эмоциональную глубину
     if (sceneIndex === totalScenes - 1) {
-      expandedText += " История подходила к своему завершению, оставляя незабываемые воспоминания.";
+      expandedText += " The story was approaching its end, leaving unforgettable memories.";
     } else if (sceneIndex === 0) {
-      expandedText = "Наша история начинается именно здесь. " + expandedText;
+      expandedText = "Our story begins exactly here. " + expandedText;
     }
 
     return expandedText;
@@ -245,10 +245,10 @@ function StoryBook({ story }: { story: StoryResult }) {
     // Добавляем вводные фразы для начала главы
     if (sceneIndex === 0 && pageNumber > 3) {
       const openings = [
-        "В этой части нашей истории",
-        "Продолжая рассказ",
-        "Развитие событий привело к тому, что",
-        "Далее происходило следующее:"
+        "In this part of our story",
+        "Continuing the story",
+        "The development of events led to the fact that",
+        "The following happened:"
       ];
       const opening = openings[Math.floor(Math.random() * openings.length)];
       enhancedText = `${opening} ${enhancedText.toLowerCase()}`;
@@ -256,7 +256,7 @@ function StoryBook({ story }: { story: StoryResult }) {
 
     // Добавляем переходные элементы
     if (sceneIndex > 0) {
-      const transitions = ["Тем временем", "После этого", "Затем", "В это время"];
+      const transitions = ["In the meanwhile", "After this", "Then", "In this time"];
       if (Math.random() > 0.6) {
         const transition = transitions[Math.floor(Math.random() * transitions.length)];
         enhancedText = `${transition}, ${enhancedText.toLowerCase()}`;
@@ -265,7 +265,7 @@ function StoryBook({ story }: { story: StoryResult }) {
 
     // Добавляем заключительные элементы для последней сцены страницы
     if (sceneIndex === totalScenes - 1 && totalScenes > 1) {
-      enhancedText += " И так история продолжалась дальше...";
+      enhancedText += " And so the story continued...";
     }
 
     return enhancedText;
@@ -298,7 +298,7 @@ function StoryBook({ story }: { story: StoryResult }) {
           <div>
             <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 4px; line-height: 1.2;">${title}</h1>
             <div style="font-size: 24px; color: #d4af37; margin: 30px 0; letter-spacing: 3px;">✦ ✦ ✦</div>
-            <p style="font-size: 20px; font-style: italic; color: #666; margin-top: 50px;">Сказка, созданная ToonzyAI</p>
+            <p style="font-size: 20px; font-style: italic; color: #666; margin-top: 50px;">Story created by ToonzyAI</p>
           </div>
         </div>
       `;
@@ -307,10 +307,10 @@ function StoryBook({ story }: { story: StoryResult }) {
       if (characterList.length > 0) {
         pdfContent += `
           <div style="page-break-after: always; padding: 50px; min-height: 280mm;">
-            <h2 style="font-size: 26px; font-weight: bold; text-align: center; margin-bottom: 40px; text-transform: uppercase; border-bottom: 2px solid #666; padding-bottom: 15px; letter-spacing: 2px;">ПЕРСОНАЖИ</h2>
+            <h2 style="font-size: 26px; font-weight: bold; text-align: center; margin-bottom: 40px; text-transform: uppercase; border-bottom: 2px solid #666; padding-bottom: 15px; letter-spacing: 2px;">CHARACTERS</h2>
             ${characterList.map((char: any) => `
               <div style="margin-bottom: 30px; font-size: 18px; border-bottom: 1px dotted #999; padding-bottom: 20px;">
-                <div style="font-weight: bold; font-size: 22px; color: #333;">${char.name || 'Безымянный'}</div>
+                <div style="font-weight: bold; font-size: 22px; color: #333;">${char.name || 'Anonymous'}</div>
                 ${char.role ? `<div style="font-style: italic; color: #666; font-size: 18px; margin-top: 5px;">— ${char.role}</div>` : ''}
                 ${char.description ? `<div style="margin-top: 12px; font-style: italic; color: #555; line-height: 1.6; font-size: 16px;">${char.description}</div>` : ''}
               </div>
@@ -334,7 +334,7 @@ function StoryBook({ story }: { story: StoryResult }) {
           
           pdfContent += `
             <div style="page-break-after: ${isLastPage ? 'avoid' : 'always'}; padding: 50px; min-height: 280mm;">
-              <h2 style="font-size: 22px; text-align: center; margin-bottom: 35px; color: #555; text-transform: uppercase; border-bottom: 2px solid #ddd; padding-bottom: 12px; letter-spacing: 2px;">ГЛАВА ${pageIndex + 1}</h2>
+              <h2 style="font-size: 22px; text-align: center; margin-bottom: 35px; color: #555; text-transform: uppercase; border-bottom: 2px solid #ddd; padding-bottom: 12px; letter-spacing: 2px;">CHAPTER ${pageIndex + 1}</h2>
               ${pageScenes.length > 0 ? pageScenes.map((scene, sceneIndex) => {
                 const sceneText = scene.description || scene.environment_description || '';
                 // Расширяем текст для большего содержания
@@ -347,7 +347,7 @@ function StoryBook({ story }: { story: StoryResult }) {
                 `;
                }).join('') : `
                  <div style="text-align: center; margin-top: 120px; font-style: italic; color: #666;">
-                   ${pageNum === 8 ? '<div style="border-top: 2px solid #ddd; padding-top: 30px; margin-top: 60px;"><div style="font-size: 28px; font-weight: bold; color: #333; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px;">КОНЕЦ</div><div style="font-size: 18px; margin-top: 20px; color: #666;">Спасибо за чтение!</div></div>' : ''}
+                   ${pageNum === 8 ? '<div style="border-top: 2px solid #ddd; padding-top: 30px; margin-top: 60px;"><div style="font-size: 28px; font-weight: bold; color: #333; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px;">END</div><div style="font-size: 18px; margin-top: 20px; color: #666;">Thank you for reading!</div></div>' : ''}
                  </div>
                `}
                <div style="position: absolute; bottom: 20px; right: 40px; font-size: 10px; color: #666;">[${pageNum}]</div>
@@ -410,7 +410,7 @@ function StoryBook({ story }: { story: StoryResult }) {
               ✦ ✦ ✦
             </div>
             <p className="text-2xl italic text-amber-700 mt-10">
-              Сказка, созданная ToonzyAI
+              Story created by ToonzyAI
             </p>
           </div>
         </div>
@@ -426,13 +426,13 @@ function StoryBook({ story }: { story: StoryResult }) {
         <div key="characters" className="w-full h-full bg-gradient-to-b from-blue-50 to-indigo-50 flex flex-col relative border border-blue-200 font-serif p-8">
           <div className="flex-1 overflow-hidden">
             <h2 className="text-4xl font-bold text-center mb-10 text-gray-800 uppercase tracking-wide border-b border-blue-300 pb-6">
-              ПЕРСОНАЖИ
+              CHARACTERS
             </h2>
             <div className="space-y-8 mt-10">
               {characterList.map((char: any, idx: number) => (
                 <div key={char.name || idx} className="border-b border-dotted border-blue-300 pb-8 last:border-b-0">
                   <div className="text-2xl font-bold text-gray-800">
-                    {char.name || 'Безымянный'}
+                    {char.name || 'Anonymous'}
                     {char.role && <span className="text-xl italic text-blue-600 font-normal"> — {char.role}</span>}
                   </div>
                   {char.description && (
@@ -455,16 +455,16 @@ function StoryBook({ story }: { story: StoryResult }) {
         <div key="prologue" className="w-full h-full bg-gradient-to-b from-purple-50 to-pink-50 flex flex-col relative border border-purple-200 font-serif p-8">
           <div className="flex-1 overflow-hidden">
             <h2 className="text-4xl font-bold text-center mb-12 text-gray-800 uppercase tracking-wide border-b border-purple-300 pb-6">
-              ПРОЛОГ
+              PROLOGUE
             </h2>
             <div className="space-y-10 mt-12">
               <p className="text-2xl leading-relaxed text-gray-800 text-justify indent-10 font-serif">
-                Наша история начинается в удивительном мире, где каждый день приносит новые открытия и приключения. 
-                Здесь, среди знакомых и незнакомых мест, разворачиваются события, которые изменят всё навсегда.
+                Our story begins in an amazing world, where every day brings new discoveries and adventures. 
+                Here, among familiar and unfamiliar places, events unfold that will change everything forever.
               </p>
               <p className="text-2xl leading-relaxed text-gray-800 text-justify indent-10 font-serif">
-                Это рассказ о храбрости и дружбе, о том, как важно верить в свои мечты и никогда не сдаваться. 
-                Приготовьтесь к путешествию, полному удивительных открытий и неожиданных поворотов!
+                This is a story about courage and friendship, about the importance of believing in your dreams and never giving up. 
+                Prepare for a journey full of amazing discoveries and unexpected turns!
               </p>
             </div>
           </div>
@@ -479,12 +479,12 @@ function StoryBook({ story }: { story: StoryResult }) {
         <div key="intro1" className="w-full h-full bg-gradient-to-b from-blue-50 to-indigo-50 flex flex-col relative border border-blue-200 font-serif p-8">
           <div className="flex-1 overflow-hidden">
             <h2 className="text-4xl font-bold text-center mb-12 text-gray-800 uppercase tracking-wide border-b border-blue-300 pb-6">
-              ВВЕДЕНИЕ
+              INTRODUCTION
             </h2>
             <div className="space-y-10 mt-12">
               <p className="text-2xl leading-relaxed text-gray-800 text-justify indent-10 font-serif">
-                Добро пожаловать в мир удивительных историй, где фантазия не знает границ, 
-                а каждое слово наполнено магией и чудесами.
+                Welcome to the world of amazing stories, where imagination knows no bounds, 
+                and every word is filled with magic and wonders.
               </p>
             </div>
           </div>
@@ -498,12 +498,12 @@ function StoryBook({ story }: { story: StoryResult }) {
         <div key="intro2" className="w-full h-full bg-gradient-to-b from-purple-50 to-pink-50 flex flex-col relative border border-purple-200 font-serif p-8">
           <div className="flex-1 overflow-hidden">
             <h2 className="text-4xl font-bold text-center mb-12 text-gray-800 uppercase tracking-wide border-b border-purple-300 pb-6">
-              ГЛАВА ПЕРВАЯ
+              CHAPTER ONE
             </h2>
             <div className="space-y-10 mt-12">
               <p className="text-2xl leading-relaxed text-gray-800 text-justify indent-10 font-serif">
-                История начинается здесь, в этом самом месте, в этот самый момент. 
-                Приготовьтесь к невероятному путешествию...
+                The story begins here, in this very place, at this very moment. 
+                Prepare for an incredible journey...
               </p>
             </div>
           </div>
@@ -551,7 +551,7 @@ function StoryBook({ story }: { story: StoryResult }) {
                         {isFirstScene && pageNumber > 3 && (
                           <div className="border-b border-dotted border-green-300 pb-3 mb-4">
                             <h3 className="text-3xl font-bold text-center text-gray-800 uppercase tracking-wide">
-                              Глава {pageNumber - 3}
+                              Chapter {pageNumber - 3}
                             </h3>
                           </div>
                         )}
@@ -559,7 +559,7 @@ function StoryBook({ story }: { story: StoryResult }) {
                           <div className="text-center mb-4">
                             <img 
                               src={imageUrl} 
-                              alt={`Иллюстрация к сцене ${scene.id}`}
+                              alt={`Illustration for scene ${scene.id}`}
                               className="max-w-full h-64 w-auto mx-auto rounded-lg border border-green-300 shadow-lg object-cover"
                               onError={(e) => {
                                 // Скрываем изображение если оно не загрузилось
@@ -600,15 +600,15 @@ function StoryBook({ story }: { story: StoryResult }) {
                   {pageNumber === 8 ? (
                     <div className="text-center border-t border-gray-300 pt-10 mt-24">
                       <div className="text-4xl font-bold text-gray-800 uppercase tracking-wide mb-6">
-                        КОНЕЦ
+                        END
                       </div>
                       <div className="text-2xl text-gray-600 italic">
-                        Спасибо за чтение!
+                        Thank you for reading!
                       </div>
                     </div>
                   ) : (
                     <div className="text-center text-gray-500 italic text-2xl">
-                      История продолжается...
+                      The story continues...
                     </div>
                   )}
                 </div>
@@ -628,15 +628,15 @@ function StoryBook({ story }: { story: StoryResult }) {
           <div key={`page-${pageNumber}`} className="w-full h-full bg-gradient-to-b from-yellow-50 to-orange-50 flex flex-col relative border border-yellow-200 font-serif p-8">
             <div className="flex-1 overflow-hidden">
               <h2 className="text-4xl font-bold text-center mb-12 text-gray-800 uppercase tracking-wide border-b border-yellow-300 pb-6">
-                СОДЕРЖАНИЕ
+                CONTENT
               </h2>
               <div className="flex-1 flex items-center justify-center text-center">
                 <div className="space-y-8 text-yellow-700 italic">
-                  <p className="text-2xl">История ещё не написана...</p>
-                  <p className="text-xl">Попробуйте сгенерировать книгу с более подробным описанием.</p>
+                  <p className="text-2xl">The story is not yet written...</p>
+                  <p className="text-xl">Try generating a book with a more detailed description.</p>
                   {pageNumber === 8 && (
                     <div className="mt-10 border-t border-yellow-300 pt-8">
-                      <p className="text-3xl font-bold text-gray-800 not-italic uppercase">КОНЕЦ</p>
+                      <p className="text-3xl font-bold text-gray-800 not-italic uppercase">END</p>
                     </div>
                   )}
                 </div>
@@ -665,11 +665,11 @@ function StoryBook({ story }: { story: StoryResult }) {
           {isDownloading ? (
             <>
               <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
-              Создание PDF...
+              Creating PDF...
             </>
           ) : (
             <>
-              📚 Скачать книгу PDF
+              📚 Download PDF book
             </>
           )}
         </Button>

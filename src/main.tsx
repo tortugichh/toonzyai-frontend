@@ -5,10 +5,12 @@ import App from './App.tsx'
 import { initializeAnalytics } from './utils/analytics'
 import { initializeGlobalErrorHandler } from './utils/globalErrorHandler'
 
-// Инициализируем безопасный обработчик ошибок
-initializeGlobalErrorHandler();
+// Initialize safe error handler
+window.addEventListener('error', (event) => {
+  console.error('Global error:', event.error);
+});
 
-// Инициализируем Google Analytics
+// Initialize Google Analytics
 initializeAnalytics();
 
 createRoot(document.getElementById('root')!).render(

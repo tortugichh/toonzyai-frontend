@@ -30,12 +30,12 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
 
   const handleGenerateClick = async () => {
     if (prompt.trim().length < 10) {
-      toastError('Промпт должен содержать минимум 10 символов');
+      toastError('Prompt must contain at least 10 characters');
       return;
     }
     setIsGenerating(true);
     try {
-      // 1) сохраняем промпт если он новый
+      // 1) save prompt if it's new
       if (prompt !== segment.segment_prompt) {
         await updatePromptMutation.mutateAsync({
           projectId,
@@ -43,17 +43,17 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
           segmentPrompt: prompt.trim(),
         });
       }
-      // 2) запускаем генерацию
+      // 2) start generation
       await generateSegmentMutation.mutateAsync({
         projectId,
         segmentNumber: segment.segment_number,
         segmentPrompt: prompt.trim(),
       });
-      // прячем textarea, показываем текст
+      // hide textarea, show text
       setIsEditing(false);
       onUpdate();
     } catch (error:any) {
-      toastError(error.message || 'Ошибка при генерации сегмента');
+      toastError(error.message || 'Error generating segment');
     } finally {
       setIsGenerating(false);
     }

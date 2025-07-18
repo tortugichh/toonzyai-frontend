@@ -40,11 +40,7 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
-      <Header 
-        user={user} 
-        onLogout={() => logoutMutation.mutate()} 
-        isLoggingOut={logoutMutation.isPending} 
-      />
+      <Header user={user ?? null} onLogout={() => logoutMutation.mutate()} isLoggingOut={logoutMutation.isPending} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Backend Status */}
