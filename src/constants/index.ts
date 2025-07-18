@@ -1,30 +1,30 @@
-// Режим разработки
+// Development mode
 export const IS_DEVELOPMENT = import.meta.env.DEV;
 export const IS_PRODUCTION = import.meta.env.PROD;
 
-// Базовый origin бекенда можно переопределить через VITE_API_ORIGIN,
-// иначе берём домен .me по умолчанию в продакшене.
+// Backend base origin can be overridden via VITE_API_ORIGIN,
+// otherwise we use .me domain by default in production.
 const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ?? (IS_PRODUCTION ? 'https://api.toonzyai.me' : '');
 
-// Полный базовый URL всех REST-эндпоинтов
+// Full base URL for all REST endpoints
 export const API_BASE_URL = `${API_ORIGIN}/api/v1`;
 
-// Настройки изображений
-export const IMAGE_CACHE_SIZE_LIMIT = 50; // максимум 50 изображений в кэше
-export const IMAGE_LOAD_TIMEOUT = 30000; // 30 секунд таймаут
+// Image settings
+export const IMAGE_CACHE_SIZE_LIMIT = 50; // maximum 50 images in cache
+export const IMAGE_LOAD_TIMEOUT = 30000; // 30 second timeout
 
-// Настройки React Query
-export const QUERY_STALE_TIME = 5 * 60 * 1000; // 5 минут
-export const QUERY_CACHE_TIME = 10 * 60 * 1000; // 10 минут
+// React Query settings
+export const QUERY_STALE_TIME = 5 * 60 * 1000; // 5 minutes
+export const QUERY_CACHE_TIME = 10 * 60 * 1000; // 10 minutes
 
-// Настройки автообновления
-export const AVATAR_REFETCH_INTERVAL = 5000; // 5 секунд для аватаров в процессе генерации
-export const ANIMATION_REFETCH_INTERVAL = 3000; // 3 секунды для анимаций в процессе
+// Auto-refresh settings
+export const AVATAR_REFETCH_INTERVAL = 5000; // 5 seconds for avatars being generated
+export const ANIMATION_REFETCH_INTERVAL = 3000; // 3 seconds for animations in progress
 
-// Лимиты
+// Limits
 export const MAX_AVATAR_PROMPT_LENGTH = 500;
 export const MAX_ANIMATION_PROMPT_LENGTH = 300;
 export const MAX_ANIMATION_SEGMENTS = 10;
 
-// API константы
+// API constants
 export const API_VERSION = 'v1'; 

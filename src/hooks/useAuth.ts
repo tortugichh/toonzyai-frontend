@@ -25,7 +25,7 @@ export function useRegister() {
   return useMutation({
     mutationFn: (data: RegisterRequest) => apiClient.register(data.username, data.email, data.password),
     onSuccess: () => {
-      // После успешной регистрации пользователь должен войти в систему
+      // After successful registration, user should log in
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
     onError: (error) => toastError(error),
@@ -68,17 +68,17 @@ export function useLogout() {
     mutationFn: async () => {
       secureLogger.log('[LOGOUT] Starting logout process...');
       
-      // Сначала вызываем API logout, затем очищаем локальное хранилище
+      // First call API logout, then clear local storage
       try {
         secureLogger.log('[LOGOUT] Calling API logout...');
         await apiClient.logout();
         secureLogger.log('[LOGOUT] API logout successful');
       } catch (error) {
         secureLogger.error('[LOGOUT] API logout failed:', sanitizeApiError(error));
-        // Продолжаем выход даже если API недоступен
+        // Continue logout even if API is unavailable
       }
       
-      // Очищаем данные
+      // Clear data
       secureLogger.log('[LOGOUT] Clearing local storage and cache...');
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
@@ -86,17 +86,17 @@ export function useLogout() {
     },
     onSuccess: () => {
       secureLogger.log('[LOGOUT] Logout mutation completed successfully');
-      toastSuccess('Вы успешно вышли из системы');
+      toastSuccess('You have successfully logged out');
       
-        // Перенаправляем на страницу логина
+        // Redirect to login page
       secureLogger.log('[LOGOUT] Redirecting to login...');
       setTimeout(() => {
         window.location.href = '/login';
-      }, 500); // Небольжая задержка для показа toast
+      }, 500); // Small delay to show toast
     },
     onError: (error) => {
       secureLogger.error('[LOGOUT] Logout mutation failed:', sanitizeApiError(error));
-      // Всё равно очищаем данные и перенаправляем
+      // Still clear data and redirect
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       queryClient.clear();
@@ -108,7 +108,7 @@ export function useLogout() {
   });
 }
 
-// Утилитарная функция для простого выхода без хуков
+// Utility function for simple logout without hooks
 export function simpleLogout() {
   secureLogger.log('[SIMPLE_LOGOUT] Performing simple logout...');
   localStorage.removeItem('access_token');
@@ -116,19 +116,19 @@ export function simpleLogout() {
   window.location.href = '/login';
 }
 
-// Новый хук для проверки токена
+// New hook for token verification
 export function useVerifyToken() {
   return useQuery({
     queryKey: ['token-verification'],
     queryFn: () => apiClient.verifyToken(),
     enabled: !!localStorage.getItem('access_token'),
     retry: false,
-    // Проверяем токен каждые 5 минут
+    // Check token every 5 minutes
     refetchInterval: 5 * 60 * 1000,
   });
 }
 
-// Хук для OAuth2 логина (для совместимости со Swagger UI)
+// Hook for OAuth2 login (for Swagger UI compatibility)
 export function useTokenLogin() {
   const queryClient = useQueryClient();
 

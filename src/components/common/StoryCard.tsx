@@ -33,20 +33,20 @@ export function StoryCard({ story, onOpen, onDelete }: StoryCardProps) {
   const getStatusText = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed':
-        return 'Готова';
+        return 'Ready';
       case 'in_progress':
-        return 'Генерируется';
+        return 'Generating';
       case 'pending':
-        return 'В очереди';
+        return 'In queue';
       case 'failed':
-        return 'Ошибка';
+        return 'Error';
       default:
         return status;
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ru-RU', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -63,7 +63,7 @@ export function StoryCard({ story, onOpen, onDelete }: StoryCardProps) {
             onDelete(story.id);
           }}
           className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
-          title="Удалить историю"
+          title="Delete story"
         >
           ×
         </button>
@@ -127,7 +127,7 @@ export function StoryCard({ story, onOpen, onDelete }: StoryCardProps) {
                 handleOpen();
               }}
             >
-              Открыть
+              Open
             </Button>
           )}
         </div>

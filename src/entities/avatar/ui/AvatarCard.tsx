@@ -49,10 +49,10 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
   const getStatusText = (status?: string) => {
     const s = status?.toLowerCase().trim();
     switch (s) {
-      case 'completed': return 'Готов';
-      case 'generating': return 'Обработка';
-      case 'failed': return 'Ошибка';
-      case 'pending': return 'Ожидание';
+      case 'completed': return 'Ready';
+      case 'generating': return 'Processing';
+      case 'failed': return 'Error';
+      case 'pending': return 'Waiting';
       default: return status;
     }
   };
@@ -63,7 +63,7 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
       <button
         onClick={handleDelete}
         className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 text-gray-500 z-10"
-        aria-label="Удалить аватар"
+        aria-label="Delete avatar"
         disabled={isDeleting}
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -72,10 +72,10 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
       </button>
       <Modal
         open={isModalOpen}
-        title="Удалить аватар?"
-        description="Вы уверены, что хотите удалить этот аватар? Это действие нельзя отменить."
-        confirmText="Удалить"
-        cancelText="Отмена"
+        title="Delete avatar?"
+        description="Are you sure you want to delete this avatar? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
         onConfirm={confirmDelete}
         onClose={() => setModalOpen(false)}
       />
@@ -86,30 +86,30 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
         <p className="font-medium text-gray-900 mb-2 line-clamp-2">{avatar.prompt}</p>
         <div className="flex items-center justify-between mb-4">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(avatar.status)}`}>{getStatusText(avatar.status)}</span>
-          <p className="text-xs text-gray-500">{new Date(avatar.created_at).toLocaleDateString('ru-RU')}</p>
+          <p className="text-xs text-gray-500">{new Date(avatar.created_at).toLocaleDateString('en-US')}</p>
         </div>
         <div className="flex">
           {normalizedStatus === 'completed' ? (
             <Button onClick={handleAnimate} className="flex-1 bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white text-sm py-2 font-medium transform-gpu transition-transform duration-300 hover:scale-105">
               <ContentIcon type="video" className="w-4 h-4 mr-2" />
-              Создать анимацию
+              Create animation
             </Button>
           ) : (
                           <div className="flex-1 bg-gray-100 text-gray-600 text-sm py-2 px-4 rounded-md text-center flex items-center justify-center">
                 {normalizedStatus === 'generating' ? (
                   <>
                     <ActionIcon action="loading" className="w-4 h-4 mr-2" animate />
-                    Генерируется...
+                    Generating...
                   </>
                 ) : normalizedStatus === 'failed' ? (
                   <>
                     <ActionIcon action="delete" className="w-4 h-4 mr-2" />
-                    Ошибка генерации
+                    Generation error
                   </>
                 ) : (
                   <>
                     <ActionIcon action="loading" className="w-4 h-4 mr-2" />
-                    В очереди...
+                    In queue...
                   </>
                 )}
             </div>

@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
-// Варианты для эффекта появления слов (fade in + slide up)
+// Variants for word appearance effect (fade in + slide up)
 const wordContainer = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.3 } },
@@ -18,7 +18,7 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
 
   return (
     <section className="relative text-center py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Декоративные элементы */}
+      {/* Decorative elements */}
       <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-orange-300/20 to-amber-300/20 rounded-full blur-xl animate-pulse" />
       <div className="absolute bottom-32 right-16 w-32 h-32 bg-gradient-to-r from-yellow-300/15 to-orange-400/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
       
@@ -43,7 +43,7 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            Создавайте{' '}
+            Create{' '}
           </motion.span>
           <motion.span 
             className="relative inline-block"
@@ -52,16 +52,16 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
             transition={{ delay: 0.8, duration: 0.8, ease: "backOut" }}
           >
             <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">
-              потрясающие
+              amazing
             </span>
-            {/* Подсветка под словом */}
+            {/* Highlight under the word */}
             <motion.div
               className="absolute -bottom-1 sm:-bottom-2 left-0 right-0 h-0.5 sm:h-1 bg-gradient-to-r from-orange-400/30 via-orange-500/50 to-orange-600/30 rounded-full"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: 1.2, duration: 0.6 }}
             />
-            {/* Блики */}
+            {/* Shimmer effect */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
               animate={{ 
@@ -81,7 +81,7 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.1, duration: 0.6 }}
           >
-            {' '}анимации с ИИ
+            {' '}animations with AI
           </motion.span>
         </motion.h1>
         
@@ -89,8 +89,8 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
           className="text-base sm:text-lg md:text-xl text-gray-600 mb-4 sm:mb-6 md:mb-8 max-w-3xl mx-auto px-4"
           variants={wordVariant}
         >
-          ToonzyAI превращает ваши идеи в профессиональные анимации за считанные минуты. 
-          Никаких сложных инструментов — только магия искусственного интеллекта.
+          ToonzyAI transforms your ideas into professional animations in minutes. 
+          No complex tools — just the magic of artificial intelligence.
         </motion.p>
         
         <motion.div 
@@ -115,7 +115,7 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
               
               {/* Button content */}
               <span className="relative z-10 flex items-center justify-center gap-2">
-                Начать создавать
+                Start creating
                 <motion.svg 
                   className="w-4 h-4 sm:w-5 sm:h-5" 
                   fill="none" 
@@ -150,7 +150,7 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
               
               {/* Button content */}
               <span className="relative z-10 flex items-center justify-center gap-2">
-                Узнать больше
+                Learn more
                 <motion.svg 
                   className="w-4 h-4 sm:w-5 sm:h-5" 
                   fill="none" 

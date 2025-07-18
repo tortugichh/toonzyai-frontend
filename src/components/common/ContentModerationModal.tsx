@@ -57,24 +57,24 @@ export function ContentModerationModal({
           </div>
           <h3 className="text-xl font-bold text-gray-900 mb-1">
             <StatusIcon status="blocked" className="w-5 h-5 mr-2" />
-            Контент заблокирован
+            Content blocked
           </h3>
           <p className="text-gray-600 text-sm">
-            Описание не соответствует нашим правилам безопасности
+            Description does not comply with our safety rules
           </p>
         </div>
         
         {/* Content */}
         <div className="mb-6">
           <p className="text-gray-700 mb-4 text-sm leading-relaxed">
-            Наша система безопасности обнаружила в вашем описании элементы, которые противоречат нашим правилам.
+            Our security system detected elements in your description that violate our rules.
           </p>
           
           {reasons.length > 0 && (
             <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3">
               <div className="flex items-center mb-2">
                 <StatusIcon status="warning" className="w-4 h-4 mr-2" />
-                <p className="font-medium text-red-900 text-sm">Обнаруженные нарушения:</p>
+                <p className="font-medium text-red-900 text-sm">Detected violations:</p>
               </div>
               <ul className="space-y-1">
                 {reasons.map((reason, index) => (
@@ -97,7 +97,7 @@ export function ContentModerationModal({
                 <svg className="w-4 h-4 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-                <p className="font-medium text-blue-900 text-sm">Как исправить:</p>
+                <p className="font-medium text-blue-900 text-sm">How to fix:</p>
               </div>
               <p className="text-blue-800 text-xs leading-relaxed">
                 {typeof suggestedFix === 'string' ? suggestedFix : 
@@ -115,7 +115,7 @@ export function ContentModerationModal({
             className="flex-1 bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] hover:opacity-90 text-white py-2 px-4 text-sm font-medium shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
           >
             <ActionIcon action="refresh" className="w-4 h-4 mr-1" />
-            Попробовать снова
+            Try again
           </Button>
           <Button
             onClick={onClose}
@@ -123,7 +123,7 @@ export function ContentModerationModal({
             className="flex-1 py-2 px-4 text-sm font-medium border-gray-300 hover:bg-gray-50 transition-colors duration-200"
           >
             <ActionIcon action="delete" className="w-4 h-4 mr-1" />
-            Отмена
+            Cancel
           </Button>
         </div>
       </Card>

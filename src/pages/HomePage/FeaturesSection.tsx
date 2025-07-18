@@ -2,24 +2,24 @@ import { useState, forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 
-// Чекпойнты для слайдера
+// Checkpoints for slider
 const checkpoints = [
-  { value: 0, label: 'Начало', features: 0 },
-  { value: 33, label: 'История', features: 1 },
-  { value: 66, label: 'Видео', features: 2 },
-  { value: 100, label: 'Результат', features: 3 }
+  { value: 0, label: 'Start', features: 0 },
+  { value: 33, label: 'Story', features: 1 },
+  { value: 66, label: 'Video', features: 2 },
+  { value: 100, label: 'Result', features: 3 }
 ];
 
 export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
   const [checkpointIndex, setCheckpointIndex] = useState(0);
 
-  // Все чекпойнты доступны на всех экранах
+  // All checkpoints available on all screens
   const availableCheckpoints = checkpoints;
   const currentCheckpoint = availableCheckpoints[checkpointIndex];
 
-  // Функция для обработки изменения слайдера с snap к чекпойнтам
+  // Function to handle slider change with snap to checkpoints
   const handleSliderChange = (value: number) => {
-    // Находим ближайший доступный чекпойнт
+    // Find the closest available checkpoint
     let closestIndex = 0;
     let minDistance = Math.abs(value - availableCheckpoints[0].value);
     
@@ -39,7 +39,7 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
   return (
     <section ref={ref} className="relative py-8 sm:py-12 md:py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Декоративные элементы */}
+        {/* Decorative elements */}
         <div className="absolute top-10 left-4 sm:left-10 w-16 h-16 sm:w-20 sm:h-20 bg-orange-200/30 rounded-full blur-xl" />
         <div className="absolute bottom-10 right-4 sm:right-10 w-24 h-24 sm:w-32 sm:h-32 bg-orange-300/20 rounded-full blur-2xl" />
         
@@ -51,16 +51,16 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
           viewport={{ once: true }}
         >
           <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-3 md:mb-4 px-2">
-            От идеи до{' '}
+            From idea to{' '}
             <span className="bg-gradient-to-r from-orange-400 to-orange-600 bg-clip-text text-transparent">
-              видео-истории
+              video story
             </span>
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-3xl mx-auto px-4">
-            Узнайте, как ToonzyAI превращает ваши идеи в увлекательные видео-истории
+            Learn how ToonzyAI transforms your ideas into engaging video stories
           </p>
           
-          {/* Прогресс индикатор */}
+          {/* Progress indicator */}
           <div className="flex items-center justify-center mt-6 sm:mt-8 mb-3 sm:mb-4 space-x-2">
             {availableCheckpoints.map((checkpoint, index) => (
               <motion.div
@@ -78,13 +78,13 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
           </div>
           
           <p className="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8 px-2">
-            {currentCheckpoint.label} ({checkpointIndex + 1}/4 шага) • ({visibleFeatures}/3 функции)
+            {currentCheckpoint.label} ({checkpointIndex + 1}/4 steps) • ({visibleFeatures}/3 features)
           </p>
         </motion.div>
 
         {/* Slider Container */}
         <div className="relative bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-xl border border-white/20">
-          {/* Навигационные кнопки */}
+          {/* Navigation buttons */}
           <div className="flex justify-between items-center mb-6 sm:mb-8 gap-4">
             <motion.button
               className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-white/80 backdrop-blur-sm rounded-lg border border-orange-200 text-orange-600 hover:bg-orange-50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
@@ -96,7 +96,7 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
               <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span className="hidden sm:inline">Назад</span>
+              <span className="hidden sm:inline">Previous</span>
             </motion.button>
             
             <motion.button
@@ -106,7 +106,7 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="hidden sm:inline">Далее</span>
+              <span className="hidden sm:inline">Next</span>
               <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -156,7 +156,7 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
               transition={{ duration: 0.5 }}
             >
               <Card className="relative p-5 sm:p-7 h-full bg-gradient-to-br from-white/90 via-white/95 to-orange-50/60 backdrop-blur-sm border border-orange-200/50 hover:border-orange-300/70 hover:shadow-2xl hover:shadow-orange-500/15 transition-all duration-500 overflow-hidden group hover:-translate-y-1">
-                {/* Декоративные элементы */}
+                {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-orange-400/15 via-amber-300/10 to-transparent rounded-bl-3xl" />
                 <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-orange-300/30 to-amber-400/30 rounded-full blur-sm group-hover:scale-150 transition-transform duration-500" />
                 
@@ -183,13 +183,13 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </motion.svg>
                   </motion.div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-orange-700 transition-colors duration-300">Создание персонажа</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900 group-hover:text-orange-700 transition-colors duration-300">Character creation</h3>
                 </div>
                 <p className="text-base sm:text-lg text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
-                  Создайте своего персонажа с любой внешностью.
+                  Create your character with any appearance.
                 </p>
                 
-                {/* Hover эффекты */}
+                {/* Hover effects */}
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400/8 via-amber-300/5 to-orange-600/8 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </Card>
@@ -215,10 +215,10 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m0 0V1a1 1 0 011-1h2a1 1 0 011 1v18a1 1 0 01-1 1H4a1 1 0 01-1-1V1a1 1 0 011-1h2a1 1 0 011 1v3m0 0h10M9 7h6m-6 4h6m-6 4h6" />
                     </svg>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Создание видео</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Video creation</h3>
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Превращаем вашу историю в красивые видео с помощью новейших технологий от Google.
+                  We transform your story into beautiful videos using the latest technologies from Google.
                 </p>
                 
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400/5 to-blue-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -245,10 +245,10 @@ export const FeaturesSection = forwardRef<HTMLElement>((props, ref) => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Готовый результат</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900">Ready result</h3>
                 </div>
                 <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                  Получите готовую анимацию, которую можно сразу смотреть и делиться с друзьями.
+                  Get a finished animation that you can watch immediately and share with friends.
                 </p>
                 
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-400/5 to-purple-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

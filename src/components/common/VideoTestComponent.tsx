@@ -15,7 +15,7 @@ const VideoTestComponent: React.FC = () => {
 
   const runVideoTest = async () => {
     if (!testProjectId) {
-      toastError('Введите ID проекта');
+      toastError('Enter project ID');
       return;
     }
 

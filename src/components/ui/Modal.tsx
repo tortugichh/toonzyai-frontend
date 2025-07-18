@@ -18,7 +18,7 @@ export default function Modal({
   title,
   description,
   confirmText = 'OK',
-  cancelText = 'Отмена',
+  cancelText = 'Cancel',
   onConfirm,
   onClose,
   children,
