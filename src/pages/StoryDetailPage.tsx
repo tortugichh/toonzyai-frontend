@@ -73,7 +73,7 @@ function StoryDetailPage() {
     );
   }
 
-  if (storyData.status === 'PENDING' || storyData.status === 'STARTED' || storyData.status === 'RETRY') {
+  if (storyData.status === 'PENDING' || storyData.status === 'RETRY') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
         <Header user={user} onLogout={handleLogout} isLoggingOut={logoutMutation.isPending} />
