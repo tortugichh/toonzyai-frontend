@@ -31,10 +31,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
           <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg text-center">
             <div className="text-6xl mb-4">😵</div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Something went wrong
+              Что-то пошло не так
             </h2>
             <p className="text-gray-600 mb-6">
-              {this.state.error?.message || 'An unexpected error occurred'}
+              {this.state.error?.message || 'Произошла неожиданная ошибка'}
             </p>
             <div className="space-y-3">
               <button 
@@ -42,13 +42,13 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
               >
                 <ActionIcon action="refresh" className="w-4 h-4 mr-2" />
-                Reload page
+              Перезагрузить страницу
               </button>
               <button
                 onClick={() => this.setState({ hasError: false, error: null })}
                 className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded transition-colors"
               >
-                🔙 Try again
+                🔙 Попробовать снова
               </button>
             </div>
           </div>

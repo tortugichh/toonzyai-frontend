@@ -27,17 +27,17 @@ export default function ProgressMonitor({ project, onRefresh, autoRefresh = true
   return (
     <Card className="p-4 mb-6 bg-white/80">
       <div className="flex justify-between items-center mb-2">
-        <h4 className="font-semibold">Project Progress</h4>
+        <h4 className="font-semibold">Прогресс проекта</h4>
         
       </div>
       <div className="mb-2 w-full h-3 bg-gray-200 rounded-full overflow-hidden">
         <div className="h-3 bg-green-500" style={{ width: `${percent}%` }} />
       </div>
       <div className="grid grid-cols-4 gap-2 text-xs text-gray-700">
-        <span className="flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full"></span>{completed} Ready</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 bg-blue-500 rounded-full"></span>{inProg} In Progress</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 bg-gray-400 rounded-full"></span>{pending} Pending</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 bg-red-500 rounded-full"></span>{failed} Errors</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 bg-green-500 rounded-full"></span>{completed} Готово</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 bg-blue-500 rounded-full"></span>{inProg} В работе</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 bg-gray-400 rounded-full"></span>{pending} Ожидает</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 bg-red-500 rounded-full"></span>{failed} Ошибки</span>
       </div>
     </Card>
   );

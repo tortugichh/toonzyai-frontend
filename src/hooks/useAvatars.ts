@@ -8,11 +8,11 @@ export function useCreateAvatar() {
 
   return useMutation({
     mutationFn: async (data: CreateAvatarRequest) => {
-      console.log('🎨 Creating avatar with prompt:', data.prompt);
+      console.log('🎨 Создаем аватара с промптом:', data.prompt);
       
       const result = await apiClient.createAvatar(data.prompt);
       
-      console.log('✅ Avatar created successfully:', {
+      console.log('✅ Аватар создан успешно:', {
         avatar_id: result.avatar_id,
         status: result.status,
         prompt: result.prompt,
@@ -24,23 +24,23 @@ export function useCreateAvatar() {
       return result;
     },
     onSuccess: (data) => {
-      console.log('🔄 Updating avatar cache after creation...');
+      console.log('🔄 Обновляем кэш аватаров после создания...');
       queryClient.invalidateQueries({ queryKey: ['avatars'] });
       
-      console.log('📊 Created avatar will have status:', data.status);
-      // Check status more flexibly as there can be different values
+      console.log('📊 Созданный аватар будет иметь статус:', data.status);
+      // Проверяем статус более гибко, так как могут быть разные значения
       const statusStr = String(data.status).toLowerCase();
       if (statusStr === 'pending' || statusStr === 'generating' || statusStr === 'in_progress') {
-        console.log('⏳ Avatar is being generated. Image will appear in a few minutes.');
+        console.log('⏳ Аватар в процессе генерации. Изображение появится через несколько минут.');
       } else if (statusStr === 'completed') {
-        console.log('🎉 Avatar is ready!');
+        console.log('🎉 Аватар готов!');
       } else {
-        console.log('ℹ️ Avatar status:', statusStr);
+        console.log('ℹ️ Статус аватара:', statusStr);
       }
     },
     onError: (error) => {
       console.error('Create avatar error in hook:', error);
-      // DON'T show toast for moderation errors, they are handled in UI
+      // НЕ показываем toast для ошибок модерации, они обрабатываются в UI
       const errorData = (error as any)?.details || (error as any)?.response?.data?.detail;
       if (errorData?.error !== 'content_policy_violation') {
         toastError(getErrorMessage(error));
@@ -53,26 +53,26 @@ export function useAvatars(page = 1, perPage = 10) {
   return useQuery({
     queryKey: ['avatars', page, perPage],
     queryFn: async () => {
-      console.log(`📥 Loading avatars: page ${page}, per page ${perPage}`);
+      console.log(`📥 Загружаем аватары: страница ${page}, на странице ${perPage}`);
       
       const result = await apiClient.getAvatars(page, perPage);
       
-      console.log(`📊 Received avatars: ${result.avatars.length} of ${result.total}`);
+      console.log(`📊 Получено аватаров: ${result.avatars.length} из ${result.total}`);
       
       if (result.avatars.length === 0) {
-        console.log('❌ AVATARS NOT FOUND! Possible reasons:');
-        console.log('1. No avatars have been created');
-        console.log('2. Backend database issues');
-        console.log('3. Authentication problems');
-        console.log('💡 Try creating an avatar or check backend logs');
+        console.log('❌ АВАТАРЫ НЕ НАЙДЕНЫ! Возможные причины:');
+        console.log('1. Аватары не создавались');
+        console.log('2. Проблемы с базой данных на бэкенде');
+        console.log('3. Проблемы с авторизацией');
+        console.log('💡 Попробуйте создать аватара или проверить логи бэкенда');
       } else {
-        console.log('🎭 Avatar details:');
+        console.log('🎭 Детали аватаров:');
         result.avatars.forEach((avatar, index) => {
           console.log(`  ${index + 1}. ID: ${avatar.avatar_id}`);
-          console.log(`     Status: ${avatar.status}`);
-          console.log(`     Prompt: ${avatar.prompt.slice(0, 50)}...`);
-          console.log(`     Created: ${avatar.created_at}`);
-          console.log(`     Image: ${avatar.image_url || 'NONE'}`);
+          console.log(`     Статус: ${avatar.status}`);
+          console.log(`     Промпт: ${avatar.prompt.slice(0, 50)}...`);
+          console.log(`     Создан: ${avatar.created_at}`);
+          console.log(`     Изображение: ${avatar.image_url || 'НЕТ'}`);
           console.log(`     ---`);
         });
       }
@@ -80,7 +80,7 @@ export function useAvatars(page = 1, perPage = 10) {
       return result;
     },
     refetchInterval: (query) => {
-      // Automatically update data every 5 seconds if there are avatars being generated
+      // Автоматически обновляем данные каждые 5 секунд, если есть аватары в процессе генерации
       const data = query.state.data;
       const hasGenerating = data?.avatars?.some((avatar: any) => {
         const status = String(avatar.status).toLowerCase();
@@ -88,7 +88,7 @@ export function useAvatars(page = 1, perPage = 10) {
       });
       
       if (hasGenerating) {
-        console.log('⏳ There are avatars being generated, updating every 5 seconds');
+        console.log('⏳ Есть аватары в процессе генерации, обновляем каждые 5 секунд');
       }
       
       return hasGenerating ? 5000 : false;
@@ -120,33 +120,33 @@ export function useDeleteAvatar() {
   });
 }
 
-// Function to get avatar image URL via API
+// Функция для получения URL изображения аватара через API
 export function getAvatarImageUrl(avatarId: string): string {
-  // Add authorization token as query parameter to bypass CORS
+  // Добавляем токен авторизации как query parameter для обхода CORS
   const token = localStorage.getItem('access_token');
   const baseUrl = `/api/v1/avatars/${avatarId}/image`;
   
-  // Return URL with token if available
+  // Возвращаем URL с токеном, если он есть
   return token ? `${baseUrl}?token=${token}` : baseUrl;
 }
 
-// Hook to get avatar image blob (more reliable method)
+// Хук для получения blob изображения аватара (более надежный способ)
 export function useAvatarImage(avatarId: string, enabled = true) {
   return useQuery({
     queryKey: ['avatar-image', avatarId],
     queryFn: async () => {
       console.log('Fetching image for avatar:', avatarId);
       
-      // Check token before request
+      // Проверяем токен перед запросом
       const token = localStorage.getItem('access_token');
       console.log('Token available:', !!token, token ? 'Token length:' + token.length : 'No token');
       
       try {
-        // Get image URL with token
+        // Получаем URL изображения с токеном
         const imageUrl = apiClient.getAvatarImageUrl(avatarId);
         console.log('Avatar image URL:', imageUrl);
         
-        // Load image with authorization token
+        // Загружаем изображение с токеном авторизации
         const response = await fetch(imageUrl, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -159,7 +159,7 @@ export function useAvatarImage(avatarId: string, enabled = true) {
         
         console.log('Image response:', response.status, response.headers.get('content-type'));
         
-        // Get blob
+        // Получаем blob
         const blob = await response.blob();
         console.log('Blob size:', blob.size, 'type:', blob.type);
         
@@ -178,8 +178,8 @@ export function useAvatarImage(avatarId: string, enabled = true) {
       }
     },
     enabled: !!avatarId && enabled,
-    staleTime: 60000, // Cache for 1 minute
-    retry: 2, // Allow 2 retries for reliability
-    retryDelay: 1000, // Delay between attempts
+    staleTime: 60000, // Кэшируем на 1 минуту
+    retry: 2, // Разрешаем 2 повтора для надежности
+    retryDelay: 1000, // Задержка между попытками
   });
 } 

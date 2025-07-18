@@ -24,18 +24,18 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
   const updatePromptMutation = useUpdateSegmentPrompt();
   const generateSegmentMutation = useGenerateSegment();
 
-  // live progress via WebSocket (only if segment is not completed)
+  // live progress via WebSocket (только если сегмент не завершён)
   const skipWS = segment.status === 'completed' || segment.status === 'failed';
   useSegmentProgressWS(segment.id, projectId, skipWS);
 
   const handleGenerateClick = async () => {
     if (prompt.trim().length < 10) {
-      toastError('Prompt must contain at least 10 characters');
+      toastError('Промпт должен содержать минимум 10 символов');
       return;
     }
     setIsGenerating(true);
     try {
-      // 1) save prompt if it's new
+      // 1) сохраняем промпт если он новый
       if (prompt !== segment.segment_prompt) {
         await updatePromptMutation.mutateAsync({
           projectId,
@@ -43,17 +43,17 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
           segmentPrompt: prompt.trim(),
         });
       }
-      // 2) start generation
+      // 2) запускаем генерацию
       await generateSegmentMutation.mutateAsync({
         projectId,
         segmentNumber: segment.segment_number,
         segmentPrompt: prompt.trim(),
       });
-      // hide textarea, show text
+      // прячем textarea, показываем текст
       setIsEditing(false);
       onUpdate();
     } catch (error:any) {
-      toastError(error.message || 'Error generating segment');
+      toastError(error.message || 'Ошибка при генерации сегмента');
     } finally {
       setIsGenerating(false);
     }
@@ -72,26 +72,26 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
   const getStatusText = () => {
     const progress = segment.progress ?? 0;
     switch (segment.status) {
-      case 'completed': return 'Ready';
-      case 'in_progress': return `In Progress (${progress}%)`;
-      case 'pending': return 'In Queue';
-      case 'failed': return 'Error';
-      default: return 'Unknown';
+      case 'completed': return 'Готово';
+      case 'in_progress': return `В процессе (${progress}%)`;
+      case 'pending': return 'В очереди';
+      case 'failed': return 'Ошибка';
+      default: return 'Неизвестно';
     }
   };
 
   const getPromptSource = () => {
     if (segment.prompts?.prompt_source === 'custom') {
-      return 'Custom';
+      return 'Пользовательский';
     }
-    return '📝 Default';
+    return '📝 По умолчанию';
   };
 
   return (
     <Card className="segment-editor p-4 mb-4 bg-white shadow-sm">
       <div className="segment-header flex justify-between items-center mb-3">
         <h3 className="text-lg font-semibold">
-          Segment {segment.segment_number} {getStatusIcon()}
+          Сегмент {segment.segment_number} {getStatusIcon()}
         </h3>
         <span className="prompt-source text-xs px-2 py-1 rounded bg-gray-100 text-gray-600">
           {getPromptSource()}
@@ -104,15 +104,15 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
             className="prompt-input w-full p-2 border border-gray-300 rounded resize-vertical"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Enter detailed description for this segment..."
+            placeholder="Введите детальное описание для этого сегмента..."
             rows={4}
           />
         ) : (
           <div className="prompt-display group relative">
             <p className="text-gray-700 whitespace-pre-wrap pr-8">
-              {prompt || 'Prompt not set'}
+              {prompt || 'Промпт не задан'}
             </p>
-            {/* Edit */}
+            {/* Редактировать */}
             {segment.status !== 'completed' && (
               <Button
                 variant="ghost"
@@ -131,7 +131,7 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
       {segment.status === 'in_progress' && (
         <div className="mb-3">
           <div className="flex justify-between text-xs text-gray-600 mb-1">
-            <span>Progress</span><span>{segment.progress}%</span>
+            <span>Прогресс</span><span>{segment.progress}%</span>
           </div>
           <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
             <div className="h-2 bg-blue-500" style={{width:`${segment.progress}%`}} />
@@ -149,17 +149,17 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
             {isGenerating ? (
           <>
             <ActionIcon action="loading" className="w-4 h-4 mr-2" animate />
-            Generating...
+            Генерация...
           </>
         ) : (
           <>
             <ActionIcon action="play" className="w-4 h-4 mr-2" />
-            Generate video
+            Сгенерировать видео
           </>
         )}
           </Button>
           {animationType === 'sequential' && !isNextAllowed && (
-            <div className="text-xs text-blue-600 mt-2">Available only after previous segment completion</div>
+            <div className="text-xs text-blue-600 mt-2">Доступно только после завершения предыдущего сегмента</div>
           )}
         </div>
       )}
@@ -178,7 +178,7 @@ export function SegmentEditor({ projectId, segment, onUpdate, animationType, isN
         <div className="video-preview">
           <LazyLoadImage 
             src={segment.start_frame_url}
-            alt={`Segment ${segment.segment_number}`}
+            alt={`Сегмент ${segment.segment_number}`}
             effect="blur"
             className="w-full max-w-md h-40 object-cover rounded"
           />

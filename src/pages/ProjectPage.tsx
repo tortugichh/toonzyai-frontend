@@ -9,8 +9,8 @@ export default function ProjectPage() {
   if (!projectId) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-red-600 text-lg">Project ID not specified</p>
-        <Button onClick={() => navigate('/studio')}>← Back to projects</Button>
+        <p className="text-red-600 text-lg">ID проекта не указан</p>
+        <Button onClick={() => navigate('/studio')}>← Назад к проектам</Button>
       </div>
     );
   }

@@ -1,11 +1,11 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
-import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import BackendStatus from '@/components/common/BackendStatus';
-
-// Pages
+import { QUERY_STALE_TIME, QUERY_CACHE_TIME, IS_DEVELOPMENT } from '@/constants';
+import { createSecureOnError } from '@/utils/globalErrorHandler';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useCurrentUser, simpleLogout } from '@/hooks/useAuth';
+import { ErrorBoundary } from '@/components/common';
 import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
@@ -14,107 +14,137 @@ import AvatarsPage from '@/pages/AvatarsPage';
 import AnimationPage from '@/pages/AnimationPage';
 import AnimationDetailPage from '@/pages/AnimationDetailPage';
 import AnimationStudioPage from '@/pages/AnimationStudioPage';
-import StoryGeneratorPage from '@/pages/StoryGeneratorPage';
-import StoryDetailPage from '@/pages/StoryDetailPage';
 import ProjectPage from '@/pages/ProjectPage';
+import { StoryGeneratorPage } from '@/pages/StoryGeneratorPage';
+import StoryDetailPage from '@/pages/StoryDetailPage';
 
-// Hooks
-import { useCurrentUser } from '@/hooks/useAuth';
+// Emergency logout function available in console
+if (typeof window !== 'undefined') {
+  (window as any).emergencyLogout = simpleLogout;
+}
 
-// Constants
-const QUERY_CACHE_TIME = 1000 * 60 * 5; // 5 minutes
-const QUERY_STALE_TIME = 1000 * 60 * 2; // 2 minutes
-
+// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: QUERY_STALE_TIME,
-      gcTime: QUERY_CACHE_TIME, // In newer versions of React Query, gcTime is used instead of cacheTime
       retry: 1,
       refetchOnWindowFocus: false,
+      staleTime: QUERY_STALE_TIME,
+      gcTime: QUERY_CACHE_TIME, // В новых версиях React Query используется gcTime вместо cacheTime
+    },
+    mutations: {
     },
   },
 });
 
-function App() {
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { data: user, isLoading } = useCurrentUser();
-  const isAuthenticated = !!user;
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Загрузка...</p>
         </div>
       </div>
     );
   }
 
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+function AppRoutes() {
+  const { data: user } = useCurrentUser();
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <ErrorBoundary>
-        <Router>
-          <div className="min-h-screen bg-gray-50">
-            <BackendStatus />
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+    <Router>
+      <Routes>
+        <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <HomePage />} />
+        <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
+        <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/avatars"
+          element={
+            <ProtectedRoute>
+              <AvatarsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/animations"
+          element={<Navigate to="/studio" replace />}
+        />
+        <Route
+          path="/animations/:id"
+          element={<Navigate to="/studio/:id" replace />}
+        />
+        <Route
+          path="/studio"
+          element={
+            <ProtectedRoute>
+              <AnimationStudioPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/studio/:projectId"
+          element={
+            <ProtectedRoute>
+              <ProjectPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/story-generator"
+          element={
+            <ProtectedRoute>
+              <StoryGeneratorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stories"
+          element={
+            <ProtectedRoute>
+              <StoryGeneratorPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/stories/:id"
+          element={
+            <ProtectedRoute>
+              <StoryDetailPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </Router>
+  );
+}
 
-              {/* Protected routes */}
-              <Route
-                path="/dashboard"
-                element={isAuthenticated ? <DashboardPage /> : <Navigate to="/login" replace />}
-              />
-              <Route
-                path="/avatars"
-                element={isAuthenticated ? <AvatarsPage /> : <Navigate to="/login" replace />}
-              />
-              <Route
-                path="/animations"
-                element={isAuthenticated ? <AnimationPage /> : <Navigate to="/login" replace />}
-              />
-              <Route
-                path="/animation/:projectId"
-                element={isAuthenticated ? <AnimationDetailPage /> : <Navigate to="/login" replace />}
-              />
-              <Route
-                path="/studio"
-                element={isAuthenticated ? <AnimationStudioPage /> : <Navigate to="/login" replace />}
-              />
-              <Route
-                path="/project/:projectId"
-                element={isAuthenticated ? <ProjectPage /> : <Navigate to="/login" replace />}
-              />
-              <Route
-                path="/story-generator"
-                element={isAuthenticated ? <StoryGeneratorPage /> : <Navigate to="/login" replace />}
-              />
-              <Route
-                path="/story/:storyId"
-                element={isAuthenticated ? <StoryDetailPage /> : <Navigate to="/login" replace />}
-              />
-
-              {/* Catch all route */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </div>
-        </Router>
-      </ErrorBoundary>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-        }}
-      />
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+function App() {
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AppRoutes />
+        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
+        {IS_DEVELOPMENT && <ReactQueryDevtools initialIsOpen={false} />}
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

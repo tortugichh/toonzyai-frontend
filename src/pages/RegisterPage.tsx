@@ -14,12 +14,12 @@ import logoSrc from '@/assets/logo.svg';
 import { apiClient } from '@/services/api';
 
 const registerSchema = z.object({
-  username: z.string().min(3, 'Username must contain at least 3 characters'),
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must contain at least 8 characters'),
-  confirmPassword: z.string().min(8, 'Confirm password'),
+  username: z.string().min(3, 'Имя пользователя должно содержать минимум 3 символа'),
+  email: z.string().email('Некорректный email адрес'),
+  password: z.string().min(8, 'Пароль должен содержать минимум 8 символов'),
+  confirmPassword: z.string().min(8, 'Подтвердите пароль'),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
+  message: 'Пароли не совпадают',
   path: ['confirmPassword'],
 });
 
@@ -43,18 +43,18 @@ function RegisterPage() {
     try {
       const { confirmPassword, ...registerData } = data;
       console.log('Sending registration data:', registerData);
-      // 1) Register user
+      // 1) Регистрируем пользователя
       await registerMutation.mutateAsync(registerData);
 
-      // 2) Automatically login with the same credentials
+      // 2) Автоматически логинимся теми же данными
       const tokens = await apiClient.login(registerData.username, registerData.password);
       localStorage.setItem('access_token', tokens.access_token);
       localStorage.setItem('refresh_token', tokens.refresh_token);
 
-      // 3) Send Google Analytics registration event
+      // 3) Отправляем событие Google Analytics о регистрации
       trackSignUp('email');
 
-      toastSuccess('Welcome to ToonzyAI!');
+      toastSuccess('Добро пожаловать в ToonzyAI!');
       navigate('/dashboard');
     } catch (error) {
       console.error('Registration error:', error);
@@ -71,8 +71,8 @@ function RegisterPage() {
             <img src={logoSrc} alt="ToonzyAI logo" className="w-9 h-9" />
             <span className="text-xl font-bold text-neutral-900">ToonzyAI</span>
           </Link>
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Registration</h1>
-          <p className="text-neutral-600">Create a new account</p>
+          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Регистрация</h1>
+          <p className="text-neutral-600">Cоздайте новый аккаунт</p>
         </div>
 
         <Card className="p-8">
@@ -80,7 +80,7 @@ function RegisterPage() {
             {/* Username Field */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-neutral-700 mb-2">
-                Username
+                Имя пользователя
               </label>
               <Input
                 id="username"
@@ -97,7 +97,7 @@ function RegisterPage() {
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
-                Email address
+                Email адрес
               </label>
               <Input
                 id="email"
@@ -114,13 +114,13 @@ function RegisterPage() {
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
-                Password
+                Пароль
               </label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Minimum 8 characters"
+                  placeholder="Минимум 8 символов"
                   {...register('password')}
                   className={`w-full pr-10 ${errors.password ? 'border-red-500' : ''}`}
                 />
@@ -149,13 +149,13 @@ function RegisterPage() {
             {/* Confirm Password Field */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-neutral-700 mb-2">
-                Confirm password
+                Подтвердите пароль
               </label>
               <div className="relative">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Repeat password"
+                  placeholder="Повторите пароль"
                   {...register('confirmPassword')}
                   className={`w-full pr-10 ${errors.confirmPassword ? 'border-red-500' : ''}`}
                 />
@@ -185,7 +185,7 @@ function RegisterPage() {
             {registerMutation.error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                 <p className="text-red-700 text-sm font-medium">
-                  Registration error
+                  Ошибка регистрации
                 </p>
                 <p className="text-red-600 text-xs mt-1">
                   {getErrorMessage(registerMutation.error)}
@@ -204,10 +204,10 @@ function RegisterPage() {
               {registerMutation.isPending ? (
                 <div className="flex items-center justify-center space-x-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span>Creating account...</span>
+                  <span>Создание аккаунта...</span>
                 </div>
               ) : (
-                'Create account'
+                'Создать аккаунт'
               )}
             </Button>
           </form>
@@ -219,7 +219,7 @@ function RegisterPage() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">or</span>
+                <span className="px-2 bg-white text-gray-500">или</span>
               </div>
             </div>
           </div>
@@ -227,12 +227,12 @@ function RegisterPage() {
           {/* Login Link */}
           <div className="mt-6 text-center">
             <p className="text-gray-600">
-              Already have an account?{' '}
+              Уже есть аккаунт?{' '}
               <Link
                 to="/login"
                 className="text-purple-600 hover:text-purple-500 font-medium transition-colors"
               >
-                Sign in
+                Войти
               </Link>
             </p>
           </div>
@@ -247,7 +247,7 @@ function RegisterPage() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>Back to home</span>
+            <span>Вернуться на главную</span>
           </Link>
         </div>
       </div>

@@ -132,7 +132,7 @@ export interface AnimationProject {
   segments?: AnimationSegment[];
 }
 
-// For animation list - returns simple array according to documentation
+// Для списка анимаций - возвращается просто массив согласно документации
 export type AnimationsResponse = AnimationProject[];
 
 export interface AssembleVideoResponse {
@@ -146,7 +146,7 @@ export interface ApiError {
   detail: string;
 }
 
-// New types for working with segments
+// Новые типы для работы с сегментами
 export interface UpdateSegmentPromptRequest {
   segment_prompt: string;
 }
@@ -159,7 +159,7 @@ export interface UpdateSegmentPromptResponse {
 }
 
 export interface GenerateSegmentRequest {
-  segment_prompt?: string; // Optional override of current prompt
+  segment_prompt?: string; // Опциональный override текущего промпта
 }
 
 export interface GenerateSegmentResponse {
@@ -189,7 +189,7 @@ export interface SegmentDetailsResponse {
   segment_number: number;
   status: SegmentStatus;
   segment_prompt: string | null;
-  project_prompt: string; // Project general prompt
+  project_prompt: string; // Общий промпт проекта
   start_frame_url: string;
   generated_video_url: string | null;
   video_url: string | null;

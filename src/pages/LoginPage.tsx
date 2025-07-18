@@ -11,8 +11,8 @@ import { getErrorMessage } from '@/services/api';
 import logoSrc from '@/assets/logo.svg';
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'Username is required'),
-  password: z.string().min(6, 'Password must contain at least 6 characters'),
+  username: z.string().min(1, 'Имя пользователя обязательно'),
+  password: z.string().min(6, 'Пароль должен содержать минимум 6 символов'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -49,8 +49,8 @@ function LoginPage() {
             <img src={logoSrc} alt="ToonzyAI logo" className="w-10 h-10" />
             <span className="text-2xl font-bold text-neutral-900">ToonzyAI</span>
           </Link>
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Sign in</h1>
-          <p className="text-neutral-600">Enter your account details</p>
+          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Вход</h1>
+          <p className="text-neutral-600">Введите данные аккаунта</p>
         </div>
 
         <Card className="p-10">
@@ -58,7 +58,7 @@ function LoginPage() {
             {/* Username Field */}
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-neutral-700 mb-2">
-                Username
+                Имя пользователя
               </label>
               <Input
                 id="username"
@@ -75,13 +75,13 @@ function LoginPage() {
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
-                Password
+                Пароль
               </label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter password"
+                  placeholder="Введите пароль"
                   {...register('password')}
                   className={`w-full pr-10 ${errors.password ? 'border-red-500' : ''}`}
                 />
@@ -111,7 +111,7 @@ function LoginPage() {
             {loginMutation.error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                 <p className="text-red-700 text-sm font-medium">
-                  Login error
+                  Ошибка входа
                 </p>
                 <p className="text-red-600 text-xs mt-1">
                   {getErrorMessage(loginMutation.error)}
@@ -129,10 +129,10 @@ function LoginPage() {
               {loginMutation.isPending ? (
                 <div className="flex items-center justify-center space-x-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-neutral-700"></div>
-                  <span>Signing in...</span>
+                  <span>Вход...</span>
                 </div>
               ) : (
-                'Sign in'
+                'Войти'
               )}
             </Button>
           </form>
@@ -144,7 +144,7 @@ function LoginPage() {
                 <div className="w-full border-t border-neutral-200" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-neutral-500">or</span>
+                <span className="px-2 bg-white text-neutral-500">или</span>
               </div>
             </div>
           </div>
@@ -152,12 +152,12 @@ function LoginPage() {
           {/* Register Link */}
           <div className="mt-6 text-center">
             <p className="text-neutral-600">
-              Don't have an account?{' '}
+              Нет аккаунта?{' '}
               <Link
                 to="/register"
                 className="text-brand hover:underline"
               >
-                Register
+                Зарегистрироваться
               </Link>
             </p>
           </div>
@@ -172,7 +172,7 @@ function LoginPage() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>Back to home</span>
+            <span>На главную</span>
           </Link>
         </div>
       </div>

@@ -84,15 +84,15 @@ export function StatusIcon({
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'completed': return 'Completed';
-      case 'failed': return 'Error';
-      case 'pending': return 'Pending';
-      case 'inProgress': return 'In Progress';
-      case 'assembling': return 'Assembling';
-      case 'warning': return 'Warning';
-      case 'info': return 'Info';
-      case 'blocked': return 'Blocked';
-      default: return 'Unknown';
+      case 'completed': return 'Завершен';
+      case 'failed': return 'Ошибка';
+      case 'pending': return 'Ожидание';
+      case 'inProgress': return 'В процессе';
+      case 'assembling': return 'Сборка';
+      case 'warning': return 'Предупреждение';
+      case 'info': return 'Информация';
+      case 'blocked': return 'Заблокировано';
+      default: return 'Неизвестно';
     }
   };
 

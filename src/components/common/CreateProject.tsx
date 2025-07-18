@@ -25,7 +25,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
   const [formData, setFormData] = useState<FormData>({
     title: '',
     avatarId: '',
-    totalSegments: 0, // 0 means "not selected"
+    totalSegments: 0, // 0 означает «не выбрано»
     prompt: '',
     animationType: 'independent',
   });
@@ -38,17 +38,17 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
     e.preventDefault();
     
     if (!formData.avatarId) {
-      toastError('Select an avatar');
+      toastError('Выберите аватар');
       return;
     }
 
     if (!formData.title.trim()) {
-      toastError('Enter project name');
+      toastError('Введите название проекта');
       return;
     }
 
     if (segmentsError) {
-      toastError('Select number of segments');
+      toastError('Выберите количество сегментов');
       return;
     }
 
@@ -63,19 +63,19 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
       
       onProjectCreated(project);
     } catch (error: any) {
-      if (error?.message?.includes('Only one animation project available')) {
+      if (error?.message?.includes('Доступен только один анимационный проект')) {
         setLimitModalOpen(true);
       } else {
-      toastError('Project creation error: ' + error.message);
+      toastError('Ошибка создания проекта: ' + error.message);
       }
     }
   };
 
   const handleInputChange = (field: keyof FormData, value: string | number) => {
     if (field === 'totalSegments') {
-      // value from <select> is always string
+      // value из <select> всегда строка
       let v = parseInt(value as string, 10);
-      if (isNaN(v)) v = 0; // "not selected"
+      if (isNaN(v)) v = 0; // «не выбрано»
       setFormData(prev => ({ ...prev, totalSegments: v }));
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
@@ -95,10 +95,10 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
     <Card className="create-project-form max-w-2xl mx-auto p-6">
       <div className="form-header mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Create new project
+          Создать новый проект
         </h2>
         <p className="text-gray-600">
-          Select an avatar and describe the animation you want to create
+          Выберите аватар и опишите анимацию, которую хотите создать
         </p>
       </div>
 
@@ -106,13 +106,13 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
         {/* Project Title */}
         <div className="form-group">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Project name
+            Название проекта
           </label>
           <Input
             type="text"
             value={formData.title}
             onChange={(e) => handleInputChange('title', e.target.value)}
-            placeholder="Enter project name"
+            placeholder="Введите название проекта"
             disabled={isSubmitting}
             className="w-full"
           />
@@ -121,18 +121,18 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
         {/* Avatar Selection */}
         <div className="form-group">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select avatar
+            Выберите аватар
           </label>
           
           {avatarsLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-2 text-gray-600">Loading avatars...</span>
+              <span className="ml-2 text-gray-600">Загрузка аватаров...</span>
             </div>
           ) : avatars.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <p>No available avatars</p>
-              <p className="text-sm mt-1">First create an avatar in the "Avatars" section</p>
+              <p>Нет доступных аватаров</p>
+              <p className="text-sm mt-1">Сначала создайте аватар в разделе "Аватары"</p>
             </div>
           ) : (
             <div className="avatars-grid grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -172,7 +172,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
         {/* Number of Segments */}
         <div className="form-group">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Number of segments
+            Количество сегментов
           </label>
           <select
             value={formData.totalSegments || ''}
@@ -181,24 +181,24 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
             className={`rounded px-3 py-2 w-full bg-white border ${segmentsError ? 'border-red-500 focus:border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
           >
             <option value="" disabled>
-              -- select --
+              -- выберите --
             </option>
             {[1, 2, 3, 4, 5].map((n) => (
               <option key={n} value={n}>{n}</option>
             ))}
           </select>
           {segmentsError && (
-            <p className="text-red-500 text-xs mt-1">Number of segments must be between 1 and 5</p>
+            <p className="text-red-500 text-xs mt-1">Количество сегментов должно быть от 1 до 5</p>
           )}
           <p className="text-xs text-gray-500 mt-1">
-            Allowed from 1 to 5 segments. Recommended 3&nbsp;–&nbsp;5 for optimal quality.
+            Допустимо от 1 до 5 сегментов. Рекомендуется 3&nbsp;–&nbsp;5 для оптимального качества.
           </p>
         </div>
 
           {/* Animation Type Selection */}
           <div className="form-group">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Animation type
+              Тип анимации
             </label>
             <div className="flex gap-4">
               <label className="flex items-center gap-2">
@@ -210,7 +210,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
                   onChange={() => handleInputChange('animationType', 'independent')}
                   disabled={isSubmitting}
                 />
-                Independent frames
+                Несвязанные кадры
               </label>
               <label className="flex items-center gap-2">
                 <input
@@ -221,12 +221,12 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
                   onChange={() => handleInputChange('animationType', 'sequential')}
                   disabled={isSubmitting}
                 />
-                Logically connected animation
+                Логически связанная анимация
               </label>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              <b>Logically connected</b>: the next frame can only be generated after the previous one is completed.<br/>
-              <b>Independent frames</b>: any frames can be generated in any order.
+              <b>Логически связанная</b>: следующий кадр можно сгенерировать только после завершения предыдущего.<br/>
+              <b>Несвязанные кадры</b>: можно генерировать любые кадры в любом порядке.
             </p>
           </div>
 
@@ -240,10 +240,10 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
             {isSubmitting ? (
               <div className="flex items-center justify-center gap-2">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                <span>Creating...</span>
+                <span>Создание...</span>
               </div>
             ) : (
-                                'Create project'
+                                'Создать проект'
             )}
           </Button>
           
@@ -255,7 +255,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
               disabled={isSubmitting}
               className="px-6 py-3"
             >
-              Cancel
+              Отмена
             </Button>
           )}
         </div>
@@ -263,17 +263,17 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
         {/* Error Display */}
         {createProjectMutation.isError && (
           <div className="error-message mt-4 p-3 bg-red-100 border border-red-300 rounded text-red-700">
-            <p>Project creation error: {createProjectMutation.error instanceof Error ? createProjectMutation.error.message : String(createProjectMutation.error)}</p>
+            <p>Ошибка создания проекта: {createProjectMutation.error instanceof Error ? createProjectMutation.error.message : String(createProjectMutation.error)}</p>
           </div>
         )}
       </form>
     </Card>
       <Modal
         open={limitModalOpen}
-        title="Animation project limit"
-        description="New users are limited to one animation project."
+        title="Лимит анимационных проектов"
+        description="Новым пользователям доступен только один анимационный проект."
         onClose={() => setLimitModalOpen(false)}
-        confirmText="Got it"
+        confirmText="Понятно"
       />
     </>
   );

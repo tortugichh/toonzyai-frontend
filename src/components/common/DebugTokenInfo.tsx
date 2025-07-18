@@ -25,7 +25,7 @@ export function DebugTokenInfo() {
   const clearTokens = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    toastSuccess('Tokens cleared');
+    toastSuccess('Токены очищены');
     window.location.reload();
   };
 
@@ -49,7 +49,7 @@ export function DebugTokenInfo() {
           <div className="mt-1 p-2 bg-gray-800 rounded text-xs break-all">
             {accessToken ? 
               accessToken.substring(0, 50) + '...' : 
-              'Not found'
+              'Не найден'
             }
           </div>
         </div>
@@ -59,18 +59,18 @@ export function DebugTokenInfo() {
           <div className="mt-1 p-2 bg-gray-800 rounded text-xs break-all">
             {refreshToken ? 
               refreshToken.substring(0, 50) + '...' : 
-              'Not found'
+              'Не найден'
             }
           </div>
         </div>
 
         <div className="pt-2 border-t border-gray-700">
-          <strong className="text-yellow-400">Status:</strong>
+          <strong className="text-yellow-400">Статус:</strong>
           <div className="mt-1">
             {accessToken && refreshToken ? (
-              <span className="text-green-400">Authorized</span>
+              <span className="text-green-400">Авторизован</span>
             ) : (
-              <span className="text-red-400">Not authorized</span>
+                              <span className="text-red-400">Не авторизован</span>
             )}
           </div>
         </div>
@@ -80,7 +80,7 @@ export function DebugTokenInfo() {
           size="sm"
           className="w-full bg-red-600 hover:bg-red-700 text-white text-xs"
         >
-          Clear tokens
+          Очистить токены
         </Button>
       </div>
     </Card>

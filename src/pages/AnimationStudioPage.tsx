@@ -76,27 +76,27 @@ function AnimationStudioPage() {
         {/* Hero / Header */}
         <div className="studio-header mb-8 bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] text-white rounded-xl p-6 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-1">
-            <Button onClick={() => navigate(-1)} variant="outline" className="border-white text-white hover:bg-white/10">← Back</Button>
+            <Button onClick={() => navigate(-1)} variant="outline" className="border-white text-white hover:bg-white/10">← Назад</Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Animation Studio
+                Студия анимации
               </h1>
               <p className="text-gray-600 mt-2">
-                Create animations with unique prompts for each segment
+                Создавайте анимации с уникальными промптами для каждого сегмента
               </p>
             </div>
           </div>
 
           {/* Avatar Filter */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 flex-1 sm:flex-none">
-            <label htmlFor="avatarFilter" className="text-sm hidden md:block">Filter by avatar:</label>
+            <label htmlFor="avatarFilter" className="text-sm hidden md:block">Фильтр по аватару:</label>
             <select
               id="avatarFilter"
               value={avatarFilter}
               onChange={(e) => setAvatarFilter(e.target.value)}
               className="rounded px-3 py-2 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-white/70 w-full sm:w-auto"
             >
-              <option value="all">All avatars</option>
+              <option value="all">Все аватары</option>
               {availableAvatars.map(av => (
                 <option key={av.avatar_id} value={av.avatar_id}>{av.prompt.slice(0, 40)}</option>
               ))}
@@ -107,7 +107,7 @@ function AnimationStudioPage() {
             onClick={() => setShowCreateForm(true)}
             className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] hover:opacity-90 text-white px-6 py-3 transform-gpu hover:scale-105 transition w-full sm:w-auto"
           >
-            ➕ New Project
+            ➕ Новый проект
           </Button>
         </div>
 
@@ -115,7 +115,7 @@ function AnimationStudioPage() {
         {isLoading ? (
           <div className="loading text-center py-12">
             <div className="animate-spin-infinite rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600 text-lg">Loading projects...</p>
+            <p className="text-gray-600 text-lg">Загрузка проектов...</p>
           </div>
         ) : projects.length === 0 ? (
           <Card className="welcome-card text-center py-12">
@@ -126,11 +126,11 @@ function AnimationStudioPage() {
                   </svg>
                 </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Welcome to ToonzyAI Studio!
+                Добро пожаловать в ToonzyAI Studio!
               </h2>
               <p className="text-gray-600 max-w-md mx-auto">
-                Here you can create amazing animations with AI. 
-                Start by creating your first project.
+                Здесь вы можете создавать удивительные анимации с помощью ИИ. 
+                Начните с создания вашего первого проекта.
               </p>
             </div>
             
@@ -138,7 +138,7 @@ function AnimationStudioPage() {
               onClick={() => setShowCreateForm(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
             >
-              Create First Project
+                              Создать первый проект
             </Button>
           </Card>
         ) : (
@@ -157,10 +157,10 @@ function AnimationStudioPage() {
       {/* Delete Confirm Modal */}
       <Modal
         open={Boolean(deleteProjectId)}
-        title="Delete project?"
-        description={`Are you sure you want to delete project "${deleteProjectName}"? This action cannot be undone.`}
-        confirmText="Delete"
-        cancelText="Cancel"
+        title="Удалить проект?"
+        description={`Вы уверены, что хотите удалить проект "${deleteProjectName}"? Это действие нельзя отменить.`}
+        confirmText="Удалить"
+        cancelText="Отмена"
         onConfirm={confirmDeleteProject}
         onClose={() => setDeleteProjectId(null)}
       />
@@ -194,11 +194,11 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
   const getStatusText = (status: string) => {
     const s = status?.toLowerCase?.().trim();
     switch (s) {
-              case 'completed': return 'Completed';
-        case 'in_progress': return 'In Progress';
-        case 'assembling': return 'Assembling';
-        case 'failed': return 'Failed';
-        default: return 'Pending';
+              case 'completed': return 'Завершен';
+        case 'in_progress': return 'В процессе';
+        case 'assembling': return 'Сборка';
+        case 'failed': return 'Ошибка';
+        default: return 'Ожидает';
     }
   };
 
@@ -219,7 +219,7 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
           onDelete();
         }}
         className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
-        title="Delete project"
+        title="Удалить проект"
       >
         ×
       </button>
@@ -242,7 +242,7 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
           {/* Project Info */}
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-lg text-gray-900 mb-1 truncate">
-              {p.name || `Project #${p.id.slice(0, 8)}`}
+              {p.name || `Проект #${p.id.slice(0, 8)}`}
             </h3>
             {p.animation_prompt && (
               <p className="text-sm text-gray-600 line-clamp-2 mb-2">
@@ -258,7 +258,7 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
         {/* Progress */}
         <div className="mb-4 space-y-1 text-xs text-gray-600">
           <div className="flex justify-between">
-            <span className="font-medium">Progress</span>
+            <span className="font-medium">Прогресс</span>
             <span>{Math.round(progressPercent)}%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
@@ -301,7 +301,7 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
 
               {/* Status badge in top-right corner */}
               <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                Completed
+                Готово
               </div>
             </div>
           </div>
@@ -315,7 +315,7 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
                     <svg className="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="text-sm">Pending processing</p>
+                    <p className="text-sm">Ожидает обработки</p>
                   </>
                 )}
                 {p.status === 'in_progress' && (
@@ -324,7 +324,7 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    <p className="text-sm">Creating segments...</p>
+                    <p className="text-sm">Создание сегментов...</p>
                   </>
                 )}
                 {p.status === 'assembling' && (
@@ -332,7 +332,7 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
                     <svg className="w-8 h-8 mx-auto mb-2 text-orange-400 animate-pulse-infinite" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                     </svg>
-                    <p className="text-sm">Assembling final video...</p>
+                    <p className="text-sm">Сборка финального видео...</p>
                   </>
                 )}
                 {p.status === 'failed' && (
@@ -340,7 +340,7 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
                     <svg className="w-8 h-8 mx-auto mb-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    <p className="text-sm">Creation failed</p>
+                    <p className="text-sm">Ошибка создания</p>
                   </>
                 )}
               </div>
@@ -350,8 +350,8 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
 
         {/* Metadata */}
         <div className="text-xs text-gray-500 flex justify-between">
-          <div>Created: {new Date(p.created_at).toLocaleDateString('ru-RU')}</div>
-          <div>Segments: {totalSegments}</div>
+          <div>Создан: {new Date(p.created_at).toLocaleDateString('ru-RU')}</div>
+          <div>Сегментов: {totalSegments}</div>
         </div>
       </div>
     </Card>

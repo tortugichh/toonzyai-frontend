@@ -67,7 +67,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
               className="text-gray-700 hover:text-gray-900 transition-all duration-300 font-medium text-base hover:scale-105 relative group"
             >
               <span className="relative z-10">
-                Dashboard
+                Панель управления
               </span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-light to-secondary-light group-hover:w-full transition-all duration-300"></span>
             </Link>
@@ -76,7 +76,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
               className="text-gray-700 hover:text-gray-900 transition-all duration-300 font-medium text-base hover:scale-105 relative group"
             >
               <span className="relative z-10">
-              Avatars
+              Аватары
               </span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-light to-secondary-light group-hover:w-full transition-all duration-300"></span>
             </Link>
@@ -85,7 +85,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
               className="text-gray-700 hover:text-gray-900 transition-all duration-300 font-medium text-base hover:scale-105 relative group"
             >
               <span className="relative z-10">
-                Animations
+                Анимации
               </span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-light to-secondary-light group-hover:w-full transition-all duration-300"></span>
             </Link>
@@ -94,7 +94,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
               className="text-gray-700 hover:text-gray-900 transition-all duration-300 font-medium text-base hover:scale-105 relative group"
             >
               <span className="relative z-10">
-                Stories
+                Истории
               </span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-light to-secondary-light group-hover:w-full transition-all duration-300"></span>
             </Link>
@@ -129,28 +129,28 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
                 className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
                 onClick={() => setMenuOpen(false)}
               >
-                Dashboard
+                Панель управления
               </Link>
               <Link
                 to="/avatars"
                 className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
                 onClick={() => setMenuOpen(false)}
               >
-                Avatars
+                Аватары
               </Link>
               <Link
                 to="/animations"
                 className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
                 onClick={() => setMenuOpen(false)}
               >
-                Animations
+                Анимации
               </Link>
               <Link
                 to="/stories"
                 className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
                 onClick={() => setMenuOpen(false)}
               >
-                Stories
+                Истории
               </Link>
               <div className="border-t border-white/20 my-2"></div>
               {user ? (
@@ -162,7 +162,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
                     onLogout();
                   }}
                 >
-                  {isLoggingOut ? 'Logging out...' : 'Logout'}
+                  {isLoggingOut ? 'Выход...' : 'Выйти'}
                 </Button>
               ) : (
                 <>
@@ -174,7 +174,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
                       navigate('/login');
                     }}
                   >
-                    Login
+                    Войти
                   </Button>
                   <Button
                     className="mx-6 mt-2 bg-gradient-to-r from-primary to-secondary-dark text-white"
@@ -183,7 +183,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
                       navigate('/register');
                     }}
                   >
-                    Start free
+                    Начать бесплатно
                   </Button>
                 </>
               )}
@@ -195,7 +195,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
             {user ? (
               <>
               <div className="hidden sm:block text-right">
-                  <p className="text-sm text-gray-700">Hello, {user.username}!</p>
+                  <p className="text-sm text-gray-700">Привет, {user.username}!</p>
                 <p className="text-xs text-gray-500">{user.email}</p>
               </div>
             <Button 
@@ -206,7 +206,7 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
             >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
                   <span className="relative z-10">
-              {isLoggingOut ? 'Logging out...' : 'Logout'}
+              {isLoggingOut ? 'Выход...' : 'Выйти'}
                   </span>
                 </Button>
               </>
@@ -217,13 +217,13 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
                   onClick={() => navigate('/login')} 
                   className="text-gray-700 hover:text-gray-900 font-medium"
                 >
-                  Login
+                  Войти
                 </Button>
                 <Button 
                   onClick={() => navigate('/register')} 
                   className="bg-gradient-to-r from-primary to-secondary-dark text-white px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:scale-105"
                 >
-                  Start free
+                  Начать бесплатно
             </Button>
               </>
             )}
