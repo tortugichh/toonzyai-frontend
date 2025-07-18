@@ -33,7 +33,6 @@ const VideoDebugPanel: React.FC<VideoDebugPanelProps> = ({
   const [results, setResults] = useState<DiagnosticResult[]>([]);
   const [isChecking, setIsChecking] = useState(false);
   const [summary, setSummary] = useState<string>('');
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const runDiagnostics = async () => {
     setIsChecking(true);
@@ -68,13 +67,13 @@ const VideoDebugPanel: React.FC<VideoDebugPanelProps> = ({
       const totalCount = diagnosticResults.length;
       
       if (availableCount > 0) {
-        setSummary(`✅ Found ${availableCount} working URLs out of ${totalCount}. Video should load!`);
+        setSummary(`✅ Найдено ${availableCount} рабочих URL из ${totalCount}. Видео должно загружаться!`);
       } else {
-        setSummary(`❌ All ${totalCount} URLs are unavailable. Authentication problem or files missing.`);
+        setSummary(`❌ Все ${totalCount} URL недоступны. Проблема с авторизацией или файлы отсутствуют.`);
       }
     } catch (error) {
       console.error('Diagnostic error:', error);
-      setSummary(`❌ Diagnostic error: ${error}`);
+      setSummary(`❌ Ошибка диагностики: ${error}`);
     } finally {
       setIsChecking(false);
     }
@@ -100,77 +99,135 @@ const VideoDebugPanel: React.FC<VideoDebugPanelProps> = ({
     }
   };
 
-  const getSegmentStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'text-gray-600 bg-gray-100';
-      case 'in_progress': return 'text-blue-600 bg-blue-100';
-      case 'completed': return 'text-green-600 bg-green-100';
-      case 'failed': return 'text-red-600 bg-red-100';
-      case 'assembling': return 'text-purple-600 bg-purple-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
   const formatFileSize = (bytes?: number): string => {
-    if (!bytes) return 'Unknown';
+    if (!bytes) return 'Неизвестно';
     const mb = bytes / (1024 * 1024);
     return `${mb.toFixed(1)} MB`;
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'pending': return 'Pending';
-      case 'processing': return 'Processing';
-      case 'completed': return 'Completed';
-      case 'failed': return 'Failed';
-      default: return status;
-    }
-  };
-
   return (
-    <Card className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Video Debug Info</h3>
-        <Button 
-          onClick={() => setIsExpanded(!isExpanded)} 
-          variant="outline" 
-          size="sm"
-        >
-          {isExpanded ? 'Hide' : 'Show'} Details
-        </Button>
-      </div>
-      
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <span className="text-sm text-gray-600">Status:</span>
-          <span className={`text-sm font-medium ${getSegmentStatusColor(segment.status)}`}>
-            {getStatusText(segment.status)}
-          </span>
-        </div>
-        
-        <div className="flex justify-between">
-          <span className="text-sm text-gray-600">Segment:</span>
-          <span className="text-sm font-medium">{segment.segment_number}</span>
-        </div>
-        
-        {segment.video_url && (
-          <div className="flex justify-between">
-            <span className="text-sm text-gray-600">Video URL:</span>
-            <span className="text-sm font-mono text-blue-600 truncate max-w-xs">
-              {segment.video_url}
-            </span>
-          </div>
+    <Card className="p-6 max-w-4xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold">
+          🔧 Диагностика видео - Сегмент {segment.segment_number}
+        </h3>
+        {onClose && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            className="text-gray-600"
+          >
+            ✕ Закрыть
+          </Button>
         )}
       </div>
-      
-      {isExpanded && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <h4 className="font-medium mb-2">Raw Data:</h4>
-          <pre className="text-xs bg-gray-100 p-2 rounded overflow-auto max-h-40">
-            {JSON.stringify(segment, null, 2)}
-          </pre>
+
+      {/* Информация о сегменте */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <h4 className="font-medium mb-2">Данные сегмента:</h4>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="font-medium">Статус:</span> {segment.status}
+          </div>
+          <div>
+            <span className="font-medium">video_url:</span> {segment.video_url || 'отсутствует'}
+          </div>
+          <div>
+            <span className="font-medium">generated_video_url:</span> {segment.generated_video_url || 'отсутствует'}
+          </div>
+          <div>
+            <span className="font-medium">urls.video_endpoint:</span> {segment.urls?.video_endpoint || 'отсутствует'}
+          </div>
+        </div>
+      </div>
+
+      {/* Кнопка запуска диагностики */}
+      <div className="mb-6">
+        <Button
+          onClick={runDiagnostics}
+          disabled={isChecking}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          {isChecking ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <span>Проверка...</span>
+            </div>
+          ) : (
+            '🚀 Запустить диагностику'
+          )}
+        </Button>
+      </div>
+
+      {/* Результаты диагностики */}
+      {results.length > 0 && (
+        <div className="mb-6">
+          <h4 className="font-medium mb-4">Результаты проверки URL:</h4>
+          <div className="space-y-3">
+            {results.map((result, index) => (
+              <div
+                key={index}
+                className={`p-3 rounded-lg border ${getStatusColor(result.status)}`}
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-lg">{getStatusIcon(result.status)}</span>
+                  <div className="flex-1">
+                    <div className="font-mono text-sm break-all">
+                      {result.url}
+                    </div>
+                    {result.error && (
+                      <div className="text-sm mt-1 text-red-600">
+                        Ошибка: {result.error}
+                      </div>
+                    )}
+                    {result.httpStatus && (
+                      <div className="text-sm mt-1 text-gray-600">
+                        HTTP Status: {result.httpStatus}
+                      </div>
+                    )}
+                    {result.videoInfo && (
+                      <div className="text-sm mt-1 text-green-600">
+                        Размер: {formatFileSize(result.videoInfo.size)} | 
+                        Формат: {result.videoInfo.format || 'неизвестен'}
+                      </div>
+                    )}
+                  </div>
+                  {result.status === 'available' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(result.url, '_blank')}
+                      className="text-blue-600"
+                    >
+                      🔗 Открыть
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
+
+      {/* Итоговый отчет */}
+      {summary && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h4 className="font-medium mb-2">💡 Итог диагностики:</h4>
+          <p className="text-sm text-blue-800">{summary}</p>
+        </div>
+      )}
+
+      {/* Рекомендации */}
+      <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <h4 className="font-medium mb-2">🛠️ Возможные решения:</h4>
+        <ul className="text-sm text-yellow-800 space-y-1">
+          <li>• Проверьте, авторизованы ли вы (access_token в localStorage)</li>
+          <li>• Убедитесь, что видео файл действительно существует в bucket</li>
+          <li>• Проверьте правильность настроек CORS для видео endpoints</li>
+          <li>• Обратитесь к разработчику если все URL недоступны</li>
+        </ul>
+      </div>
     </Card>
   );
 };

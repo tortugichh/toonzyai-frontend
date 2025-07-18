@@ -123,7 +123,7 @@ export interface AnimationProject {
   user_id: string;
   source_avatar_id: string;
   total_segments: number;
-  animation_prompt: string | null;
+  animation_prompt: string;
   status: AnimationStatus;
   final_video_url: string | null;
   video_url: string | null;

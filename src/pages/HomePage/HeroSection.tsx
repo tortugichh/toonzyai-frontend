@@ -1,33 +1,24 @@
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+
+// Варианты для эффекта появления слов (fade in + slide up)
+const wordContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.3 } },
+};
+const wordVariant = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 
 interface HeroSectionProps {
   scrollToFeatures: () => void;
 }
-
-const wordContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.3,
-    },
-  },
-};
-
-const wordVariant = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-};
 
 export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
   const navigate = useNavigate();
 
   return (
     <section className="relative text-center py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Decorative elements */}
+      {/* Декоративные элементы */}
       <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-orange-300/20 to-amber-300/20 rounded-full blur-xl animate-pulse" />
       <div className="absolute bottom-32 right-16 w-32 h-32 bg-gradient-to-r from-yellow-300/15 to-orange-400/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
       
@@ -50,24 +41,47 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
           <motion.span
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
           >
-            Create amazing
+            Создавайте{' '}
+          </motion.span>
+          <motion.span 
+            className="relative inline-block"
+            initial={{ opacity: 0, scale: 0.8, rotateX: 90 }}
+            animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+            transition={{ delay: 0.8, duration: 0.8, ease: "backOut" }}
+          >
+            <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">
+              потрясающие
+            </span>
+            {/* Подсветка под словом */}
+            <motion.div
+              className="absolute -bottom-1 sm:-bottom-2 left-0 right-0 h-0.5 sm:h-1 bg-gradient-to-r from-orange-400/30 via-orange-500/50 to-orange-600/30 rounded-full"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 1.2, duration: 0.6 }}
+            />
+            {/* Блики */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+              animate={{ 
+                x: ['-100%', '100%'],
+                opacity: [0, 1, 0] 
+              }}
+              transition={{ 
+                duration: 2, 
+                repeat: Infinity, 
+                repeatDelay: 3,
+                ease: "easeInOut" 
+              }}
+            />
           </motion.span>
           <motion.span
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6, duration: 0.6 }}
-            className="block text-brand"
+            transition={{ delay: 1.1, duration: 0.6 }}
           >
-            AI animations
-          </motion.span>
-          <motion.span
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-          >
-            {' '}in minutes
+            {' '}анимации с ИИ
           </motion.span>
         </motion.h1>
         
@@ -75,8 +89,8 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
           className="text-base sm:text-lg md:text-xl text-gray-600 mb-4 sm:mb-6 md:mb-8 max-w-3xl mx-auto px-4"
           variants={wordVariant}
         >
-          ToonzyAI transforms your ideas into professional animations in minutes. 
-          No complex tools — just the magic of artificial intelligence.
+          ToonzyAI превращает ваши идеи в профессиональные анимации за считанные минуты. 
+          Никаких сложных инструментов — только магия искусственного интеллекта.
         </motion.p>
         
         <motion.div 
@@ -96,9 +110,26 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
               {/* Glow effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300" />
               
-              <span className="relative z-10 flex items-center justify-center">
-                <span className="mr-2">🚀</span>
-                Start for free
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+              
+              {/* Button content */}
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                Начать создавать
+                <motion.svg 
+                  className="w-4 h-4 sm:w-5 sm:h-5" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ 
+                    duration: 2, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </motion.svg>
               </span>
             </Button>
           </motion.div>
@@ -108,35 +139,35 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
             whileTap={{ scale: 0.95 }}
             className="w-full sm:w-auto"
           >
-            <Button 
-              size="lg"
+          <Button 
               variant="outline"
-              className="border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl transition-all duration-300 w-full sm:w-auto"
-              onClick={scrollToFeatures}
-            >
-              <span className="mr-2">✨</span>
-              See how it works
-            </Button>
+            size="lg" 
+              className="relative bg-white/80 backdrop-blur-sm border-2 border-orange-200 text-orange-600 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl hover:bg-orange-50/80 hover:border-orange-300 transition-all duration-300 overflow-hidden group w-full sm:w-auto"
+            onClick={scrollToFeatures}
+          >
+              {/* Subtle glow */}
+              <div className="absolute inset-0 bg-orange-100/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              
+              {/* Button content */}
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                Узнать больше
+                <motion.svg 
+                  className="w-4 h-4 sm:w-5 sm:h-5" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                  animate={{ y: [0, 3, 0] }}
+                  transition={{ 
+                    duration: 2, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </motion.svg>
+              </span>
+          </Button>
           </motion.div>
-        </motion.div>
-        
-        {/* Trust indicators */}
-        <motion.div 
-          className="mt-8 sm:mt-12 flex flex-wrap justify-center items-center gap-4 sm:gap-8 text-sm text-gray-500"
-          variants={wordVariant}
-        >
-          <div className="flex items-center">
-            <span className="mr-2">⚡</span>
-            <span>Generate in seconds</span>
-          </div>
-          <div className="flex items-center">
-            <span className="mr-2">🎨</span>
-            <span>Professional quality</span>
-          </div>
-          <div className="flex items-center">
-            <span className="mr-2">🔒</span>
-            <span>100% secure</span>
-          </div>
         </motion.div>
       </motion.div>
     </section>

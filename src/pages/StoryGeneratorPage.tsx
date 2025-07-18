@@ -19,7 +19,7 @@ import { StoryCard } from '@/components/common/StoryCard';
 
 const POLLING_INTERVAL = 3000; // 3 seconds
 
-// Types for quiz
+// Типы для квиза
 interface QuizData {
   prompt: string;
   genre: string;
@@ -30,14 +30,11 @@ interface QuizData {
   wishes: string;
 }
 
-function Loader({ text = 'Generating book...' }) {
+function Loader({ text = 'Генерируем книгу...' }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mb-6"></div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Creating your story</h2>
-        <p className="text-gray-600">{text}</p>
-      </div>
+    <div className="flex flex-col items-center justify-center py-16">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mb-6"></div>
+      <div className="text-xl text-blue-700 font-semibold animate-pulse">{text}</div>
     </div>
   );
 }
@@ -50,19 +47,19 @@ function ErrorBlock({ message }: { message: string }) {
   );
 }
 
-// Progress bar for quiz
-function ProgressBar({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
+// Прогресс-бар для квиза
+function QuizProgress({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
   const progress = (currentStep / totalSteps) * 100;
   
   return (
     <div className="mb-6">
       <div className="flex justify-between text-sm text-gray-600 mb-2">
-        <span>Step {currentStep} of {totalSteps}</span>
+        <span>Шаг {currentStep} из {totalSteps}</span>
         <span>{Math.round(progress)}%</span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2">
         <div 
-          className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+          className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
           style={{ width: `${progress}%` }}
         ></div>
       </div>
@@ -70,35 +67,33 @@ function ProgressBar({ currentStep, totalSteps }: { currentStep: number; totalSt
   );
 }
 
-// Step 1: Main idea
-function Step1({ value, onUpdate, onNext }: { 
-  value: string; 
+// Шаг 1: Основная идея
+function Step1({ data, onUpdate, onNext }: { 
+  data: string; 
   onUpdate: (value: string) => void; 
-  onNext: () => void;
+  onNext: () => void; 
 }) {
-  const [inputValue, setInputValue] = useState(value);
+  const [value, setValue] = useState(data);
 
   const handleNext = () => {
-    if (inputValue.trim().length < 10) {
-      alert('Please enter at least 10 characters');
-      return;
+    if (value.trim()) {
+      onUpdate(value);
+      onNext();
     }
-    onUpdate(inputValue);
-    onNext();
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">📖 Main story idea</h2>
-        <p className="text-gray-600">Tell us what your book will be about? Describe the main plot or idea.</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">📖 Основная идея истории</h2>
+        <p className="text-gray-600">Расскажите, о чём будет ваша книга? Опишите основной сюжет или идею.</p>
       </div>
       
       <div className="space-y-4">
         <textarea
-          placeholder="For example: A boy found a magic lamp and went on an amazing journey..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Например: Мальчик нашёл волшебную лампу и отправился в удивительное путешествие..."
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
           className="w-full p-4 border border-gray-300 rounded-lg h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
         />
@@ -106,10 +101,10 @@ function Step1({ value, onUpdate, onNext }: {
         <div className="flex justify-end">
           <Button 
             onClick={handleNext}
-            disabled={inputValue.trim().length < 10}
+            disabled={!value.trim()}
             className="px-8 py-2"
           >
-            Next →
+            Далее →
           </Button>
         </div>
       </div>
@@ -117,7 +112,7 @@ function Step1({ value, onUpdate, onNext }: {
   );
 }
 
-// Step 2: Genre and style
+// Шаг 2: Жанр и стиль
 function Step2({ data, onUpdate, onNext, onBack }: { 
   data: { genre: string; style: string }; 
   onUpdate: (data: { genre: string; style: string }) => void; 
@@ -127,8 +122,8 @@ function Step2({ data, onUpdate, onNext, onBack }: {
   const [genre, setGenre] = useState(data.genre);
   const [style, setStyle] = useState(data.style);
 
-  const genres = ['Fairy Tale', 'Adventure', 'Science Fiction', 'Detective', 'Comedy', 'Drama', 'Fantasy'];
-  const styles = ['Cheerful', 'Magical', 'Mysterious', 'Romantic', 'Dynamic', 'Calm', 'Epic'];
+  const genres = ['Сказка', 'Приключения', 'Фантастика', 'Детектив', 'Комедия', 'Драма', 'Фэнтези'];
+  const styles = ['Весёлый', 'Магический', 'Загадочный', 'Романтический', 'Динамичный', 'Спокойный', 'Эпический'];
 
   const handleNext = () => {
     onUpdate({ genre, style });
@@ -138,13 +133,13 @@ function Step2({ data, onUpdate, onNext, onBack }: {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">🎭 Genre and style</h2>
-        <p className="text-gray-600">Choose a genre and style for your story</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">🎭 Жанр и стиль</h2>
+        <p className="text-gray-600">Выберите жанр и стиль для вашей истории</p>
       </div>
       
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">Genre:</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">Жанр:</label>
           <div className="grid grid-cols-2 gap-2">
             {genres.map((g) => (
               <button
@@ -162,7 +157,7 @@ function Step2({ data, onUpdate, onNext, onBack }: {
             ))}
           </div>
           <Input
-            placeholder="Or enter your own genre..."
+            placeholder="Или введите свой жанр..."
             value={genre}
             onChange={(e) => setGenre(e.target.value)}
             className="mt-2"
@@ -170,7 +165,7 @@ function Step2({ data, onUpdate, onNext, onBack }: {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">Style:</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">Стиль:</label>
           <div className="grid grid-cols-2 gap-2">
             {styles.map((s) => (
               <button
@@ -188,7 +183,7 @@ function Step2({ data, onUpdate, onNext, onBack }: {
             ))}
           </div>
           <Input
-            placeholder="Or enter your own style..."
+            placeholder="Или введите свой стиль..."
             value={style}
             onChange={(e) => setStyle(e.target.value)}
             className="mt-2"
@@ -197,14 +192,14 @@ function Step2({ data, onUpdate, onNext, onBack }: {
         
         <div className="flex justify-between">
           <Button variant="outline" onClick={onBack}>
-            ← Back
+            ← Назад
           </Button>
           <Button 
             onClick={handleNext}
             disabled={!genre.trim()}
             className="px-8 py-2"
           >
-            Next →
+            Далее →
           </Button>
         </div>
       </div>
@@ -212,7 +207,7 @@ function Step2({ data, onUpdate, onNext, onBack }: {
   );
 }
 
-// Step 3: Story theme  
+// Шаг 3: Тема истории  
 function Step3({ data, onUpdate, onNext, onBack }: { 
   data: { theme: string; bookStyle: string }; 
   onUpdate: (data: { theme: string; bookStyle: string }) => void; 
@@ -221,7 +216,7 @@ function Step3({ data, onUpdate, onNext, onBack }: {
 }) {
   const [theme, setTheme] = useState(data.theme);
 
-  const themes = ['Friendship', 'Family', 'Adventure', 'Love', 'Courage', 'Dreams', 'Nature'];
+  const themes = ['Дружба', 'Семья', 'Приключения', 'Любовь', 'Мужество', 'Мечты', 'Природа'];
 
   const handleNext = () => {
     // Передаем пустой bookStyle, так как это поле больше не используется
@@ -232,13 +227,13 @@ function Step3({ data, onUpdate, onNext, onBack }: {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">🎨 Story theme</h2>
-        <p className="text-gray-600">What is the main theme of your story?</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">🎨 Тема истории</h2>
+        <p className="text-gray-600">Какая основная тема вашей истории?</p>
       </div>
       
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">Story theme:</label>
+          <label className="block text-sm font-medium text-gray-700 mb-3">Тема истории:</label>
           <div className="grid grid-cols-2 gap-2">
             {themes.map((t) => (
               <button
@@ -256,7 +251,7 @@ function Step3({ data, onUpdate, onNext, onBack }: {
             ))}
           </div>
           <Input
-            placeholder="Or enter your own theme..."
+            placeholder="Или введите свою тему..."
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
             className="mt-2"
@@ -265,13 +260,13 @@ function Step3({ data, onUpdate, onNext, onBack }: {
         
         <div className="flex justify-between">
           <Button variant="outline" onClick={onBack}>
-            ← Back
+            ← Назад
           </Button>
           <Button 
             onClick={handleNext}
             className="px-8 py-2"
           >
-            Next →
+            Далее →
           </Button>
         </div>
       </div>
@@ -279,7 +274,7 @@ function Step3({ data, onUpdate, onNext, onBack }: {
   );
 }
 
-// Step 4: Characters
+// Шаг 4: Персонажи
 function Step4({ data, onUpdate, onNext, onBack }: { 
   data: Array<{ name: string; description?: string; role?: string }>; 
   onUpdate: (data: Array<{ name: string; description?: string; role?: string }>) => void; 
@@ -307,15 +302,15 @@ function Step4({ data, onUpdate, onNext, onBack }: {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">👥 Characters</h2>
-        <p className="text-gray-600">Who will be the main characters of your story?</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">👥 Персонажи</h2>
+        <p className="text-gray-600">Кто будет главными героями вашей истории?</p>
       </div>
       
       <div className="space-y-4">
         {characters.map((char, idx) => (
           <div key={idx} className="border border-gray-200 rounded-lg p-4 space-y-3">
             <div className="flex justify-between items-center">
-              <h4 className="font-medium text-gray-700">Character {idx + 1}</h4>
+              <h4 className="font-medium text-gray-700">Персонаж {idx + 1}</h4>
               {characters.length > 1 && (
                 <Button 
                   type="button" 
@@ -323,24 +318,24 @@ function Step4({ data, onUpdate, onNext, onBack }: {
                   size="sm" 
                   onClick={() => removeCharacter(idx)}
                 >
-                  Remove
+                  Удалить
                 </Button>
               )}
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Input
-                placeholder="Character name"
+                placeholder="Имя персонажа"
                 value={char.name}
                 onChange={(e) => handleCharacterChange(idx, 'name', e.target.value)}
               />
               <Input
-                placeholder="Role (main, friend...)"
+                placeholder="Роль (главный, друг...)"
                 value={char.role}
                 onChange={(e) => handleCharacterChange(idx, 'role', e.target.value)}
               />
               <Input
-                placeholder="Description"
+                placeholder="Описание"
                 value={char.description}
                 onChange={(e) => handleCharacterChange(idx, 'description', e.target.value)}
               />
@@ -354,18 +349,18 @@ function Step4({ data, onUpdate, onNext, onBack }: {
           onClick={addCharacter}
           className="w-full"
         >
-          + Add character
+          + Добавить персонажа
         </Button>
         
         <div className="flex justify-between">
           <Button variant="outline" onClick={onBack}>
-            ← Back
+            ← Назад
           </Button>
           <Button 
             onClick={handleNext}
             className="px-8 py-2"
           >
-            Next →
+            Далее →
           </Button>
         </div>
       </div>
@@ -373,7 +368,7 @@ function Step4({ data, onUpdate, onNext, onBack }: {
   );
 }
 
-// Step 5: Final wishes and generation
+// Шаг 5: Финальные пожелания и генерация
 function Step5({ data, onUpdate, onGenerate, onBack, isGenerating }: { 
   data: string; 
   onUpdate: (value: string) => void; 
@@ -391,35 +386,35 @@ function Step5({ data, onUpdate, onGenerate, onBack, isGenerating }: {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">✨ Final wishes</h2>
-        <p className="text-gray-600">Do you have any special wishes for the story? (optional)</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-3">✨ Финальные пожелания</h2>
+        <p className="text-gray-600">Есть ли особые пожелания к истории? (необязательно)</p>
       </div>
       
       <div className="space-y-4">
         <textarea
-          placeholder="For example: Add more dialogues, make the ending unexpected, include elements of humor..."
+          placeholder="Например: Добавьте больше диалогов, сделайте концовку неожиданной, включите элементы юмора..."
           value={wishes}
           onChange={(e) => setWishes(e.target.value)}
           className="w-full p-4 border border-gray-300 rounded-lg h-24 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
         
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="font-medium text-blue-800 mb-2">🎉 Ready for generation!</h4>
+          <h4 className="font-medium text-blue-800 mb-2">🎉 Готово к генерации!</h4>
           <p className="text-blue-700 text-sm">
-            All data collected. Click "Create book" to generate your unique story.
+            Все данные собраны. Нажмите "Создать книгу" для генерации вашей уникальной истории.
           </p>
         </div>
         
         <div className="flex justify-between">
           <Button variant="outline" onClick={onBack} disabled={isGenerating}>
-            ← Back
+            ← Назад
           </Button>
           <Button 
             onClick={handleGenerate}
             disabled={isGenerating}
             className="px-8 py-2 bg-green-600 hover:bg-green-700"
           >
-            {isGenerating ? 'Creating book...' : '📚 Create book'}
+            {isGenerating ? 'Создаём книгу...' : '📚 Создать книгу'}
           </Button>
         </div>
       </div>
@@ -431,7 +426,7 @@ function StoryBook({ story }: { story: any }) {
   const bookRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // Universal parsing of multi-agent result
+  // Универсальный парсинг мультиагентного результата
   const script: any = story.script ?? story;
   const title = script.title ?? 'Generated Story';
   const scenes: any[] = script.scenes ?? [];
@@ -442,13 +437,13 @@ function StoryBook({ story }: { story: any }) {
     ? charactersBlock
     : charactersBlock?.characters ?? [];
   
-  // Parsing illustrations
+  // Парсинг иллюстраций
   const illustrationsBlock = story.illustrations;
   const illustrationsList = Array.isArray(illustrationsBlock)
     ? illustrationsBlock
     : illustrationsBlock?.illustrations ?? [];
   
-  // Create a map of illustrations by scene_id for quick search
+  // Создаем карту иллюстраций по scene_id для быстрого поиска
   const illustrationsMap = new Map();
   illustrationsList.forEach((ill: any) => {
     if (ill.scene_id && ill.image_url) {
@@ -456,93 +451,93 @@ function StoryBook({ story }: { story: any }) {
     }
   });
 
-  // Function to expand scene text
+  // Функция для расширения текста сцен
   const expandSceneText = (originalText: string, sceneIndex: number, totalScenes: number): string => {
     if (!originalText || originalText.length < 50) {
       return originalText;
     }
 
-    // Add context transitions and details
+    // Добавляем контекстные переходы и детали
     const transitions = [
-      "Meanwhile", "Meanwhile", "Meanwhile", "Meanwhile", "Meanwhile", 
-      "Meanwhile", "Meanwhile", "Meanwhile", "Meanwhile"
+      "Между тем", "Тем временем", "В это время", "Неожиданно", "Вдруг", 
+      "Внезапно", "После этого", "Затем", "В следующий момент"
     ];
     
     const descriptiveWords = [
-      "amazing", "incredible", "magical", "mysterious", "beautiful",
-      "mysterious", "interesting", "captivating", "unusual", "wonderful"
+      "удивительный", "невероятный", "волшебный", "таинственный", "прекрасный",
+      "загадочный", "интересный", "захватывающий", "необычный", "чудесный"
     ];
 
     let expandedText = originalText;
 
-    // Add transitions between scenes
+    // Добавляем переходы между сценами
     if (sceneIndex > 0 && Math.random() > 0.5) {
       const transition = transitions[Math.floor(Math.random() * transitions.length)];
       expandedText = `${transition}, ${expandedText.toLowerCase()}`;
     }
 
-    // Add descriptive details
+    // Добавляем описательные детали
     if (expandedText.length < 150) {
       const adjective = descriptiveWords[Math.floor(Math.random() * descriptiveWords.length)];
-      expandedText += ` This was truly a ${adjective} moment in the story.`;
+      expandedText += ` Это был поистине ${adjective} момент в истории.`;
     }
 
-    // Add emotional depth
+    // Добавляем эмоциональную глубину
     if (sceneIndex === totalScenes - 1) {
-      expandedText += " The story was approaching its end, leaving unforgettable memories.";
+      expandedText += " История подходила к своему завершению, оставляя незабываемые воспоминания.";
     } else if (sceneIndex === 0) {
-      expandedText = "Our story begins right here. " + expandedText;
+      expandedText = "Наша история начинается именно здесь. " + expandedText;
     }
 
     return expandedText;
   };
 
-  // Function to enhance scene text in the interactive book
+  // Функция для улучшения текста сцен в интерактивной книге
   const enhanceSceneText = (originalText: string, sceneIndex: number, totalScenes: number, pageNumber: number): string => {
     if (!originalText) return originalText;
 
     let enhancedText = originalText;
 
-    // Add introductory phrases for the beginning of a chapter
+    // Добавляем вводные фразы для начала главы
     if (sceneIndex === 0 && pageNumber > 3) {
       const openings = [
-        "In this part of our story",
-        "Continuing the story",
-        "The events led to the fact that",
-        "The following happened:"
+        "В этой части нашей истории",
+        "Продолжая рассказ",
+        "Развитие событий привело к тому, что",
+        "Далее происходило следующее:"
       ];
       const opening = openings[Math.floor(Math.random() * openings.length)];
       enhancedText = `${opening} ${enhancedText.toLowerCase()}`;
     }
 
-    // Add transitional elements
+    // Добавляем переходные элементы
     if (sceneIndex > 0) {
-      const transitions = ["Meanwhile", "After this", "Then", "Meanwhile"];
+      const transitions = ["Тем временем", "После этого", "Затем", "В это время"];
       if (Math.random() > 0.6) {
         const transition = transitions[Math.floor(Math.random() * transitions.length)];
         enhancedText = `${transition}, ${enhancedText.toLowerCase()}`;
       }
     }
 
-    // Add concluding elements for the last scene of the page
+    // Добавляем заключительные элементы для последней сцены страницы
     if (sceneIndex === totalScenes - 1 && totalScenes > 1) {
-      enhancedText += " And so the story continued...";
+      enhancedText += " И так история продолжалась дальше...";
     }
 
     return enhancedText;
   };
 
-  // Download PDF function
+  // Функция скачивания PDF
   const downloadPDF = async () => {
     if (!bookRef.current) return;
     
     setIsDownloading(true);
     
     try {
-      // Create a simplified version for PDF without images
+      // Создаем упрощенную версию для PDF без изображений
       const pdfPages = createBookPages();
       
-      // Create a temporary container with visible styles
+      // Создаем временный контейнер с видимыми стилями
       const tempDiv = document.createElement('div');
       tempDiv.style.position = 'fixed';
       tempDiv.style.left = '0';
@@ -553,28 +548,28 @@ function StoryBook({ story }: { story: any }) {
       tempDiv.style.fontFamily = 'Times New Roman, serif';
       tempDiv.style.color = '#2c2c2c';
       
-      // Create a simple HTML for PDF
+      // Создаем простой HTML для PDF
       let pdfContent = '';
       
-             // Title page
+             // Титульная страница
        pdfContent += `
          <div style="page-break-after: always; padding: 50px; min-height: 280mm; text-align: center; display: flex; align-items: center; justify-content: center;">
            <div>
              <h1 style="font-size: 36px; font-weight: bold; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 4px; line-height: 1.2;">${title}</h1>
              <div style="font-size: 24px; color: #d4af37; margin: 30px 0; letter-spacing: 3px;">✦ ✦ ✦</div>
-             <p style="font-size: 20px; font-style: italic; color: #666; margin-top: 50px;">Story created by ToonzyAI</p>
+             <p style="font-size: 20px; font-style: italic; color: #666; margin-top: 50px;">Сказка, созданная ToonzyAI</p>
            </div>
          </div>
        `;
       
-             // Characters page
+             // Страница персонажей
        if (characterList.length > 0) {
          pdfContent += `
            <div style="page-break-after: always; padding: 50px; min-height: 280mm;">
-             <h2 style="font-size: 26px; font-weight: bold; text-align: center; margin-bottom: 40px; text-transform: uppercase; border-bottom: 2px solid #666; padding-bottom: 15px; letter-spacing: 2px;">CHARACTERS</h2>
+             <h2 style="font-size: 26px; font-weight: bold; text-align: center; margin-bottom: 40px; text-transform: uppercase; border-bottom: 2px solid #666; padding-bottom: 15px; letter-spacing: 2px;">ПЕРСОНАЖИ</h2>
              ${characterList.map((char: any) => `
                <div style="margin-bottom: 30px; font-size: 18px; border-bottom: 1px dotted #999; padding-bottom: 20px;">
-                 <div style="font-weight: bold; font-size: 22px; color: #333;">${char.name || 'Anonymous'}</div>
+                 <div style="font-weight: bold; font-size: 22px; color: #333;">${char.name || 'Безымянный'}</div>
                  ${char.role ? `<div style="font-style: italic; color: #666; font-size: 18px; margin-top: 5px;">— ${char.role}</div>` : ''}
                  ${char.description ? `<div style="margin-top: 12px; font-style: italic; color: #555; line-height: 1.6; font-size: 16px;">${char.description}</div>` : ''}
                </div>
@@ -583,7 +578,7 @@ function StoryBook({ story }: { story: any }) {
          `;
       }
       
-              // Main content pages with expanded text
+              // Основные страницы с расширенным текстом
         if (scenes.length > 0) {
           const contentPagesCount = 5;
           const scenesPerPage = Math.max(1, Math.ceil(scenes.length / contentPagesCount));
@@ -598,10 +593,10 @@ function StoryBook({ story }: { story: any }) {
             
                        pdfContent += `
              <div style="page-break-after: ${isLastPage ? 'avoid' : 'always'}; padding: 50px; min-height: 280mm;">
-               <h2 style="font-size: 22px; text-align: center; margin-bottom: 35px; color: #555; text-transform: uppercase; border-bottom: 2px solid #ddd; padding-bottom: 12px; letter-spacing: 2px;">CHAPTER ${pageIndex + 1}</h2>
+               <h2 style="font-size: 22px; text-align: center; margin-bottom: 35px; color: #555; text-transform: uppercase; border-bottom: 2px solid #ddd; padding-bottom: 12px; letter-spacing: 2px;">ГЛАВА ${pageIndex + 1}</h2>
                ${pageScenes.length > 0 ? pageScenes.map((scene, sceneIndex) => {
                  const sceneText = scene.description || scene.environment_description || '';
-                 // Expand text for more content
+                 // Расширяем текст для большего содержания
                  const expandedText = expandSceneText(sceneText, sceneIndex, pageScenes.length);
                  return `
                    <div style="margin-bottom: 40px;">
@@ -611,7 +606,7 @@ function StoryBook({ story }: { story: any }) {
                  `;
                 }).join('') : `
                   <div style="text-align: center; margin-top: 120px; font-style: italic; color: #666;">
-                    ${pageNum === 8 ? '<div style="border-top: 2px solid #ddd; padding-top: 30px; margin-top: 60px;"><div style="font-size: 28px; font-weight: bold; color: #333; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px;">END</div><div style="font-size: 18px; margin-top: 20px; color: #666;">Thank you for reading!</div></div>' : ''}
+                    ${pageNum === 8 ? '<div style="border-top: 2px solid #ddd; padding-top: 30px; margin-top: 60px;"><div style="font-size: 28px; font-weight: bold; color: #333; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px;">КОНЕЦ</div><div style="font-size: 18px; margin-top: 20px; color: #666;">Спасибо за чтение!</div></div>' : ''}
                   </div>
                 `}
                 <div style="position: absolute; bottom: 20px; right: 40px; font-size: 10px; color: #666;">[${pageNum}]</div>
@@ -623,10 +618,10 @@ function StoryBook({ story }: { story: any }) {
       tempDiv.innerHTML = pdfContent;
       document.body.appendChild(tempDiv);
       
-      // Wait a bit for rendering
+      // Ждем немного для рендеринга
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Settings for PDF
+      // Настройки для PDF
       const options = {
         margin: [10, 10, 10, 10],
         filename: `${title.replace(/[^a-zA-Z0-9\u0400-\u04FF\s]/g, '_')}.pdf`,
@@ -649,12 +644,12 @@ function StoryBook({ story }: { story: any }) {
       
       await html2pdf().from(tempDiv).set(options).save();
       
-      // Remove temporary element
+      // Убираем временный элемент
       document.body.removeChild(tempDiv);
       
     } catch (error) {
-      console.error('Error creating PDF:', error);
-      alert('An error occurred while creating the PDF file. Please try again.');
+      console.error('Ошибка при создании PDF:', error);
+      alert('Произошла ошибка при создании PDF файла. Попробуйте еще раз.');
     } finally {
       setIsDownloading(false);
     }
@@ -662,12 +657,12 @@ function StoryBook({ story }: { story: any }) {
 
 
 
-  // Create a book strictly on 8 pages
+  // Создаем книгу строго на 8 страниц
   const createBookPages = () => {
     const pages = [];
     const totalPages = 8;
 
-    // Page 1: Title page
+    // Страница 1: Титульная
     pages.push(
       <div key="title" className="w-full h-full bg-gradient-to-b from-amber-50 to-orange-50 flex flex-col relative border border-amber-200 font-serif shadow-inner">
         <div className="flex-1 flex items-center justify-center p-12 text-center">
@@ -679,7 +674,7 @@ function StoryBook({ story }: { story: any }) {
               ✦ ✦ ✦
             </div>
             <p className="text-lg italic text-amber-700 mt-8">
-              Story created by ToonzyAI
+              Сказка, созданная ToonzyAI
             </p>
           </div>
         </div>
@@ -689,19 +684,19 @@ function StoryBook({ story }: { story: any }) {
       </div>
     );
 
-    // Page 2: Characters (if any)
+    // Страница 2: Персонажи (если есть)
     if (characterList.length > 0) {
       pages.push(
         <div key="characters" className="w-full h-full bg-gradient-to-b from-blue-50 to-indigo-50 flex flex-col relative border border-blue-200 font-serif p-12">
           <div className="flex-1 overflow-hidden">
             <h2 className="text-3xl font-bold text-center mb-8 text-gray-800 uppercase tracking-wide border-b border-blue-300 pb-4">
-              CHARACTERS
+              ПЕРСОНАЖИ
             </h2>
             <div className="space-y-6 mt-8">
               {characterList.map((char: any, idx: number) => (
                 <div key={char.name || idx} className="border-b border-dotted border-blue-300 pb-6 last:border-b-0">
                   <div className="text-xl font-bold text-gray-800">
-                    {char.name || 'Anonymous'}
+                    {char.name || 'Безымянный'}
                     {char.role && <span className="text-lg italic text-blue-600 font-normal"> — {char.role}</span>}
                   </div>
                   {char.description && (
@@ -719,21 +714,21 @@ function StoryBook({ story }: { story: any }) {
         </div>
       );
 
-                // Page 3: Prologue/Introduction
+                // Страница 3: Пролог/Введение
       pages.push(
         <div key="prologue" className="w-full h-full bg-gradient-to-b from-purple-50 to-pink-50 flex flex-col relative border border-purple-200 font-serif p-12">
           <div className="flex-1 overflow-hidden">
             <h2 className="text-3xl font-bold text-center mb-10 text-gray-800 uppercase tracking-wide border-b border-purple-300 pb-4">
-              PROLOGUE
+              ПРОЛОГ
             </h2>
             <div className="space-y-8 mt-10">
               <p className="text-xl leading-relaxed text-gray-800 text-justify indent-8 font-serif">
-                Our story begins in an amazing world, where every day brings new discoveries and adventures. 
-                Here, among familiar and unfamiliar places, events unfold that will change everything forever.
+                Наша история начинается в удивительном мире, где каждый день приносит новые открытия и приключения. 
+                Здесь, среди знакомых и незнакомых мест, разворачиваются события, которые изменят всё навсегда.
               </p>
               <p className="text-xl leading-relaxed text-gray-800 text-justify indent-8 font-serif">
-                This is a story about courage and friendship, about the importance of believing in your dreams and never giving up. 
-                Prepare for an amazing journey, full of amazing discoveries and unexpected turns!
+                Это рассказ о храбрости и дружбе, о том, как важно верить в свои мечты и никогда не сдаваться. 
+                Приготовьтесь к путешествию, полному удивительных открытий и неожиданных поворотов!
               </p>
             </div>
           </div>
@@ -743,17 +738,17 @@ function StoryBook({ story }: { story: any }) {
         </div>
       );
     } else {
-      // If no characters, pages 2-3 for introduction
+      // Если нет персонажей, страницы 2-3 для введения
       pages.push(
         <div key="intro1" className="w-full h-full bg-gradient-to-b from-blue-50 to-indigo-50 flex flex-col relative border border-blue-200 font-serif p-12">
           <div className="flex-1 overflow-hidden">
             <h2 className="text-3xl font-bold text-center mb-10 text-gray-800 uppercase tracking-wide border-b border-blue-300 pb-4">
-              INTRODUCTION
+              ВВЕДЕНИЕ
             </h2>
             <div className="space-y-8 mt-10">
               <p className="text-xl leading-relaxed text-gray-800 text-justify indent-8 font-serif">
-                Welcome to the world of amazing stories, where imagination knows no bounds, 
-                and every word is filled with magic and wonders.
+                Добро пожаловать в мир удивительных историй, где фантазия не знает границ, 
+                а каждое слово наполнено магией и чудесами.
               </p>
             </div>
           </div>
@@ -767,12 +762,12 @@ function StoryBook({ story }: { story: any }) {
         <div key="intro2" className="w-full h-full bg-gradient-to-b from-purple-50 to-pink-50 flex flex-col relative border border-purple-200 font-serif p-12">
           <div className="flex-1 overflow-hidden">
             <h2 className="text-3xl font-bold text-center mb-10 text-gray-800 uppercase tracking-wide border-b border-purple-300 pb-4">
-              CHAPTER ONE
+              ГЛАВА ПЕРВАЯ
             </h2>
             <div className="space-y-8 mt-10">
               <p className="text-xl leading-relaxed text-gray-800 text-justify indent-8 font-serif">
-                The story begins here, in this very place, at this very moment. 
-                Prepare for an incredible journey...
+                История начинается здесь, в этом самом месте, в этот самый момент. 
+                Приготовьтесь к невероятному путешествию...
               </p>
             </div>
           </div>
@@ -783,17 +778,17 @@ function StoryBook({ story }: { story: any }) {
       );
     }
 
-    // Main story content with illustrations
+    // Основной текст истории с иллюстрациями
     if (scenes.length > 0) {
-      // Determine the number of pages for the main content
-      const contentPagesCount = characterList.length > 0 ? 5 : 5; // Pages 4-8 or 4-8
+      // Определяем количество страниц для основного текста
+      const contentPagesCount = characterList.length > 0 ? 5 : 5; // Страницы 4-8 или 4-8
       const startPageNumber = characterList.length > 0 ? 4 : 4;
       
-      // Create pages, distributing scenes with images
+      // Создаем страницы, распределяя сцены с изображениями
       const scenesPerPage = Math.ceil(scenes.length / contentPagesCount);
       
       for (let pageIndex = 0; pageIndex < contentPagesCount; pageIndex++) {
-        const pageNumber = startPageNumber + pageIndex; // Pages 4-8
+        const pageNumber = startPageNumber + pageIndex; // Страницы 4-8
         const sceneStartIndex = pageIndex * scenesPerPage;
         const sceneEndIndex = Math.min(sceneStartIndex + scenesPerPage, scenes.length);
         const pageScenes = scenes.slice(sceneStartIndex, sceneEndIndex);
@@ -812,7 +807,7 @@ function StoryBook({ story }: { story: any }) {
                     const isFirstScene = idx === 0;
                     const isLastScene = idx === pageScenes.length - 1;
                     
-                    // Expand text for better readability
+                    // Расширяем текст для лучшего чтения
                     const enhancedText = enhanceSceneText(sceneText, idx, pageScenes.length, pageNumber);
                     
                     return (
@@ -820,7 +815,7 @@ function StoryBook({ story }: { story: any }) {
                         {isFirstScene && pageNumber > 3 && (
                           <div className="border-b border-dotted border-green-300 pb-4 mb-6">
                             <h3 className="text-2xl font-bold text-center text-gray-800 uppercase tracking-wide">
-                              Chapter {pageNumber - 3}
+                              Глава {pageNumber - 3}
                             </h3>
                           </div>
                         )}
@@ -828,10 +823,10 @@ function StoryBook({ story }: { story: any }) {
                           <div className="text-center mb-6">
                             <img 
                               src={imageUrl} 
-                              alt={`Illustration for scene ${scene.id}`}
+                              alt={`Иллюстрация к сцене ${scene.id}`}
                               className="max-w-full h-48 w-auto mx-auto rounded-lg border border-green-300 shadow-lg object-cover"
                               onError={(e) => {
-                                // Hide image if it fails to load
+                                // Скрываем изображение если оно не загрузилось
                                 (e.target as HTMLElement).style.display = 'none';
                               }}
                             />
@@ -858,7 +853,7 @@ function StoryBook({ story }: { story: any }) {
             </div>
           );
         } else {
-          // Empty page if content is insufficient
+          // Пустая страница, если контента недостаточно
           pages.push(
             <div key={`page-${pageNumber}`} className="w-full h-full bg-gradient-to-b from-gray-50 to-slate-50 flex flex-col relative border border-gray-200 font-serif p-10">
               <div className="flex-1 overflow-hidden">
@@ -869,15 +864,15 @@ function StoryBook({ story }: { story: any }) {
                   {pageNumber === 8 ? (
                     <div className="text-center border-t border-gray-300 pt-8 mt-20">
                       <div className="text-3xl font-bold text-gray-800 uppercase tracking-wide mb-4">
-                        END
+                        КОНЕЦ
                       </div>
                       <div className="text-lg text-gray-600 italic">
-                        Thank you for reading!
+                        Спасибо за чтение!
                       </div>
                     </div>
                   ) : (
                     <div className="text-center text-gray-500 italic text-lg">
-                      The story continues...
+                      История продолжается...
                     </div>
                   )}
                 </div>
@@ -890,22 +885,22 @@ function StoryBook({ story }: { story: any }) {
         }
       }
     } else {
-      // If no content, fill remaining pages with placeholders
+      // Если нет контента, заполняем оставшиеся страницы заглушками
       const startPage = characterList.length > 0 ? 4 : 4;
       for (let pageNumber = startPage; pageNumber <= 8; pageNumber++) {
         pages.push(
           <div key={`page-${pageNumber}`} className="w-full h-full bg-gradient-to-b from-yellow-50 to-orange-50 flex flex-col relative border border-yellow-200 font-serif p-12">
             <div className="flex-1 overflow-hidden">
               <h2 className="text-3xl font-bold text-center mb-10 text-gray-800 uppercase tracking-wide border-b border-yellow-300 pb-4">
-                CONTENT
+                СОДЕРЖАНИЕ
               </h2>
               <div className="flex-1 flex items-center justify-center text-center">
                 <div className="space-y-6 text-yellow-700 italic">
-                  <p className="text-xl">Story not yet written...</p>
-                  <p className="text-lg">Try generating a book with a more detailed description.</p>
+                  <p className="text-xl">История ещё не написана...</p>
+                  <p className="text-lg">Попробуйте сгенерировать книгу с более подробным описанием.</p>
                   {pageNumber === 8 && (
                     <div className="mt-8 border-t border-yellow-300 pt-6">
-                      <p className="text-2xl font-bold text-gray-800 not-italic uppercase">END</p>
+                      <p className="text-2xl font-bold text-gray-800 not-italic uppercase">КОНЕЦ</p>
                     </div>
                   )}
                 </div>
@@ -924,7 +919,7 @@ function StoryBook({ story }: { story: any }) {
 
   return (
     <div className="w-full max-w-5xl mx-auto p-6 md:p-8">
-      {/* Download button */}
+      {/* Кнопка скачивания */}
       <div className="flex justify-center mb-8">
         <Button
           onClick={downloadPDF}
@@ -934,17 +929,17 @@ function StoryBook({ story }: { story: any }) {
           {isDownloading ? (
             <>
               <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
-              Creating PDF...
+              Создание PDF...
             </>
           ) : (
             <>
-              �� Download PDF book
+              📚 Скачать книгу PDF
             </>
           )}
         </Button>
       </div>
 
-      {/* Book */}
+      {/* Книга */}
       <div ref={bookRef} className="flex justify-center my-8 transform-gpu perspective-1000 animate-fadeIn">
         <HTMLFlipBook
           width={550}
@@ -982,7 +977,7 @@ export function StoryGeneratorPage() {
   const { data: user, isLoading } = useCurrentUser();
   const navigate = useNavigate();
   
-  // States for quiz
+  // Состояния для квиза
   const [currentStep, setCurrentStep] = useState(1);
   const [quizData, setQuizData] = useState<QuizData>({
     prompt: '',
@@ -994,29 +989,29 @@ export function StoryGeneratorPage() {
     wishes: ''
   });
 
-  // States for generation
+  // Состояния для генерации
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [story, setStory] = useState<StoryResult | null>(null);
   const [showBook, setShowBook] = useState(false);
 
-  // States for viewing existing stories
+  // Состояния для просмотра существующих историй
   const [selectedStory, setSelectedStory] = useState<StoryItem | null>(null);
   const [viewingExistingStory, setViewingExistingStory] = useState(false);
 
-  // Hooks for working with stories
+  // Hooks для работы с историями
   const { data: storiesData, isLoading: storiesLoading, refetch: refetchStories } = useStories();
   const { data: selectedStoryData } = useStory(selectedStory?.task_id || '');
 
   useEffect(() => {
     if (story) {
-      setTimeout(() => setShowBook(true), 400); // smooth appearance
+      setTimeout(() => setShowBook(true), 400); // плавное появление
     } else {
       setShowBook(false);
     }
   }, [story]);
 
-  // Update data for selected story
+  // Обновляем данные выбранной истории
   useEffect(() => {
     if (selectedStoryData?.status === 'SUCCESS' && selectedStory) {
       setStory(selectedStoryData);
@@ -1029,33 +1024,33 @@ export function StoryGeneratorPage() {
     if (storyItem.status === 'completed') {
       setSelectedStory(storyItem);
     } else {
-      // Show notification that the story is still being generated
-      console.log('Story is still generating...');
+      // Показать уведомление о том, что история еще не готова
+      console.log('История еще генерируется...');
     }
   };
 
   const handleDeleteStory = async (storyId: string) => {
-    // TODO: Add endpoint for deleting story
-    console.log('Deleting story:', storyId);
-    // After deletion, update the list
+    // TODO: Добавить endpoint для удаления истории
+    console.log('Удаление истории:', storyId);
+    // После удаления обновить список
     refetchStories();
   };
 
   if (isLoading) {
-    return <Loader text="Checking authorization..." />;
+    return <Loader text="Проверка авторизации..." />;
   }
   if (!user) {
     return (
       <div className="container mx-auto p-4">
         <Card className="max-w-xl mx-auto mt-16">
           <CardHeader>
-            <CardTitle>Authorization required</CardTitle>
+            <CardTitle>Требуется авторизация</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center gap-4 py-6">
               <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center text-3xl text-amber-500 border border-amber-200 mb-2">🔒</div>
-              <div className="text-lg text-amber-800 mb-2 text-center">Please log in to generate a book</div>
-              <Button onClick={() => navigate('/login')} className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded">Login</Button>
+              <div className="text-lg text-amber-800 mb-2 text-center">Чтобы сгенерировать книгу, пожалуйста, войдите в свой аккаунт</div>
+              <Button onClick={() => navigate('/login')} className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded">Войти</Button>
             </div>
           </CardContent>
         </Card>
@@ -1063,7 +1058,7 @@ export function StoryGeneratorPage() {
     );
   }
 
-  // Functions for quiz
+  // Функции для квиза
   const totalSteps = 5;
 
   const nextStep = () => {
@@ -1092,7 +1087,7 @@ export function StoryGeneratorPage() {
         setStory(result);
         setIsGenerating(false);
         setError(null);
-        // Navigate to story detail page
+        // Навигация на детальную страницу истории
         navigate(`/stories/${taskId}`);
       } else if (result.status === 'PENDING' || result.status === 'RETRY') {
         setTimeout(() => pollStatus(taskId), POLLING_INTERVAL);
@@ -1151,11 +1146,11 @@ export function StoryGeneratorPage() {
     setViewingExistingStory(false);
   };
 
-  // If book is generated, show it
+  // Если книга сгенерирована, показываем её
   if (story) {
     return (
       <>
-        <Header user={user ?? null} onLogout={() => {}} />
+        <Header user={user} onLogout={() => {}} />
         <div className="container mx-auto p-4">
           <div className="text-center mb-6">
             <Button 
@@ -1163,7 +1158,7 @@ export function StoryGeneratorPage() {
               variant="outline"
               className="mb-4"
             >
-              ← {viewingExistingStory ? 'Back to stories' : 'Create new book'}
+              ← {viewingExistingStory ? 'К списку книг' : 'Создать новую книгу'}
             </Button>
           </div>
           {showBook && <StoryBook story={story} />}
@@ -1172,23 +1167,23 @@ export function StoryGeneratorPage() {
     );
   }
 
-  // Main quiz
+  // Основной квиз
   return (
     <>
-      <Header user={user ?? null} onLogout={() => {}} />
+      <Header user={user} onLogout={() => {}} />
       <div className="container mx-auto p-4">
-        {/* Previously created books section */}
+        {/* Секция ранее созданных книг */}
         {storiesData?.stories && storiesData.stories.length > 0 && (
           <div className="mb-8">
             <Card className="max-w-6xl mx-auto">
               <CardHeader>
-                <CardTitle className="text-center">📚 Your books</CardTitle>
+                <CardTitle className="text-center">📚 Ваши книги</CardTitle>
               </CardHeader>
               <CardContent>
                 {storiesLoading ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading books...</p>
+                    <p className="text-gray-600">Загрузка книг...</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1207,23 +1202,23 @@ export function StoryGeneratorPage() {
           </div>
         )}
 
-        {/* Quiz for creating a new book */}
+        {/* Квиз для создания новой книги */}
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
-            <CardTitle>✨ Create new interactive book</CardTitle>
+            <CardTitle>✨ Создать новую интерактивную книгу</CardTitle>
           </CardHeader>
           <CardContent>
-            <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+            <QuizProgress currentStep={currentStep} totalSteps={totalSteps} />
             
             {error && <ErrorBlock message={error} />}
 
-            {isGenerating && <Loader text="Creating your unique book..." />}
+            {isGenerating && <Loader text="Создаём вашу уникальную книгу..." />}
 
             {!isGenerating && (
               <>
                 {currentStep === 1 && (
                   <Step1
-                    value={quizData.prompt}
+                    data={quizData.prompt}
                     onUpdate={(value) => updateQuizData('prompt', value)}
                     onNext={nextStep}
                   />
