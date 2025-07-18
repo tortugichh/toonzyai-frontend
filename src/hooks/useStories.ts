@@ -22,20 +22,8 @@ export const useStories = () => {
   return useQuery<StoryListResponse>({
     queryKey: ['stories'],
     queryFn: async () => {
-      // Use the generic fetch method that should exist on apiClient
-      const token = localStorage.getItem('access_token');
-      const response = await fetch('/api/v1/stories/', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      return response.json();
+      // Use apiClient instead of direct fetch for proper error handling and token management
+      return await apiClient.getStories();
     },
   });
 };
@@ -45,19 +33,8 @@ export const useStory = (taskId: string) => {
   return useQuery({
     queryKey: ['story', taskId],
     queryFn: async () => {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch(`/api/v1/stories/${taskId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      return response.json();
+      // Use apiClient instead of direct fetch for proper error handling and token management
+      return await apiClient.getStoryStatus(taskId);
     },
     enabled: !!taskId,
     refetchInterval: (data) => {

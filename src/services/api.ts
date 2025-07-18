@@ -105,6 +105,20 @@ export interface StoryCreateResponse {
   task_id: string;
 }
 
+export interface StoryListResponse {
+  stories: Array<{
+    id: string;
+    title: string;
+    theme?: string;
+    genre?: string;
+    style?: string;
+    status: string;
+    preview_text?: string;
+    created_at: string;
+    task_id: string;
+  }>;
+}
+
 export interface StoryScene {
   id: number;
   description: string;
@@ -226,11 +240,14 @@ export class APIError extends Error {
   static async fromResponse(response: Response): Promise<APIError> {
     let details: ErrorResponse | string;
     try {
+      console.log('[APIError.fromResponse] Trying to parse JSON from response...');
       details = await response.json();
-    } catch {
+      console.log('[APIError.fromResponse] Parsed JSON:', details);
+    } catch (err) {
+      console.warn('[APIError.fromResponse] Failed to parse JSON, trying text. Error:', err);
       details = await response.text() || response.statusText;
+      console.log('[APIError.fromResponse] Parsed text:', details);
     }
-
     return new APIError(response.status, response.statusText, details);
   }
 }
@@ -371,12 +388,14 @@ class APIClient {
     };
 
     let response = await makeRequest(token);
+    console.log(`[APIClient.request] Response for ${url}:`, response);
 
     // Handle 401 with token refresh
     if (response.status === 401 && token) {
       const newToken = await this.tokenManager.refreshAccessToken();
       if (newToken) {
         response = await makeRequest(newToken);
+        console.log(`[APIClient.request] Retried with refreshed token for ${url}:`, response);
       } else {
         // Redirect to login if refresh failed
         window.location.href = '/login';
@@ -385,19 +404,23 @@ class APIClient {
     }
 
     if (!response.ok) {
+      console.warn(`[APIClient.request] Response not ok for ${url}, status: ${response.status}`);
       throw await APIError.fromResponse(response);
     }
 
     // Handle no content responses
     if (response.status === 204) {
+      console.log(`[APIClient.request] No content for ${url}`);
       return {} as T;
     }
 
     const contentType = response.headers.get('content-type');
     if (contentType?.includes('application/json')) {
+      console.log(`[APIClient.request] Parsing JSON for ${url}`);
       return response.json();
     }
 
+    console.log(`[APIClient.request] Returning raw response for ${url}`);
     return response as unknown as T;
   }
 
@@ -726,15 +749,31 @@ class APIClient {
 
   // ============ Story Generation API ============
 
-  async createStory(prompt: string): Promise<StoryCreateResponse> {
+  async createStory(request: {
+    prompt?: string;
+    genre?: string;
+    style?: string;
+    theme?: string;
+    book_style?: string;
+    characters?: Array<{
+      name: string;
+      description?: string;
+      role?: string;
+    }>;
+    wishes?: string;
+  }): Promise<StoryCreateResponse> {
     return this.request<StoryCreateResponse>('/stories/', {
       method: 'POST',
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify(request),
     });
   }
 
   async getStoryStatus(taskId: string): Promise<StoryStatusResponse> {
     return this.request<StoryStatusResponse>(`/stories/${taskId}`);
+  }
+
+  async getStories(): Promise<StoryListResponse> {
+    return this.request<StoryListResponse>('/stories/');
   }
 
   async generateSegmentById(segmentId: string, segmentPrompt: string) {

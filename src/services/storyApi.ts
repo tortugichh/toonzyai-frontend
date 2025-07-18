@@ -2,44 +2,7 @@ import type {
   StoryCreateResponse,
   StoryStatusResponse,
 } from './api';
-import { APIError } from './api';
-
-const API_BASE = '/api/v1';
-
-// This is a placeholder for the actual request function from the APIClient instance.
-// In a real scenario, you would pass the client's request method to these functions
-// or instantiate the client here. For now, we assume a global request function
-// for simplicity in this isolated file.
-// A proper implementation would involve refactoring api.ts to allow for this.
-
-// Переименовываю функцию request в requestFn
-const requestFn = async function<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const token = localStorage.getItem('access_token');
-  const headers = new Headers(options.headers || {});
-  if (token) {
-    headers.append('Authorization', `Bearer ${token}`);
-  }
-  if (options.body) {
-    headers.append('Content-Type', 'application/json');
-  }
-
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
-  if (!response.ok) {
-    throw await APIError.fromResponse(response);
-  }
-  // For 204 No Content
-  if (response.status === 204) {
-    return {} as T;
-  }
-  return response.json();
-};
+import { apiClient } from './api';
 
 
 export interface StoryCreateRequest {
@@ -57,14 +20,11 @@ export interface StoryCreateRequest {
 }
 
 export async function createStory(request: StoryCreateRequest): Promise<StoryCreateResponse> {
-  return requestFn<StoryCreateResponse>('/stories/', {
-    method: 'POST',
-    body: JSON.stringify(request),
-  });
+  return apiClient.createStory(request);
 }
 
 export async function getStoryStatus(taskId: string): Promise<StoryStatusResponse> {
-  return requestFn<StoryStatusResponse>(`/stories/${taskId}`);
+  return apiClient.getStoryStatus(taskId);
 }
 
 export interface CreateAnimationProjectPayload {
@@ -89,27 +49,26 @@ export interface AnimationSegment {
 }
 
 export async function createAnimationProject(payload: CreateAnimationProjectPayload): Promise<AnimationProject> {
-  return requestFn<AnimationProject>('/animations/', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  return apiClient.createAnimationProject(
+    payload.name,
+    payload.source_avatar_id,
+    payload.total_segments,
+    payload.animation_prompt || undefined
+  );
 }
 
 export async function generateSegment(projectId: string, segmentNumber: number, segmentPrompt: string) {
-  return requestFn(`/animations/${projectId}/segments/${segmentNumber}/generate`, {
-    method: 'POST',
-    body: JSON.stringify({ segment_prompt: segmentPrompt }),
-  });
+  return apiClient.generateSegment(projectId, segmentNumber, segmentPrompt);
 }
 
 export async function getSegmentDetails(projectId: string, segmentNumber: number): Promise<AnimationSegment> {
-  return requestFn<AnimationSegment>(`/animations/${projectId}/segments/${segmentNumber}`);
+  return apiClient.getSegmentDetails(projectId, segmentNumber);
 }
 
 export async function getAnimationProject(projectId: string): Promise<AnimationProject> {
-  return requestFn<AnimationProject>(`/animations/${projectId}`);
+  return apiClient.getAnimationProject(projectId);
 }
 
 export async function assembleVideo(projectId: string) {
-  return requestFn(`/animations/${projectId}/assemble`, { method: 'POST' });
+  return apiClient.assembleVideo(projectId);
 } 
