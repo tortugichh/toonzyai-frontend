@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useLogin } from '@/hooks/useAuth';
 import { getErrorMessage } from '@/services/api';
+import { toast } from 'react-hot-toast';
 import logoSrc from '@/assets/logo.svg';
 
 const loginSchema = z.object({
@@ -37,7 +38,14 @@ function LoginPage() {
       navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
-      console.error('Detailed error:', getErrorMessage(error));
+      const errorMessage = getErrorMessage(error);
+      
+      // Check if the error is about email verification
+      if (errorMessage.includes('verify your email')) {
+        toast.error('Пожалуйста, подтвердите ваш email перед входом. Проверьте вашу почту или запросите новое письмо с подтверждением.');
+      } else {
+        console.error('Detailed error:', errorMessage);
+      }
     }
   };
 
@@ -158,6 +166,15 @@ function LoginPage() {
                 className="text-brand hover:underline"
               >
                 Зарегистрироваться
+              </Link>
+            </p>
+            <p className="text-neutral-600 mt-2">
+              Не получили письмо с подтверждением?{' '}
+              <Link
+                to="/verify-email"
+                className="text-brand hover:underline"
+              >
+                Проверить статус
               </Link>
             </p>
           </div>

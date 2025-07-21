@@ -483,6 +483,26 @@ class APIClient {
     return this.request('/auth/verify-token');
   }
 
+  async verifyEmail(token: string): Promise<{ message: string; user: User }> {
+    return this.request('/auth/verify-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    });
+  }
+
+  async resendVerificationEmail(email: string): Promise<{ message: string }> {
+    return this.request('/auth/resend-verification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+  }
+
   // ============ AVATAR ENDPOINTS ============
   async createAvatar(prompt: string): Promise<Avatar> {
     return this.request<Avatar>('/avatars/', {

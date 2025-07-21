@@ -46,16 +46,11 @@ function RegisterPage() {
       // 1) Регистрируем пользователя
       await registerMutation.mutateAsync(registerData);
 
-      // 2) Автоматически логинимся теми же данными
-      const tokens = await apiClient.login(registerData.username, registerData.password);
-      localStorage.setItem('access_token', tokens.access_token);
-      localStorage.setItem('refresh_token', tokens.refresh_token);
-
-      // 3) Отправляем событие Google Analytics о регистрации
+      // 2) Отправляем событие Google Analytics о регистрации
       trackSignUp('email');
 
-      toastSuccess('Добро пожаловать в ToonzyAI!');
-      navigate('/dashboard');
+      toastSuccess('Регистрация успешна! Проверьте ваш email для подтверждения.');
+      navigate('/verify-email');
     } catch (error) {
       console.error('Registration error:', error);
       console.error('Detailed error:', getErrorMessage(error));

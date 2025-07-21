@@ -9,6 +9,7 @@ import { ErrorBoundary } from '@/components/common';
 import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
+import EmailVerificationPage from '@/pages/EmailVerificationPage';
 import DashboardPage from '@/pages/DashboardPage';
 import AvatarsPage from '@/pages/AvatarsPage';
 import AnimationPage from '@/pages/AnimationPage';
@@ -67,6 +68,7 @@ function AppRoutes() {
         <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <HomePage />} />
         <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} />
         <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
+        <Route path="/verify-email" element={user ? <Navigate to="/dashboard" replace /> : <EmailVerificationPage />} />
         <Route
           path="/dashboard"
           element={
