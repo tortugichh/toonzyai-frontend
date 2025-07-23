@@ -33,10 +33,14 @@ function EmailVerificationPage() {
       const result = await apiClient.verifyEmail(verificationToken);
       setIsVerified(true);
       toastSuccess('Email успешно подтвержден!');
-      
-      // Redirect to login after a short delay
+      // Store tokens for auto-login
+      if (result.access_token && result.refresh_token) {
+        localStorage.setItem('access_token', result.access_token);
+        localStorage.setItem('refresh_token', result.refresh_token);
+      }
+      // Redirect to dashboard after a short delay
       setTimeout(() => {
-        navigate('/login');
+        navigate('/dashboard');
       }, 2000);
       
     } catch (error) {
@@ -88,14 +92,13 @@ function EmailVerificationPage() {
                 </svg>
               </div>
               <h2 className="text-xl font-semibold text-neutral-900 mb-2">Подтверждение успешно!</h2>
-              <p className="text-neutral-600">Теперь вы можете войти в свой аккаунт</p>
+              <p className="text-neutral-600">Теперь вы будете автоматически перенаправлены в личный кабинет</p>
             </div>
-            
             <Button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/dashboard')}
               className="w-full py-3 text-lg"
             >
-              Перейти к входу
+              Перейти в кабинет
             </Button>
           </Card>
         </div>
@@ -137,7 +140,6 @@ function EmailVerificationPage() {
               <div className="mb-6">
                 <p className="text-neutral-600 mb-4">
                   Мы отправили письмо с подтверждением на ваш email. 
-                  Если вы не получили письмо, введите ваш email ниже и мы отправим его снова.
                 </p>
                 
                 <div className="space-y-4">

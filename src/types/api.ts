@@ -1,6 +1,6 @@
 // Authentication types
 export interface LoginRequest {
-  username: string;
+  login: string;
   password: string;
 }
 

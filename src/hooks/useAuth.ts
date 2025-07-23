@@ -9,7 +9,7 @@ export function useLogin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: LoginRequest) => apiClient.login(data.username, data.password),
+    mutationFn: (data: LoginRequest) => apiClient.login(data.login, data.password),
     onSuccess: (response) => {
       localStorage.setItem('access_token', response.access_token);
       localStorage.setItem('refresh_token', response.refresh_token);
@@ -133,8 +133,8 @@ export function useTokenLogin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ username, password }: { username: string; password: string }) => 
-      apiClient.login(username, password), // Using the same login method
+    mutationFn: ({ login, password }: { login: string; password: string }) => 
+      apiClient.login(login, password), // Using the same login method
     onSuccess: (response) => {
       localStorage.setItem('access_token', response.access_token);
       localStorage.setItem('refresh_token', response.refresh_token);

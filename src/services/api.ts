@@ -432,10 +432,10 @@ class APIClient {
     });
   }
 
-  async login(username: string, password: string): Promise<LoginResponse> {
+  async login(login: string, password: string): Promise<LoginResponse> {
     const response = await this.request<LoginResponse>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ login, password }),
     });
     
     this.tokenManager.setTokens(response.access_token, response.refresh_token);
@@ -483,7 +483,7 @@ class APIClient {
     return this.request('/auth/verify-token');
   }
 
-  async verifyEmail(token: string): Promise<{ message: string; user: User }> {
+  async verifyEmail(token: string): Promise<any> {
     return this.request('/auth/verify-email', {
       method: 'POST',
       headers: {

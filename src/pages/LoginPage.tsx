@@ -12,7 +12,7 @@ import { toast } from 'react-hot-toast';
 import logoSrc from '@/assets/logo.svg';
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'Имя пользователя обязательно'),
+  login: z.string().min(1, 'Имя пользователя или Email обязательно'),
   password: z.string().min(6, 'Пароль должен содержать минимум 6 символов'),
 });
 
@@ -63,20 +63,20 @@ function LoginPage() {
 
         <Card className="p-10">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Username Field */}
+            {/* Login Field */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-neutral-700 mb-2">
-                Имя пользователя
+              <label htmlFor="login" className="block text-sm font-medium text-neutral-700 mb-2">
+                Имя пользователя или Email
               </label>
               <Input
-                id="username"
+                id="login"
                 type="text"
-                placeholder="username"
-                {...register('username')}
-                className={errors.username ? 'border-red-500' : ''}
+                placeholder="username или email"
+                {...register('login')}
+                className={errors.login ? 'border-red-500' : ''}
               />
-              {errors.username && (
-                <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
+              {errors.login && (
+                <p className="text-red-500 text-sm mt-1">{errors.login.message}</p>
               )}
             </div>
 
@@ -168,15 +168,7 @@ function LoginPage() {
                 Зарегистрироваться
               </Link>
             </p>
-            <p className="text-neutral-600 mt-2">
-              Не получили письмо с подтверждением?{' '}
-              <Link
-                to="/verify-email"
-                className="text-brand hover:underline"
-              >
-                Проверить статус
-              </Link>
-            </p>
+            
           </div>
         </Card>
 
