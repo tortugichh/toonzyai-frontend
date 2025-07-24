@@ -115,6 +115,16 @@ function LoginPage() {
               )}
             </div>
 
+            {/* Forgot Password Link */}
+            <div className="text-right">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-brand hover:underline"
+              >
+                Забыли пароль?
+              </Link>
+            </div>
+
             {/* Error Message */}
             {loginMutation.error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">

@@ -494,13 +494,51 @@ class APIClient {
   }
 
   async resendVerificationEmail(email: string): Promise<{ message: string }> {
-    return this.request('/auth/resend-verification', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    });
+    try {
+      const response = await this.request<{ message: string }>('/auth/resend-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      return response;
+    } catch (error) {
+      secureLogger.error('Failed to resend verification email', { error: sanitizeApiError(error) });
+      throw error;
+    }
+  }
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    try {
+      const response = await this.request<{ message: string }>('/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      return response;
+    } catch (error) {
+      secureLogger.error('Failed to send forgot password email', { error: sanitizeApiError(error) });
+      throw error;
+    }
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<{ message: string }> {
+    try {
+      const response = await this.request<{ message: string }>('/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, new_password: newPassword }),
+      });
+      return response;
+    } catch (error) {
+      secureLogger.error('Failed to reset password', { error: sanitizeApiError(error) });
+      throw error;
+    }
   }
 
   // ============ AVATAR ENDPOINTS ============
