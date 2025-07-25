@@ -170,6 +170,8 @@ function AvatarsPage() {
           <SuccessNotification onClose={() => setShowSuccess(false)} />
         )}
 
+        
+
         {/* Info tip about animations */}
         {avatars?.avatars && avatars.avatars.some(a => a.status?.toLowerCase?.().trim() === 'completed') && (
           <Card className="mb-8 p-4 bg-blue-50 border-blue-200 border">

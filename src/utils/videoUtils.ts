@@ -152,10 +152,7 @@ export const findWorkingVideoUrl = async (
   const urls = getSegmentVideoUrls(projectId, segmentNumber, segment);
   const checkedUrls: Array<{ url: string; available: boolean; error?: string }> = [];
 
-  console.log(`🔍 Checking ${urls.length} video URLs for segment ${segmentNumber}:`);
-
   for (const url of urls) {
-    console.log(`   Testing: ${url}`);
     const result = await checkVideoAvailability(url);
     
     checkedUrls.push({
@@ -165,14 +162,10 @@ export const findWorkingVideoUrl = async (
     });
 
     if (result.available) {
-      console.log(`✅ Found working video URL: ${url}`);
       return { url, checkedUrls };
-    } else {
-      console.log(`❌ URL not available: ${result.error}`);
     }
   }
 
-  console.log(`❌ No working video URL found for segment ${segmentNumber}`);
   return { url: null, checkedUrls };
 };
 
@@ -187,7 +180,6 @@ export const downloadVideo = async (
   const token = localStorage.getItem('access_token');
 
   try {
-    console.log(`📥 Starting download: ${filename}`);
     
     const response = await fetch(url, {
       headers: {
@@ -236,7 +228,6 @@ export const downloadVideo = async (
     window.URL.revokeObjectURL(downloadUrl);
     document.body.removeChild(a);
     
-    console.log(`✅ Download completed: ${filename}`);
     return { success: true };
   } catch (error: any) {
     console.error(`❌ Download failed: ${error.message}`);
@@ -288,29 +279,16 @@ export const debugVideoIssues = async (
   segmentNumber: number,
   segment?: Parameters<typeof getSegmentVideoUrls>[2]
 ): Promise<void> => {
-  console.group(`🔧 VIDEO DEBUG: Segment ${segmentNumber}`);
-  
   // 1. Проверяем наличие токена
   const token = localStorage.getItem('access_token');
-  console.log('🔑 Auth token:', token ? `Present (${token.length} chars)` : 'Missing');
   
   // 2. Проверяем данные сегмента
-  console.log('📊 Segment data:', {
-    video_url: segment?.video_url,
-    generated_video_url: segment?.generated_video_url,
-    urls: segment?.urls,
-  });
   
   // 3. Получаем все возможные URL'ы
   const urls = getSegmentVideoUrls(projectId, segmentNumber, segment);
-  console.log(`🔗 Found ${urls.length} potential URLs:`, urls);
   
   // 4. Проверяем доступность каждого URL
   const results = await findWorkingVideoUrl(projectId, segmentNumber, segment);
-  console.log('✅ Working URL:', results.url);
-  console.log('📋 All checks:', results.checkedUrls);
-  
-  console.groupEnd();
 };
 
 /**
@@ -321,10 +299,8 @@ export const createSegmentVideoBlobUrl = async (
   segmentNumber: number
 ): Promise<string | null> => {
   try {
-    console.log(`📹 Creating blob URL for segment ${segmentNumber}`);
     const blob = await apiClient.getSegmentVideoBlob(projectId, segmentNumber);
     const blobUrl = URL.createObjectURL(blob);
-    console.log(`✅ Segment video blob URL created: ${blobUrl}`);
     return blobUrl;
   } catch (error) {
     console.error(`❌ Failed to create segment video blob URL:`, error);
@@ -339,10 +315,8 @@ export const createFinalVideoBlobUrl = async (
   projectId: string
 ): Promise<string | null> => {
   try {
-    console.log(`📹 Creating blob URL for final video`);
     const blob = await apiClient.getFinalVideoBlob(projectId);
     const blobUrl = URL.createObjectURL(blob);
-    console.log(`✅ Final video blob URL created: ${blobUrl}`);
     return blobUrl;
   } catch (error) {
     console.error(`❌ Failed to create final video blob URL:`, error);

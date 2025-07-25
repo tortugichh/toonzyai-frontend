@@ -240,13 +240,9 @@ export class APIError extends Error {
   static async fromResponse(response: Response): Promise<APIError> {
     let details: ErrorResponse | string;
     try {
-      console.log('[APIError.fromResponse] Trying to parse JSON from response...');
       details = await response.json();
-      console.log('[APIError.fromResponse] Parsed JSON:', details);
     } catch (err) {
-      console.warn('[APIError.fromResponse] Failed to parse JSON, trying text. Error:', err);
       details = await response.text() || response.statusText;
-      console.log('[APIError.fromResponse] Parsed text:', details);
     }
     return new APIError(response.status, response.statusText, details);
   }
@@ -388,14 +384,12 @@ class APIClient {
     };
 
     let response = await makeRequest(token);
-    console.log(`[APIClient.request] Response for ${url}:`, response);
 
     // Handle 401 with token refresh
     if (response.status === 401 && token) {
       const newToken = await this.tokenManager.refreshAccessToken();
       if (newToken) {
         response = await makeRequest(newToken);
-        console.log(`[APIClient.request] Retried with refreshed token for ${url}:`, response);
       } else {
         // Redirect to login if refresh failed
         window.location.href = '/login';
@@ -404,23 +398,19 @@ class APIClient {
     }
 
     if (!response.ok) {
-      console.warn(`[APIClient.request] Response not ok for ${url}, status: ${response.status}`);
       throw await APIError.fromResponse(response);
     }
 
     // Handle no content responses
     if (response.status === 204) {
-      console.log(`[APIClient.request] No content for ${url}`);
       return {} as T;
     }
 
     const contentType = response.headers.get('content-type');
     if (contentType?.includes('application/json')) {
-      console.log(`[APIClient.request] Parsing JSON for ${url}`);
       return response.json();
     }
 
-    console.log(`[APIClient.request] Returning raw response for ${url}`);
     return response as unknown as T;
   }
 
@@ -871,6 +861,12 @@ export const apiClient = new APIClient();
 
 // Helper function for error handling
 export const getErrorMessage = (error: unknown): string => {
+  // Hide backend URLs or technical details
+  const hideUrl = (msg: string) =>
+    /https?:\/\/|0\.0\.0\.0|localhost|127\.0\.0\.1|\/api\//.test(msg)
+      ? 'Ошибка соединения с сервером. Попробуйте позже.'
+      : msg;
+
   if (error instanceof APIError) {
     switch (error.status) {
       case 401:
@@ -885,31 +881,28 @@ export const getErrorMessage = (error: unknown): string => {
             .map(fe => `${fe.field}: ${fe.message}`)
             .join(', ');
         }
-        return error.message;
+        return hideUrl(error.message);
       case 429:
         return 'Слишком много запросов. Попробуйте позже.';
       case 500:
         return 'Ошибка сервера. Попробуйте позже.';
       default:
-        // Если details объект – показываем detail/field_errors
         if (typeof error.details === 'object') {
           const d = error.details as any;
-          if (d.detail) return d.detail;
+          if (d.detail) return hideUrl(d.detail);
           if (d.field_errors) {
             return d.field_errors.map((fe: any) => `${fe.field}: ${fe.message}`).join(', ');
           }
         }
-        return error.message || 'Произошла неизвестная ошибка.';
+        return hideUrl(error.message || 'Произошла неизвестная ошибка.');
     }
   }
-  
   if (error instanceof Error) {
-    return error.message;
+    return hideUrl(error.message);
   }
-  
-  // Fallback: stringify если объект
   try {
-    return JSON.stringify(error);
+    const msg = JSON.stringify(error);
+    return hideUrl(msg);
   } catch {
     return 'Произошла неожиданная ошибка.';
   }

@@ -392,6 +392,31 @@ function AnimationPage() {
           </div>
         </div>
 
+        {/* Video Generation Limit Alert */}
+        {user && (
+          <Card className="mb-6 p-4 bg-orange-50 border-orange-200">
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L5.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-orange-800 font-medium mb-1">⚠️ Лимит генерации видео</h3>
+                <p className="text-orange-700 text-sm mb-2">
+                  Новым пользователям доступна только <strong>одна генерация видео</strong>. 
+                  Аватары и истории можно создавать без ограничений.
+                </p>
+                <div className="text-xs text-orange-600 space-y-1">
+                  <p>• Аватары: без ограничений</p>
+                  <p>• Истории: без ограничений</p>
+                  <p>• Видео анимации: 1 раз</p>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Success Message */}
         {successMessage && (
           <Card className="mb-8 p-4 bg-green-50 border-green-200 border">

@@ -27,7 +27,6 @@ function AvatarDebugPanel() {
     };
     
     setLogs(prev => [newLog, ...prev.slice(0, 19)]); // Сохраняем последние 20 записей
-    console.log(`[${newLog.timestamp}] ${action}:`, message, details);
   };
 
   const clearLogs = () => setLogs([]);

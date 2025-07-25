@@ -51,6 +51,26 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
     segment.status === 'in_progress' || segment.status === 'pending'
   );
 
+  // Add programmatic download handler
+  const handleDownload = async () => {
+    if (!project.final_video_url) return;
+    try {
+      const response = await fetch(project.final_video_url, { mode: 'cors' });
+      if (!response.ok) throw new Error('Ошибка загрузки файла');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `animation-${project.id}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert('Не удалось скачать видео. Попробуйте открыть ссылку в новой вкладке.');
+    }
+  };
+
   return (
     <div className="animation-project max-w-4xl mx-auto p-6">
       <div className="project-header flex items-center gap-4 mb-6">
@@ -131,7 +151,19 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
             controls 
             className="w-full max-w-2xl rounded shadow-lg"
           />
-          
+          {/* Download Button */}
+          <div className="mt-4 flex justify-end">
+            <a
+              href={project.final_video_url}
+              download={`animation-${project.id}.mp4`}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded shadow transition"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+              </svg>
+              Скачать видео
+            </a>
+          </div>
         </Card>
       )}
 

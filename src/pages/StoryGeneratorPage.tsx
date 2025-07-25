@@ -83,10 +83,10 @@ function Step1({ data, onUpdate, onNext }: {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 sm:px-4 md:px-8">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">📖 Основная идея истории</h2>
-        <p className="text-gray-600">Расскажите, о чём будет ваша книга? Опишите основной сюжет или идею.</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">📖 Основная идея истории</h2>
+        <p className="text-gray-600 text-sm md:text-base">Расскажите, о чём будет ваша книга? Опишите основной сюжет или идею.</p>
       </div>
       
       <div className="space-y-4">
@@ -131,22 +131,21 @@ function Step2({ data, onUpdate, onNext, onBack }: {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 sm:px-4 md:px-8">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">🎭 Жанр и стиль</h2>
-        <p className="text-gray-600">Выберите жанр и стиль для вашей истории</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">🎭 Жанр и стиль</h2>
+        <p className="text-gray-600 text-sm md:text-base">Выберите жанр и стиль для вашей истории</p>
       </div>
-      
       <div className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">Жанр:</label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {genres.map((g) => (
               <button
                 key={g}
                 type="button"
                 onClick={() => setGenre(g)}
-                className={`p-3 border rounded-lg text-sm transition-all ${
+                className={`p-2 md:p-3 border rounded-lg text-xs md:text-sm transition-all w-full ${
                   genre === g 
                     ? 'bg-blue-500 text-white border-blue-500' 
                     : 'bg-white text-gray-700 border-gray-300 hover:border-blue-300'
@@ -160,19 +159,18 @@ function Step2({ data, onUpdate, onNext, onBack }: {
             placeholder="Или введите свой жанр..."
             value={genre}
             onChange={(e) => setGenre(e.target.value)}
-            className="mt-2"
+            className="mt-2 w-full"
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">Стиль:</label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {styles.map((s) => (
               <button
                 key={s}
                 type="button"
                 onClick={() => setStyle(s)}
-                className={`p-3 border rounded-lg text-sm transition-all ${
+                className={`p-2 md:p-3 border rounded-lg text-xs md:text-sm transition-all w-full ${
                   style === s 
                     ? 'bg-green-500 text-white border-green-500' 
                     : 'bg-white text-gray-700 border-gray-300 hover:border-green-300'
@@ -182,25 +180,10 @@ function Step2({ data, onUpdate, onNext, onBack }: {
               </button>
             ))}
           </div>
-          <Input
-            placeholder="Или введите свой стиль..."
-            value={style}
-            onChange={(e) => setStyle(e.target.value)}
-            className="mt-2"
-          />
         </div>
-        
-        <div className="flex justify-between">
-          <Button variant="outline" onClick={onBack}>
-            ← Назад
-          </Button>
-          <Button 
-            onClick={handleNext}
-            disabled={!genre.trim()}
-            className="px-8 py-2"
-          >
-            Далее →
-          </Button>
+        <div className="flex flex-col sm:flex-row justify-between gap-2 mt-4">
+          <Button variant="outline" onClick={onBack} className="w-full sm:w-auto order-2 sm:order-1">← Назад</Button>
+          <Button onClick={handleNext} className="w-full sm:w-auto order-1 sm:order-2 px-6 py-2">Далее →</Button>
         </div>
       </div>
     </div>
@@ -225,10 +208,10 @@ function Step3({ data, onUpdate, onNext, onBack }: {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 sm:px-4 md:px-8">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">🎨 Тема истории</h2>
-        <p className="text-gray-600">Какая основная тема вашей истории?</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">🎨 Тема истории</h2>
+        <p className="text-gray-600 text-sm md:text-base">Какая основная тема вашей истории?</p>
       </div>
       
       <div className="space-y-6">
@@ -300,10 +283,10 @@ function Step4({ data, onUpdate, onNext, onBack }: {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 sm:px-4 md:px-8">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">👥 Персонажи</h2>
-        <p className="text-gray-600">Кто будет главными героями вашей истории?</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">👥 Персонажи</h2>
+        <p className="text-gray-600 text-sm md:text-base">Кто будет главными героями вашей истории?</p>
       </div>
       
       <div className="space-y-4">
@@ -384,10 +367,10 @@ function Step5({ data, onUpdate, onGenerate, onBack, isGenerating }: {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 sm:px-4 md:px-8">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">✨ Финальные пожелания</h2>
-        <p className="text-gray-600">Есть ли особые пожелания к истории? (необязательно)</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-3">✨ Финальные пожелания</h2>
+        <p className="text-gray-600 text-sm md:text-base">Есть ли особые пожелания к истории? (необязательно)</p>
       </div>
       
       <div className="space-y-4">
@@ -1172,6 +1155,8 @@ export function StoryGeneratorPage() {
     <>
       <Header user={user} onLogout={() => {}} />
       <div className="container mx-auto p-4">
+       
+
         {/* Секция ранее созданных книг */}
         {storiesData?.stories && storiesData.stories.length > 0 && (
           <div className="mb-8">

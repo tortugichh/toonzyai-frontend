@@ -23,12 +23,9 @@ export function DebugAvatarInfo({ avatar }: DebugAvatarInfoProps) {
     setError(null);
     
     try {
-      console.log('Fetching debug info for avatar:', avatar.avatar_id);
       const response = await apiClient.request(`/avatars/debug/${avatar.avatar_id}`);
-      console.log('Debug info received:', response);
       setDebugInfo(response);
     } catch (err: any) {
-      console.error('Error fetching debug info:', err);
       setError(err.message || 'Failed to fetch debug info');
     } finally {
       setIsLoading(false);
@@ -37,12 +34,9 @@ export function DebugAvatarInfo({ avatar }: DebugAvatarInfoProps) {
 
   const testImageLoad = async () => {
     try {
-      console.log('Testing image load for avatar:', avatar.avatar_id);
       const blobUrl = await avatarImageCache.get(avatar.avatar_id);
-      console.log('Image loaded successfully:', blobUrl);
       setTestImageResult(`✅ Success: ${blobUrl}`);
     } catch (error: any) {
-      console.error('Image load failed:', error);
       setTestImageResult(`❌ Failed: ${error.message}`);
     }
   };

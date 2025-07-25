@@ -111,6 +111,26 @@ function AnimationStudioPage() {
           </Button>
         </div>
 
+        {/* Video Generation Limit Alert */}
+        {user && (
+          <Card className="mb-6 p-4 bg-orange-50 border-orange-200">
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L5.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-orange-800 font-medium mb-1">Лимит генерации видео</h3>
+                <p className="text-orange-700 text-sm mb-2">
+                  Новым пользователям доступна только <strong>одна генерация видео</strong>. 
+                  Аватары и истории можно создавать без ограничений.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Projects List */}
         {isLoading ? (
           <div className="loading text-center py-12">
@@ -303,6 +323,19 @@ function ProjectCard({ project, onOpen, onDelete }: ProjectCardProps) {
               <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                 Готово
               </div>
+            </div>
+            {/* Download Button */}
+            <div className="mt-2 flex justify-end">
+              <a
+                href={p.final_video_url}
+                download
+                className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded shadow transition"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+                </svg>
+                Скачать видео
+              </a>
             </div>
           </div>
         ) : (

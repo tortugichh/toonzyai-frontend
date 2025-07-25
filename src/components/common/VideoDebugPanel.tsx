@@ -43,8 +43,6 @@ const VideoDebugPanel: React.FC<VideoDebugPanelProps> = ({
       const diagnosticResults: DiagnosticResult[] = [];
 
       for (const url of urls) {
-        console.log(`🔍 Testing URL: ${url}`);
-        
         const availability = await checkVideoAvailability(url);
         const videoInfo = await getVideoInfo(url);
         
@@ -72,7 +70,6 @@ const VideoDebugPanel: React.FC<VideoDebugPanelProps> = ({
         setSummary(`❌ Все ${totalCount} URL недоступны. Проблема с авторизацией или файлы отсутствуют.`);
       }
     } catch (error) {
-      console.error('Diagnostic error:', error);
       setSummary(`❌ Ошибка диагностики: ${error}`);
     } finally {
       setIsChecking(false);

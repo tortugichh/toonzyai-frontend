@@ -63,7 +63,7 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
       
       onProjectCreated(project);
     } catch (error: any) {
-      if (error?.message?.includes('Доступен только один анимационный проект')) {
+      if (error?.message?.includes('Доступна только одна генерация видео')) {
         setLimitModalOpen(true);
       } else {
       toastError('Ошибка создания проекта: ' + error.message);
@@ -270,8 +270,8 @@ export function CreateProject({ onProjectCreated, onCancel }: CreateProjectProps
     </Card>
       <Modal
         open={limitModalOpen}
-        title="Лимит анимационных проектов"
-        description="Новым пользователям доступен только один анимационный проект."
+        title="Лимит генерации видео"
+        description="Новым пользователям доступна только одна генерация видео. Аватары и истории можно создавать без ограничений."
         onClose={() => setLimitModalOpen(false)}
         confirmText="Понятно"
       />

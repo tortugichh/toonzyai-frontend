@@ -14,16 +14,13 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Prevent background scrolling when mobile menu is open
   useEffect(() => {
     if (menuOpen) {
-      // Save current scroll position
       const scrollY = window.scrollY;
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.top = `-${scrollY}px`;
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
-      // Prevent layout shift from disappearing scrollbar
       if (scrollbarWidth > 0) {
         document.body.style.paddingRight = `${scrollbarWidth}px`;
       }
@@ -35,13 +32,11 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
       document.body.style.width = '';
       document.body.style.paddingRight = '';
       document.body.classList.remove('overflow-hidden');
-      // Restore scroll position
       if (scrollY) {
         window.scrollTo(0, Math.abs(parseInt(scrollY)) || 0);
       }
     }
 
-    // Cleanup on unmount
     return () => {
       document.body.style.position = '';
       document.body.style.top = '';
