@@ -6,6 +6,13 @@
 import { API_BASE_URL } from '@/constants';
 import { secureLogger, sanitizeApiError } from '@/utils/secureLogging';
 
+// Use original console methods to avoid recursion
+const originalConsole = {
+  log: console.log,
+  error: console.error,
+  warn: console.warn
+};
+
 // Базовый путь API – полноценный URL в продакшене, либо прокси-путь в dev
 export const API_BASE = API_BASE_URL || '/api/v1';
 
@@ -314,7 +321,7 @@ class TokenManager {
         throw new Error('Refresh failed');
       }
     } catch (error) {
-      secureLogger.error('Token refresh failed:', sanitizeApiError(error));
+              originalConsole.error('Token refresh failed:', sanitizeApiError(error));
       this.clearTokens();
       this.failedQueue.forEach(resolve => resolve(null));
       this.failedQueue = [];
@@ -352,7 +359,7 @@ class TokenManager {
         return newToken;
       }
     } catch (error) {
-      secureLogger.error('Token validation failed:', sanitizeApiError(error));
+      originalConsole.error('Token validation failed:', sanitizeApiError(error));
     }
 
     // If validation failed for other reasons, try refresh anyway
@@ -862,10 +869,16 @@ export const apiClient = new APIClient();
 // Helper function for error handling
 export const getErrorMessage = (error: unknown): string => {
   // Hide backend URLs or technical details
-  const hideUrl = (msg: string) =>
-    /https?:\/\/|0\.0\.0\.0|localhost|127\.0\.0\.1|\/api\//.test(msg)
-      ? 'Connection error. Please try again later.'
-      : msg;
+  const hideUrl = (msg: string) => {
+    // Remove all URLs and technical details from error messages
+    const cleaned = msg
+      .replace(/https?:\/\/[^\s]+/g, '[API_URL]')
+      .replace(/localhost:\d+/g, '[LOCALHOST]')
+      .replace(/127\.0\.0\.1:\d+/g, '[LOCALHOST]')
+      .replace(/0\.0\.0\.0:\d+/g, '[LOCALHOST]')
+      .replace(/\/api\/[^\s]+/g, '[API_ENDPOINT]');
+    return cleaned || 'Connection error. Please try again later.';
+  };
 
   if (error instanceof APIError) {
     switch (error.status) {

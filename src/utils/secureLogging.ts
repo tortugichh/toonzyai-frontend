@@ -1,15 +1,20 @@
 import { IS_PRODUCTION } from '@/constants';
 
+// Store original console methods to avoid recursion
+const originalConsole = {
+  log: console.log,
+  error: console.error,
+  warn: console.warn
+};
+
 // Функция для маскировки чувствительных данных в URL
 const maskSensitiveUrl = (text: string): string => {
-  if (!IS_PRODUCTION) {
-    return text; // В режиме разработки показываем всё
-  }
-
-  // Заменяем полные URL бэкенда на маскированные версии
+  // Always mask URLs to prevent them from appearing in console logs
   return text
     .replace(/https?:\/\/[^\/\s]+\/api\/v1/g, '[BACKEND_API]')
     .replace(/https?:\/\/api\.toonzyai\.me/g, '[BACKEND_API]')
+    .replace(/http:\/\/localhost:\d+/g, '[LOCALHOST]')
+    .replace(/http:\/\/127\.0\.0\.1:\d+/g, '[LOCALHOST]')
     .replace(/wss?:\/\/[^\/\s]+/g, '[BACKEND_WS]')
     .replace(/wss?:\/\/api\.toonzyai\.me/g, '[BACKEND_WS]')
     .replace(/"url":\s*"https?:\/\/[^"]+"/g, '"url": "[MASKED_URL]"')
@@ -19,81 +24,66 @@ const maskSensitiveUrl = (text: string): string => {
 // Безопасный logger
 export const secureLogger = {
   log: (...args: any[]) => {
-    if (IS_PRODUCTION) {
-      // В продакшене маскируем чувствительные данные
-      const maskedArgs = args.map(arg => {
-        if (typeof arg === 'string') {
-          return maskSensitiveUrl(arg);
+    // Always mask sensitive data to prevent URLs from appearing in console
+    const maskedArgs = args.map(arg => {
+      if (typeof arg === 'string') {
+        return maskSensitiveUrl(arg);
+      }
+      if (typeof arg === 'object' && arg !== null) {
+        try {
+          const str = JSON.stringify(arg);
+          return JSON.parse(maskSensitiveUrl(str));
+        } catch {
+          return '[OBJECT]';
         }
-        if (typeof arg === 'object' && arg !== null) {
-          try {
-            const str = JSON.stringify(arg);
-            return JSON.parse(maskSensitiveUrl(str));
-          } catch {
-            return '[OBJECT]';
-          }
-        }
-        return arg;
-      });
-      console.log(...maskedArgs);
-    } else {
-      // В разработке показываем всё как есть
-      console.log(...args);
-    }
+      }
+      return arg;
+    });
+    originalConsole.log(...maskedArgs);
   },
 
   error: (...args: any[]) => {
-    if (IS_PRODUCTION) {
-      // В продакшене маскируем чувствительные данные
-      const maskedArgs = args.map(arg => {
-        if (typeof arg === 'string') {
-          return maskSensitiveUrl(arg);
+    // Always mask sensitive data to prevent URLs from appearing in console
+    const maskedArgs = args.map(arg => {
+      if (typeof arg === 'string') {
+        return maskSensitiveUrl(arg);
+      }
+      if (typeof arg === 'object' && arg !== null) {
+        try {
+          const str = JSON.stringify(arg);
+          return JSON.parse(maskSensitiveUrl(str));
+        } catch {
+          return '[ERROR_OBJECT]';
         }
-        if (typeof arg === 'object' && arg !== null) {
-          try {
-            const str = JSON.stringify(arg);
-            return JSON.parse(maskSensitiveUrl(str));
-          } catch {
-            return '[ERROR_OBJECT]';
-          }
-        }
-        return arg;
-      });
-      console.error(...maskedArgs);
-    } else {
-      // В разработке показываем всё как есть
-      console.error(...args);
-    }
+      }
+      return arg;
+    });
+    originalConsole.error(...maskedArgs);
   },
 
   warn: (...args: any[]) => {
-    if (IS_PRODUCTION) {
-      const maskedArgs = args.map(arg => {
-        if (typeof arg === 'string') {
-          return maskSensitiveUrl(arg);
+    // Always mask sensitive data to prevent URLs from appearing in console
+    const maskedArgs = args.map(arg => {
+      if (typeof arg === 'string') {
+        return maskSensitiveUrl(arg);
+      }
+      if (typeof arg === 'object' && arg !== null) {
+        try {
+          const str = JSON.stringify(arg);
+          return JSON.parse(maskSensitiveUrl(str));
+        } catch {
+          return '[WARNING_OBJECT]';
         }
-        if (typeof arg === 'object' && arg !== null) {
-          try {
-            const str = JSON.stringify(arg);
-            return JSON.parse(maskSensitiveUrl(str));
-          } catch {
-            return '[WARNING_OBJECT]';
-          }
-        }
-        return arg;
-      });
-      console.warn(...maskedArgs);
-    } else {
-      console.warn(...args);
-    }
+      }
+      return arg;
+    });
+    originalConsole.warn(...maskedArgs);
   }
 };
 
 // Безопасная обработка ошибок API 
 export const sanitizeApiError = (error: any): any => {
-  if (!IS_PRODUCTION) {
-    return error; // В разработке возвращаем как есть
-  }
+  // Always sanitize errors to prevent URLs from appearing in console
 
   if (error && typeof error === 'object') {
     const sanitized = { ...error };

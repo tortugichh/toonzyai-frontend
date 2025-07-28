@@ -4,7 +4,8 @@ export const IS_PRODUCTION = import.meta.env.PROD;
 
 // Базовый origin бекенда можно переопределить через VITE_API_ORIGIN,
 // иначе берём домен .me по умолчанию в продакшене.
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ?? (IS_PRODUCTION ? 'https://api.toonzyai.me' : '');
+// Force local development - never use production API in development
+const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ?? '';
 
 // Полный базовый URL всех REST-эндпоинтов
 export const API_BASE_URL = `${API_ORIGIN}/api/v1`;
