@@ -55,59 +55,45 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
             </span>
           </Link>
           
-          {/* Desktop nav for large screens */}
+          {/* Desktop nav */}
           <nav className="hidden lg:flex space-x-6">
             <Link 
               to="/dashboard" 
               className="text-gray-700 hover:text-gray-900 transition-all duration-300 font-medium text-base hover:scale-105 relative group"
             >
-              <span className="relative z-10">
-                Панель управления
-              </span>
+              <span className="relative z-10">Dashboard</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-light to-secondary-light group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link 
               to="/avatars" 
               className="text-gray-700 hover:text-gray-900 transition-all duration-300 font-medium text-base hover:scale-105 relative group"
             >
-              <span className="relative z-10">
-              Аватары
-              </span>
+              <span className="relative z-10">Avatars</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-light to-secondary-light group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link 
               to="/animations" 
               className="text-gray-700 hover:text-gray-900 transition-all duration-300 font-medium text-base hover:scale-105 relative group"
             >
-              <span className="relative z-10">
-                Анимации
-              </span>
+              <span className="relative z-10">Animations</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-light to-secondary-light group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link 
               to="/stories" 
               className="text-gray-700 hover:text-gray-900 transition-all duration-300 font-medium text-base hover:scale-105 relative group"
             >
-              <span className="relative z-10">
-                Истории
-              </span>
+              <span className="relative z-10">Stories</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-light to-secondary-light group-hover:w-full transition-all duration-300"></span>
             </Link>
           </nav>
           
-          {/* Hamburger for small & medium screens */}
+          {/* Hamburger menu */}
           <button
             className="flex lg:hidden items-center justify-center w-10 h-10 text-gray-700 hover:text-gray-900 focus:outline-none"
             onClick={() => setMenuOpen((prev) => !prev)}
             aria-label="Toggle navigation"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {menuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
@@ -116,110 +102,57 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
             </svg>
           </button>
 
-          {/* Dropdown for small & medium screens */}
+          {/* Dropdown menu */}
           {menuOpen && (
             <nav className="absolute top-full left-0 w-full backdrop-blur-xl bg-white/90 border-t border-white/20 shadow-lg lg:hidden flex flex-col py-4 space-y-2 z-40">
-              <Link
-                to="/dashboard"
-                className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
-                onClick={() => setMenuOpen(false)}
-              >
-                Панель управления
-              </Link>
-              <Link
-                to="/avatars"
-                className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
-                onClick={() => setMenuOpen(false)}
-              >
-                Аватары
-              </Link>
-              <Link
-                to="/animations"
-                className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
-                onClick={() => setMenuOpen(false)}
-              >
-                Анимации
-              </Link>
-              <Link
-                to="/stories"
-                className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium transition-colors duration-200"
-                onClick={() => setMenuOpen(false)}
-              >
-                Истории
-              </Link>
+              <Link to="/dashboard" className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+              <Link to="/avatars" className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium" onClick={() => setMenuOpen(false)}>Avatars</Link>
+              <Link to="/animations" className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium" onClick={() => setMenuOpen(false)}>Animations</Link>
+              <Link to="/stories" className="px-6 py-2 text-gray-700 hover:bg-white/50 font-medium" onClick={() => setMenuOpen(false)}>Stories</Link>
               <div className="border-t border-white/20 my-2"></div>
               {user ? (
-                <Button
-                  variant="ghost"
-                  className="mx-6 justify-start hover:bg-white/50"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    onLogout();
-                  }}
-                >
-                  {isLoggingOut ? 'Выход...' : 'Выйти'}
+                <Button variant="ghost" className="mx-6 justify-start hover:bg-white/50" onClick={() => { setMenuOpen(false); onLogout(); }}>
+                  {isLoggingOut ? 'Logging out...' : 'Logout'}
                 </Button>
               ) : (
                 <>
-                  <Button
-                    variant="ghost"
-                    className="mx-6 justify-start hover:bg-white/50"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      navigate('/login');
-                    }}
-                  >
-                    Войти
+                  <Button variant="ghost" className="mx-6 justify-start hover:bg-white/50" onClick={() => { setMenuOpen(false); navigate('/login'); }}>
+                    Login
                   </Button>
-                  <Button
-                    className="mx-6 mt-2 bg-gradient-to-r from-primary to-secondary-dark text-white"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      navigate('/register');
-                    }}
-                  >
-                    Начать бесплатно
+                  <Button className="mx-6 mt-2 bg-gradient-to-r from-primary to-secondary-dark text-white" onClick={() => { setMenuOpen(false); navigate('/register'); }}>
+                    Start for free
                   </Button>
                 </>
               )}
             </nav>
           )}
 
-          {/* Auth buttons for large screens */}
+          {/* Auth buttons (desktop) */}
           <div className="hidden lg:flex items-center space-x-4">
             {user ? (
               <>
-              <div className="hidden sm:block text-right">
-                  <p className="text-sm text-gray-700">Привет, {user.username}!</p>
-                <p className="text-xs text-gray-500">{user.email}</p>
-              </div>
-            <Button 
-              variant="outline" 
-              onClick={onLogout}
-              disabled={isLoggingOut}
+                <div className="hidden sm:block text-right">
+                  <p className="text-sm text-gray-700">Hello, {user.username}!</p>
+                  <p className="text-xs text-gray-500">{user.email}</p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={onLogout}
+                  disabled={isLoggingOut}
                   className="bg-gradient-to-r from-primary to-secondary-dark text-white px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:scale-105 relative overflow-hidden group"
-            >
+                >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
-                  <span className="relative z-10">
-              {isLoggingOut ? 'Выход...' : 'Выйти'}
-                  </span>
+                  <span className="relative z-10">{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
                 </Button>
               </>
             ) : (
               <>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => navigate('/login')} 
-                  className="text-gray-700 hover:text-gray-900 font-medium"
-                >
-                  Войти
+                <Button variant="ghost" onClick={() => navigate('/login')} className="text-gray-700 hover:text-gray-900 font-medium">
+                  Login
                 </Button>
-                <Button 
-                  onClick={() => navigate('/register')} 
-                  className="bg-gradient-to-r from-primary to-secondary-dark text-white px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:scale-105"
-                >
-                  Начать бесплатно
-            </Button>
+                <Button onClick={() => navigate('/register')} className="bg-gradient-to-r from-primary to-secondary-dark text-white px-6 py-3 rounded-xl hover:opacity-90 transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:scale-105">
+                  Start for free
+                </Button>
               </>
             )}
           </div>
@@ -227,7 +160,6 @@ export function Header({ user, onLogout, isLoggingOut = false }: HeaderProps) {
       </div>
     </header>
   );
-} 
+}
 
-// Provide default export for environments expecting default module
-export default Header; 
+export default Header;

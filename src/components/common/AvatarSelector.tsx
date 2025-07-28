@@ -44,13 +44,13 @@ export function AvatarSelector({
     const normalizedStatus = status?.toLowerCase?.().trim();
     switch (normalizedStatus) {
       case 'completed':
-        return 'Готов';
+        return 'Ready';
       case 'generating':
-        return 'Генерируется';
+        return 'Generating';
       case 'failed':
-        return 'Ошибка';
+        return 'Failed';
       case 'pending':
-        return 'В очереди';
+        return 'In queue';
       default:
         return status;
     }
@@ -62,9 +62,9 @@ export function AvatarSelector({
     return (
       <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
         <ContentIcon type="palette" className="w-8 h-8 mb-3 mx-auto text-gray-400" />
-        <p className="text-gray-600 mb-2">Нет готовых аватаров</p>
+        <p className="text-gray-600 mb-2">No avatars available</p>
         <p className="text-sm text-gray-500 mb-4">
-          Сначала создайте аватар, чтобы его можно было анимировать
+          Create an avatar first to use it for animation
         </p>
         {onCreateNew && (
           <Button
@@ -73,7 +73,7 @@ export function AvatarSelector({
             className="text-purple-600 hover:text-purple-700 border-purple-300"
           >
             <ActionIcon action="create" className="w-4 h-4 mr-2" />
-            Создать аватар
+            Create Avatar
           </Button>
         )}
       </div>
@@ -89,18 +89,18 @@ export function AvatarSelector({
           <p className="text-sm text-blue-800">
             {completedCount > 0 ? (
               <>
-                Доступно <strong>{completedCount}</strong> готовых аватаров из <strong>{avatars.length}</strong> общих.
+                <strong>{completedCount}</strong> ready avatar(s) out of <strong>{avatars.length}</strong>.
                 {completedCount < avatars.length && (
-                  <span className="text-blue-600"> Некоторые аватары ещё генерируются.</span>
+                  <span className="text-blue-600"> Some avatars are still being generated.</span>
                 )}
               </>
             ) : (
               <>
-                У вас есть <strong>{avatars.length}</strong> аватаров, но они ещё не готовы для анимации. 
-                Дождитесь завершения генерации.
+                You have <strong>{avatars.length}</strong> avatars, but none are ready yet. 
+                Please wait until generation is complete.
               </>
             )}
-            {avatars.length > 3 && ' Используйте поиск для быстрого нахождения нужного аватара.'}
+            {avatars.length > 3 && ' Use search to quickly find the right avatar.'}
           </p>
         </div>
       </div>
@@ -110,7 +110,7 @@ export function AvatarSelector({
         <div className="relative">
           <Input
             type="text"
-            placeholder="Поиск по описанию аватара..."
+            placeholder="Search by avatar description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -133,8 +133,8 @@ export function AvatarSelector({
       {searchTerm && (
         <p className="text-sm text-gray-600">
           {filteredAvatars.length === 0 
-            ? 'Ничего не найдено' 
-            : `Найдено ${filteredAvatars.length} из ${avatars.length} аватаров`
+            ? 'No results found' 
+            : `Found ${filteredAvatars.length} of ${avatars.length} avatars`
           }
         </p>
       )}
@@ -143,8 +143,8 @@ export function AvatarSelector({
       {filteredAvatars.length === 0 ? (
         <div className="text-center py-8 bg-gray-50 rounded-lg">
           <span className="text-2xl mb-2 block">🔍</span>
-          <p className="text-gray-600">Ничего не найдено</p>
-          <p className="text-sm text-gray-500">Попробуйте изменить поисковый запрос</p>
+          <p className="text-gray-600">No results found</p>
+          <p className="text-sm text-gray-500">Try changing your search query</p>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
@@ -180,7 +180,7 @@ export function AvatarSelector({
                 </p>
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-gray-500">
-                    {new Date(avatar.created_at).toLocaleDateString('ru-RU')}
+                    {new Date(avatar.created_at).toLocaleDateString('en-US')}
                   </p>
                   <span className={`px-2 py-1 ${getStatusColor(avatar.status)} text-xs rounded-full font-medium`}>
                     {getStatusText(avatar.status)}
@@ -216,16 +216,16 @@ export function AvatarSelector({
                   ? 'text-green-800'
                   : 'text-yellow-800'
               }`}>
-                Выбран аватар: <strong>
+                Selected avatar: <strong>
                   {avatars.find(a => a.avatar_id === selectedAvatarId)?.prompt.slice(0, 50)}
                   {avatars.find(a => a.avatar_id === selectedAvatarId)?.prompt.length! > 50 ? '...' : ''}
                 </strong>
               </p>
               {avatars.find(a => a.avatar_id === selectedAvatarId)?.status?.toLowerCase?.().trim() !== 'completed' && (
-                <p className="text-xs text-yellow-700 mt-1">
+                <p className="text-xs text-yellow-700 mt-1 flex items-center">
                   <StatusIcon status="warning" className="w-3 h-3 mr-1" />
-                  Этот аватар ещё не готов ({getStatusText(avatars.find(a => a.avatar_id === selectedAvatarId)?.status!)}). 
-                  Анимация может не запуститься.
+                  This avatar is not ready yet ({getStatusText(avatars.find(a => a.avatar_id === selectedAvatarId)?.status!)}). 
+                  Animation may not work.
                 </p>
               )}
             </div>
@@ -234,4 +234,4 @@ export function AvatarSelector({
       )}
     </div>
   );
-} 
+}

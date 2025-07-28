@@ -18,32 +18,25 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Загружаем изображение с авторизацией через новый метод API
+  // Load image with authentication
   useEffect(() => {
     const loadImageWithAuth = async () => {
       if (!avatar.avatar_id) return;
-      
+
       setIsLoading(true);
       setHasError(false);
-      
+
       try {
-        
-        // Используем новый метод с правильной аутентификацией
         const blob = await apiClient.getAvatarImageBlob(avatar.avatar_id);
-        
+
         if (blob.size === 0) {
-          throw new Error('Получен пустой файл');
+          throw new Error('Received empty file');
         }
 
         const url = URL.createObjectURL(blob);
         setBlobUrl(url);
-        
-      } catch (error: any) {
+      } catch (error) {
         setHasError(true);
-        
-        // Если статус аватара "completed", но изображение не загружается - это проблема
-        if (avatar.status === 'completed') {
-        }
       } finally {
         setIsLoading(false);
       }
@@ -51,16 +44,13 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
 
     loadImageWithAuth();
 
-    // Cleanup blob URL при размонтировании или смене аватара
     return () => {
-      // Очищаем предыдущий blob URL только если он есть
       if (blobUrl) {
         URL.revokeObjectURL(blobUrl);
       }
     };
-  }, [avatar.avatar_id]); // Убираем blobUrl из зависимостей
+  }, [avatar.avatar_id]); // don’t include blobUrl, otherwise cleanup breaks it
 
-  // Отдельный useEffect для очистки blob URL при размонтировании
   useEffect(() => {
     return () => {
       if (blobUrl) {
@@ -81,32 +71,32 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
     setImageLoaded(false);
   };
 
-  // Показываем ошибку только если загрузка завершена и есть ошибка
+  // Error state
   if (hasError && !isLoading) {
     if (!showPlaceholder) return null;
-    
+
     return (
       <div className={`bg-gray-200 rounded-lg flex items-center justify-center ${className}`}>
         <div className="text-center p-4">
-                      <div className="mb-2">
-              <StatusIcon status="warning" className="w-10 h-10 text-yellow-500" />
-            </div>
+          <div className="mb-2">
+            <StatusIcon status="warning" className="w-10 h-10 text-yellow-500" />
+          </div>
           <p className="text-gray-500 text-sm">
-            {avatar.status === 'completed' ? 'Ошибка загрузки' : 'Генерируется...'}
+            {avatar.status === 'completed' ? 'Image load error' : 'Generating...'}
           </p>
         </div>
       </div>
     );
   }
 
-  // Показываем загрузку пока идет процесс
+  // Loading state
   if (isLoading || !imageUrl) {
     return (
       <div className={`bg-gray-100 rounded-lg flex items-center justify-center ${className}`}>
         <div className="text-center p-4">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto mb-2"></div>
           <p className="text-gray-500 text-sm">
-            {avatar.status === 'completed' ? 'Загрузка...' : 'Генерация...'}
+            {avatar.status === 'completed' ? 'Loading...' : 'Generating...'}
           </p>
         </div>
       </div>
@@ -134,4 +124,4 @@ const AvatarImage = ({ avatar, className = '', showPlaceholder = true }: AvatarI
   );
 };
 
-export default AvatarImage; 
+export default AvatarImage;

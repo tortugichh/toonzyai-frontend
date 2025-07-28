@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useBulkUpdatePrompts } from '@/hooks/useAnimations';
 import type { AnimationProject } from '@/services/api';
 
@@ -9,7 +8,6 @@ interface PromptPlannerProps {
   project: AnimationProject;
   onSaved?: () => void;
 }
-
 
 export default function PromptPlanner({ project, onSaved }: PromptPlannerProps) {
   const { mutateAsync: savePrompts, isPending } = useBulkUpdatePrompts();
@@ -23,7 +21,6 @@ export default function PromptPlanner({ project, onSaved }: PromptPlannerProps) 
     return initial;
   });
 
-  
   const handleChange = (index: number, value: string) => {
     setPrompts((prev) => ({ ...prev, [index]: value }));
   };
@@ -47,32 +44,41 @@ export default function PromptPlanner({ project, onSaved }: PromptPlannerProps) 
 
   return (
     <Card className="p-6 mb-6">
-      <h3 className="text-lg font-semibold mb-4">Планировщик промптов</h3>
+      <h3 className="text-lg font-semibold mb-4">Prompt Planner</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: project.total_segments }, (_, idx) => {
           const num = idx + 1;
+          const isInvalid = prompts[num].trim().length < 10;
           return (
             <div key={num} className="space-y-2">
-              <label className="text-sm font-medium text-gray-700 block">Сегмент {num}</label>
+              <label className="text-sm font-medium text-gray-700 block">
+                Segment {num}
+              </label>
               <textarea
                 value={prompts[num]}
                 onChange={(e) => handleChange(num, e.target.value)}
                 rows={3}
-                placeholder="Описание (≥10 симв.)"
-                className={`w-full p-2 border rounded bg-white ${prompts[num].trim().length<10?'border-red-400':'border-gray-300'}`}
+                placeholder="Enter at least 10 characters..."
+                className={`w-full p-2 border rounded bg-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  isInvalid ? 'border-red-400' : 'border-gray-300'
+                }`}
               />
-              {prompts[num].trim().length<10 && (
-                <p className="text-xs text-red-500">Минимум 10 символов</p>
+              {isInvalid && (
+                <p className="text-xs text-red-500">Minimum 10 characters required</p>
               )}
             </div>
           );
         })}
       </div>
       <div className="mt-4 flex justify-end">
-        <Button onClick={handleSave} disabled={!allValid || isPending} className="bg-green-600 hover:bg-green-700">
-          {isPending ? 'Сохранение...' : '💾 Сохранить промпты'}
+        <Button
+          onClick={handleSave}
+          disabled={!allValid || isPending}
+          className="bg-green-600 hover:bg-green-700"
+        >
+          {isPending ? 'Saving...' : '💾 Save Prompts'}
         </Button>
       </div>
     </Card>
   );
-} 
+}

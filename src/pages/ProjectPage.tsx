@@ -9,15 +9,18 @@ export default function ProjectPage() {
   if (!projectId) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-red-600 text-lg">ID проекта не указан</p>
-        <Button onClick={() => navigate('/studio')}>← Назад к проектам</Button>
+        <p className="text-red-600 text-lg">Project ID is missing</p>
+        <Button onClick={() => navigate('/studio')}>← Back to Projects</Button>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <AnimationProjectComponent projectId={projectId} onBack={() => navigate('/studio')} />
+      <AnimationProjectComponent 
+        projectId={projectId} 
+        onBack={() => navigate('/studio')} 
+      />
     </div>
   );
-} 
+}

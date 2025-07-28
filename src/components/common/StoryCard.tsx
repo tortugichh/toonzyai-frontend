@@ -9,9 +9,9 @@ interface StoryCardProps {
   onDelete?: (storyId: string) => void;
 }
 
-export function StoryCard({ story, onOpen, onDelete }: StoryCardProps) {
+export function StoryCard({ story, onDelete }: StoryCardProps) {
   const navigate = useNavigate();
-  
+
   const handleOpen = () => {
     navigate(`/stories/${story.task_id}`);
   };
@@ -33,20 +33,20 @@ export function StoryCard({ story, onOpen, onDelete }: StoryCardProps) {
   const getStatusText = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed':
-        return 'Готова';
+        return 'Completed';
       case 'in_progress':
-        return 'Генерируется';
+        return 'Generating';
       case 'pending':
-        return 'В очереди';
+        return 'Pending';
       case 'failed':
-        return 'Ошибка';
+        return 'Failed';
       default:
         return status;
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ru-RU', {
+    return new Date(dateString).toLocaleDateString('en-US', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -63,29 +63,26 @@ export function StoryCard({ story, onOpen, onDelete }: StoryCardProps) {
             onDelete(story.id);
           }}
           className="absolute top-2 right-2 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
-          title="Удалить историю"
+          title="Delete story"
         >
           ×
         </button>
       )}
 
-      <div 
-        className="p-6 cursor-pointer" 
-        onClick={handleOpen}
-      >
+      <div className="p-6 cursor-pointer" onClick={handleOpen}>
         {/* Story Header */}
         <div className="flex items-start gap-4 mb-4">
-          {/* Book Icon */}
+          {/* Icon */}
           <div className="w-12 h-12 bg-gradient-to-br from-amber-100 to-orange-200 rounded-lg flex items-center justify-center flex-shrink-0">
             <span className="text-xl">📖</span>
           </div>
-          
+
           {/* Story Info */}
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-lg text-gray-900 mb-1 truncate">
               {story.title}
             </h3>
-            
+
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-2">
               {story.genre && (
                 <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
@@ -99,7 +96,11 @@ export function StoryCard({ story, onOpen, onDelete }: StoryCardProps) {
               )}
             </div>
 
-            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(story.status)}`}>
+            <span
+              className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                story.status
+              )}`}
+            >
               {getStatusText(story.status)}
             </span>
           </div>
@@ -117,17 +118,17 @@ export function StoryCard({ story, onOpen, onDelete }: StoryCardProps) {
         {/* Footer */}
         <div className="flex items-center justify-between text-sm text-gray-500">
           <span>{formatDate(story.created_at)}</span>
-          
+
           {story.status === 'completed' && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpen();
               }}
             >
-              Открыть
+              Open
             </Button>
           )}
         </div>
@@ -135,12 +136,10 @@ export function StoryCard({ story, onOpen, onDelete }: StoryCardProps) {
         {/* Theme badge */}
         {story.theme && (
           <div className="mt-3 pt-3 border-t border-gray-100">
-            <span className="text-xs text-gray-500">
-              💡 {story.theme}
-            </span>
+            <span className="text-xs text-gray-500">💡 {story.theme}</span>
           </div>
         )}
       </div>
     </Card>
   );
-} 
+}

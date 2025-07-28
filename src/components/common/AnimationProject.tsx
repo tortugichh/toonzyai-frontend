@@ -20,7 +20,7 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
     return (
       <div className="loading text-center py-10">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600 text-lg">Загрузка проекта...</p>
+        <p className="text-gray-600 text-lg">Loading project...</p>
       </div>
     );
   }
@@ -28,21 +28,18 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
   if (!project) {
     return (
       <div className="error text-center py-10">
-        <p className="text-red-600 text-lg">Проект не найден</p>
-        <Button onClick={onBack} className="mt-4">← Назад</Button>
+        <p className="text-red-600 text-lg">Project not found</p>
+        <Button onClick={onBack} className="mt-4">← Back</Button>
       </div>
     );
   }
 
   const handleAssembleVideo = async () => {
-    console.log('[UI] ▶️ Assemble video button clicked', { projectId });
     try {
       const resp = await assembleVideoMutation.mutateAsync(projectId);
-      console.log('[UI] ✅ Assemble video API response', resp);
       refetch();
     } catch (error: any) {
-      console.error('[UI] ❌ Assemble video error', error);
-      toastError('Ошибка сборки видео: ' + error.message);
+      toastError('Video assembly error: ' + error.message);
     }
   };
 
@@ -51,12 +48,11 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
     segment.status === 'in_progress' || segment.status === 'pending'
   );
 
-  // Add programmatic download handler
   const handleDownload = async () => {
     if (!project.final_video_url) return;
     try {
       const response = await fetch(project.final_video_url, { mode: 'cors' });
-      if (!response.ok) throw new Error('Ошибка загрузки файла');
+      if (!response.ok) throw new Error('File download error');
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -67,7 +63,7 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      alert('Не удалось скачать видео. Попробуйте открыть ссылку в новой вкладке.');
+      alert('Could not download video. Try opening the link in a new tab.');
     }
   };
 
@@ -79,11 +75,11 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
           variant="outline"
           className="btn-back"
         >
-          ← Назад
+          ← Back
         </Button>
         <div className="flex-1">
           <h2 className="text-2xl font-bold text-gray-900">
-            Редактор анимационного проекта
+            Animation Project Editor
           </h2>
         </div>
       </div>
@@ -92,14 +88,14 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
       <Card className="mb-4 p-4 border-2 border-dashed border-blue-400 bg-blue-50">
         <div className="flex items-center gap-3">
           {project.animation_type === 'sequential' ? (
-            <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-semibold text-sm">Логическая цепочка кадров</span>
+            <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-semibold text-sm">Sequential Frames</span>
           ) : (
-            <span className="px-3 py-1 rounded-full bg-gray-400 text-white font-semibold text-sm">Независимые кадры</span>
+            <span className="px-3 py-1 rounded-full bg-gray-400 text-white font-semibold text-sm">Independent Frames</span>
           )}
           <span className="text-gray-700 text-sm">
             {project.animation_type === 'sequential'
-              ? 'Следующий сегмент можно создать только после завершения предыдущего.'
-              : 'Можно создавать и генерировать любые сегменты в любом порядке.'}
+              ? 'The next segment can only be created after the previous one is completed.'
+              : 'You can create and generate any segments in any order.'}
           </span>
         </div>
       </Card>
@@ -108,13 +104,13 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
       <Card className="project-status p-4 mb-6 bg-blue-50 border-blue-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h3 className="font-semibold text-blue-900">Статус проекта</h3>
+            <h3 className="font-semibold text-blue-900">Project Status</h3>
             <p className="text-blue-700">
-              {project.status === 'completed' && '✅ Завершен'}
-              {project.status === 'in_progress' && '⏳ В процессе'}
-              {project.status === 'pending' && '⏸️ Ожидает'}
-              {project.status === 'assembling' && '🎬 Сборка видео'}
-              {project.status === 'failed' && '❌ Ошибка'}
+              {project.status === 'completed' && '✅ Completed'}
+              {project.status === 'in_progress' && '⏳ In Progress'}
+              {project.status === 'pending' && '⏸️ Pending'}
+              {project.status === 'assembling' && '🎬 Assembling Video'}
+              {project.status === 'failed' && '❌ Error'}
             </p>
           </div>
           
@@ -127,16 +123,14 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
               {assembleVideoMutation.isPending ? (
                 <div className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Сборка видео...
+                  Assembling video...
                 </div>
               ) : (
-                '🎬 Собрать финальное видео'
+                '🎬 Assemble Final Video'
               )}
             </Button>
           )}
         </div>
-
-        
       </Card>
 
       {/* Global Progress Monitor */}
@@ -145,13 +139,12 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
       {/* Final Video */}
       {project.final_video_url && (
         <Card className="final-video p-4 mb-6 bg-green-50 border-green-200">
-          <h3 className="font-semibold text-green-900 mb-3">Финальное видео готово!</h3>
+          <h3 className="font-semibold text-green-900 mb-3">Final Video is Ready!</h3>
           <video 
             src={project.final_video_url} 
             controls 
             className="w-full max-w-2xl rounded shadow-lg"
           />
-          {/* Download Button */}
           <div className="mt-4 flex justify-end">
             <a
               href={project.final_video_url}
@@ -161,23 +154,21 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
               </svg>
-              Скачать видео
+              Download Video
             </a>
           </div>
         </Card>
       )}
 
-     
-
       {/* Segments */}
       <div className="segments-section">
         <h3 className="text-xl font-semibold mb-4">
-          Сегменты ({segments.length})
+          Segments ({segments.length})
         </h3>
         
         {segments.length === 0 ? (
           <Card className="p-6 text-center">
-            <p className="text-gray-600">Сегменты не найдены</p>
+            <p className="text-gray-600">No segments found</p>
           </Card>
         ) : (
           <div className="segments-list space-y-4">
@@ -203,34 +194,34 @@ export function AnimationProject({ projectId, onBack }: AnimationProjectProps) {
 
       {/* Progress Summary */}
       <Card className="progress-summary p-4 mt-6 bg-gray-50">
-        <h4 className="font-semibold mb-2">Прогресс</h4>
+        <h4 className="font-semibold mb-2">Progress</h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">
               {segments.filter(s => s.status === 'completed').length}
             </div>
-            <div className="text-gray-600">Завершено</div>
+            <div className="text-gray-600">Completed</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-yellow-600">
               {segments.filter(s => s.status === 'in_progress').length}
             </div>
-            <div className="text-gray-600">В процессе</div>
+            <div className="text-gray-600">In Progress</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-gray-600">
               {segments.filter(s => s.status === 'pending').length}
             </div>
-            <div className="text-gray-600">Ожидает</div>
+            <div className="text-gray-600">Pending</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-red-600">
               {segments.filter(s => s.status === 'failed').length}
             </div>
-            <div className="text-gray-600">Ошибки</div>
+            <div className="text-gray-600">Errors</div>
           </div>
         </div>
       </Card>
     </div>
   );
-} 
+}

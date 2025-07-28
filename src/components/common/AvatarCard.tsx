@@ -17,8 +17,8 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
 
-  // Подробная отладка каждого аватара
-  console.log(`🎭 AVATAR CARD DEBUG для ${avatar.avatar_id}:`, {
+  // Debug log for each avatar
+  console.log(`🎭 AVATAR CARD DEBUG for ${avatar.avatar_id}:`, {
     originalStatus: avatar.status,
     statusType: typeof avatar.status,
     statusString: String(avatar.status),
@@ -32,7 +32,7 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
   };
 
   const confirmDelete = () => {
-      onDelete(avatar.avatar_id);
+    onDelete(avatar.avatar_id);
   };
 
   const handleAnimate = () => {
@@ -44,7 +44,6 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
     });
   };
 
-  // Нормализуем статус для проверки - теперь используем lowercase
   const normalizedStatus = avatar.status?.toString().toLowerCase().trim();
 
   const getStatusColor = (status: string) => {
@@ -67,13 +66,13 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
     const normalizedStatus = status?.toLowerCase?.().trim();
     switch (normalizedStatus) {
       case 'completed':
-        return 'Готов';
+        return 'Ready';
       case 'generating':
-        return 'Обработка';
+        return 'Processing';
       case 'failed':
-        return 'Ошибка';
+        return 'Error';
       case 'pending':
-        return 'Ожидание';
+        return 'Pending';
       default:
         return status;
     }
@@ -81,11 +80,11 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
 
   return (
     <Card className="relative bg-white/80 backdrop-blur-sm border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-visible">
-      {/* Close button */}
+      {/* Delete button */}
       <button
         onClick={handleDelete}
         className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 text-gray-500 z-10"
-        aria-label="Удалить аватар"
+        aria-label="Delete avatar"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -93,10 +92,10 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
       </button>
       <Modal
         open={isModalOpen}
-        title="Удалить аватар?"
-        description="Вы уверены, что хотите удалить этот аватар? Это действие нельзя отменить."
-        confirmText="Удалить"
-        cancelText="Отмена"
+        title="Delete Avatar?"
+        description="Are you sure you want to delete this avatar? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
         onConfirm={confirmDelete}
         onClose={() => setModalOpen(false)}
       />
@@ -117,7 +116,7 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
             {getStatusText(avatar.status)}
           </span>
           <p className="text-xs text-gray-500">
-            {new Date(avatar.created_at).toLocaleDateString('ru-RU')}
+            {new Date(avatar.created_at).toLocaleDateString('en-US')}
           </p>
         </div>
         
@@ -125,29 +124,29 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
           {normalizedStatus === 'completed' ? (
               <Button
                 onClick={handleAnimate}
-              className="flex-1 bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white text-sm py-2 font-medium transform-gpu transition-transform duration-300 hover:scale-105"
+                className="flex-1 bg-gradient-to-r from-[#FFA657] via-[#FF8800] to-[#CC6E00] text-white text-sm py-2 font-medium transform-gpu transition-transform duration-300 hover:scale-105"
               >
                 <ContentIcon type="video" className="w-4 h-4 mr-2" />
-                Создать анимацию
+                Create Animation
               </Button>
           ) : normalizedStatus === 'generating' ? (
               <div className="flex-1 bg-yellow-100 text-yellow-700 text-sm py-2 px-4 rounded-md text-center flex items-center justify-center">
                 <ActionIcon action="loading" className="w-4 h-4 mr-2" animate />
-                Генерируется...
+                Generating...
               </div>
           ) : normalizedStatus === 'failed' ? (
               <div className="flex-1 bg-red-100 text-red-700 text-sm py-2 px-4 rounded-md text-center flex items-center justify-center">
                 <ActionIcon action="delete" className="w-4 h-4 mr-2" />
-                Ошибка генерации
+                Generation Failed
               </div>
           ) : (
               <div className="flex-1 bg-gray-100 text-gray-600 text-sm py-2 px-4 rounded-md text-center flex items-center justify-center">
                 <ActionIcon action="loading" className="w-4 h-4 mr-2" />
-                В очереди...
+                In Queue...
               </div>
           )}
         </div>
       </div>
     </Card>
   );
-} 
+}

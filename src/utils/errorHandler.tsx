@@ -1,8 +1,3 @@
-/**
- * Error Handling Utilities
- * Согласно FRONTEND_INTEGRATION_GUIDE.md
- */
-
 import React from 'react';
 
 export class APIError extends Error {
@@ -87,7 +82,7 @@ export function ErrorDisplay({ error, retry }: { error: unknown; retry?: () => v
         </div>
         <div className="ml-3 flex-1">
           <h3 className="text-sm font-medium text-red-800">
-            Произошла ошибка
+            An error occurred
           </h3>
           <p className="mt-1 text-sm text-red-700">
             {message}
@@ -98,7 +93,7 @@ export function ErrorDisplay({ error, retry }: { error: unknown; retry?: () => v
                 onClick={retry}
                 className="text-sm bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded transition-colors"
               >
-                Попробовать снова
+                Try again
               </button>
             </div>
           )}

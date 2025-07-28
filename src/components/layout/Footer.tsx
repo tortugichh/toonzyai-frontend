@@ -10,10 +10,10 @@ export default function Footer() {
             <img src={logoSrc} alt="ToonzyAI logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
             <span className="text-xl sm:text-2xl font-black tracking-tight">TOONZYAI</span>
           </Link>
-          <p className="text-base sm:text-lg font-bold">Создавайте, анимируйте, вдохновляйте.</p>
+          <p className="text-base sm:text-lg font-bold">Create, Animate, Inspire.</p>
         </div>
         <p className="text-sm sm:text-base text-gray-600 font-semibold">© {new Date().getFullYear()} ToonzyAI.</p>
       </div>
     </footer>
   );
-} 
+}

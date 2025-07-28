@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -34,25 +32,24 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
     fetchProject();
   }, [projectId, fetchProject]);
 
-  // subscribe to websocket progress
+  // Subscribe to websocket progress
   useProjectProgressWS(projectId);
 
-  // В версии API v2 генерация требует обязательный segment_prompt,
-  // поэтому автоматический запуск для pending-сегментов отключён.
-  // Пользователь должен указать prompt вручную в интерфейсе SegmentEditor.
+  // In API v2 generation requires a mandatory segment_prompt,
+  // so auto-generation for pending segments is disabled.
+  // The user must provide a prompt manually in the UI.
 
-  // Helper functions
   const getStatusText = (status: string, statusDescription?: string): string => {
     if (statusDescription) {
       return statusDescription;
     }
     
     switch (status) {
-      case 'pending': return 'Ожидает';
-      case 'in_progress': return 'Генерируется...';
-      case 'completed': return 'Готово';
-      case 'failed': return 'Ошибка';
-      case 'assembling': return 'Собирается...';
+      case 'pending': return 'Pending';
+      case 'in_progress': return 'Generating...';
+      case 'completed': return 'Completed';
+      case 'failed': return 'Error';
+      case 'assembling': return 'Assembling...';
       default: return status;
     }
   };
@@ -69,8 +66,6 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
   };
 
   const handleUpdatePrompt = (segmentNumber: number, prompt: string) => {
-    // В API v2 отдельного endpoint для обновления промпта нет;
-    // сохраняем локально, чтобы потом передать при генерации.
     setSegmentPrompts(prev => ({ ...prev, [segmentNumber]: prompt }));
   };
 
@@ -79,14 +74,13 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
     const fallbackPrompt = segmentObj?.segment_prompt || segmentObj?.prompts?.project_prompt || '';
     const effectivePrompt = (prompt ?? segmentPrompts[segmentNumber] ?? fallbackPrompt).trim();
     if (effectivePrompt.length < 10) {
-      toastError('Prompt должен содержать минимум 10 символов');
+      toastError('Prompt must be at least 10 characters');
       return;
     }
     try {
       setLocalError(null);
       await generateSegment({ projectId, segmentNumber, segmentPrompt: effectivePrompt });
       console.log(`✅ Started generation for segment ${segmentNumber}`);
-      // fetchProject will be called automatically via polling
     } catch (err) {
       setLocalError(getErrorMessage(err));
     }
@@ -103,28 +97,23 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
 
   const handleGenerateAll = async () => {
     try {
-      if (!currentProject) return; // safety check, но в UI он всегда есть
+      if (!currentProject) return;
 
       setLocalError(null);
 
-      // 1) Собираем промпты для всех сегментов
       const bulkPrompts = currentProject.segments.map(seg => {
         const localPrompt = segmentPrompts[seg.segment_number];
         const effective = (localPrompt ?? seg.segment_prompt ?? seg.prompts?.project_prompt ?? '').trim();
         return { segment_number: seg.segment_number, segment_prompt: effective };
       });
 
-      // Проверка: все промпты должны быть ≥10 символов
       const invalid = bulkPrompts.filter(p => p.segment_prompt.length < 10);
       if (invalid.length > 0) {
-        toastError(`Укажите промпты (≥10 символов) для сегментов: ${invalid.map(i => i.segment_number).join(', ')}`);
+        toastError(`Please provide prompts (≥10 characters) for segments: ${invalid.map(i => i.segment_number).join(', ')}`);
         return;
       }
 
-      // 2) Обновляем промпты пакетно на бэке
       await apiClient.updateSegmentPromptsBulk(projectId, bulkPrompts);
-
-      // 3) Запускаем параллельную генерацию
       await generateAllSegments({ projectId, forceRegenerate: false });
       console.log('🚀 Parallel generation started for all segments');
     } catch (err) {
@@ -133,16 +122,12 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
   };
 
   const getVideoUrl = (segment: AnimationSegment): string | null => {
-    // Use new API endpoint format with authentication
     if (segment.urls?.video_endpoint) {
       return segment.urls.video_endpoint;
     }
-    
     if (segment.video_url) {
       return segment.video_url;
     }
-
-    // Fallback to standard endpoint
     return apiClient.getSegmentVideoUrl(projectId, segment.segment_number);
   };
 
@@ -150,7 +135,7 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2">Загрузка проекта...</span>
+        <span className="ml-2">Loading project...</span>
       </div>
     );
   }
@@ -159,14 +144,14 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
     return (
       <Card className="p-6">
         <div className="text-red-600">
-          <h3 className="font-semibold mb-2">Ошибка</h3>
+          <h3 className="font-semibold mb-2">Error</h3>
           <p className="text-sm">{getErrorMessage(error) || localError}</p>
           <Button 
             onClick={() => fetchProject()} 
             className="mt-4"
             size="sm"
           >
-            Попробовать снова
+            Try Again
           </Button>
         </div>
       </Card>
@@ -177,14 +162,13 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
     return (
       <Card className="p-6">
         <div className="text-gray-600 text-center">
-          <p>Проект не найден</p>
+          <p>Project not found</p>
         </div>
       </Card>
     );
   }
 
   const completedSegments = currentProject.segments.filter(s => s.status === 'completed');
-  // Суммируем progress всех сегментов для более плавной полосы
   const totalProgressPoints = currentProject.segments.reduce((sum, seg) => sum + (seg.progress ?? (seg.status === 'completed' ? 100 : 0)), 0);
   const progressPercent = Math.round(totalProgressPoints / (currentProject.total_segments * 100) * 100);
   const canAssemble = completedSegments.length > 0 && !currentProject.final_video_url;
@@ -195,7 +179,7 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
       <Card className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
-            <h2 className="text-xl font-bold">Проект анимации</h2>
+            <h2 className="text-xl font-bold">Animation Project</h2>
             <p className="text-gray-600 text-sm mt-1">{currentProject.animation_prompt}</p>
           </div>
           <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(currentProject.status)}`}>
@@ -203,7 +187,7 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
           </span>
         </div>
 
-        {/* GLOBAL PROGRESS BAR */}
+        {/* Global Progress Bar */}
         <div className="w-full mb-4">
           <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
             <div
@@ -216,19 +200,19 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
-            <span className="text-gray-500">Сегментов:</span>
+            <span className="text-gray-500">Segments:</span>
             <div className="font-medium">{currentProject.segments.length}/{currentProject.total_segments}</div>
           </div>
           <div>
-            <span className="text-gray-500">Готово:</span>
+            <span className="text-gray-500">Completed:</span>
             <div className="font-medium text-green-600">{completedSegments.length}</div>
           </div>
           <div>
-            <span className="text-gray-500">Создан:</span>
+            <span className="text-gray-500">Created:</span>
             <div className="font-medium">{new Date(currentProject.created_at).toLocaleDateString()}</div>
           </div>
           <div>
-            <span className="text-gray-500">ID проекта:</span>
+            <span className="text-gray-500">Project ID:</span>
             <div className="font-mono text-xs">{currentProject.id}</div>
           </div>
         </div>
@@ -244,10 +228,10 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
               {isGeneratingAll ? (
                 <div className="flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Запуск генерации...
+                  Starting generation...
                 </div>
               ) : (
-                '🚀 Сгенерировать все сегменты'
+                '🚀 Generate All Segments'
               )}
             </Button>
           </div>
@@ -256,13 +240,13 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
 
       {/* Segments */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Управление сегментами</h3>
+        <h3 className="text-lg font-semibold">Segment Management</h3>
         
         {currentProject.segments.length === 0 ? (
           <Card className="p-6">
             <div className="text-center text-gray-600">
-              <p>⏳ Сегменты создаются...</p>
-              <p className="text-sm mt-1">Это может занять 30-60 секунд</p>
+              <p>⏳ Creating segments...</p>
+              <p className="text-sm mt-1">This may take 30–60 seconds</p>
             </div>
           </Card>
         ) : (
@@ -276,48 +260,45 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
               return (
                 <Card key={segKey} className="p-4">
                   <div className="flex justify-between items-center mb-3">
-                    <h4 className="font-semibold">Сегмент {idx + 1}</h4>
+                    <h4 className="font-semibold">Segment {idx + 1}</h4>
                     <span className={`px-2 py-1 rounded text-sm ${getStatusColor(segStatus)}`}>
                       {getStatusText(segStatus, segment?.status_description)}
                     </span>
                   </div>
 
-                  {/* Prompt summary */}
                   {segPrompt && (
                     <p className="text-sm text-gray-700 mb-2 line-clamp-3">
                       {segPrompt}
                     </p>
                   )}
 
-                  {/* Enhanced info display */}
                   {segment?.generation && (
                     <div className="mb-3 p-2 bg-blue-50 rounded text-sm">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
                         <div>
-                          <span className="text-gray-500">Генератор:</span>
+                          <span className="text-gray-500">Generator:</span>
                           <div className="font-medium">{segment.generation.generator}</div>
                         </div>
                         <div>
-                          <span className="text-gray-500">Качество:</span>
+                          <span className="text-gray-500">Quality:</span>
                           <div className="font-medium">{segment.generation.quality}</div>
                         </div>
                         <div>
-                          <span className="text-gray-500">Длительность:</span>
+                          <span className="text-gray-500">Duration:</span>
                           <div className="font-medium">{segment.generation.duration}</div>
                         </div>
                         <div>
-                          <span className="text-gray-500">Время:</span>
+                          <span className="text-gray-500">Time:</span>
                           <div className="font-medium">{segment.generation.estimated_time}</div>
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {/* Prompt Management */}
                   {segment && (
                   <div className="mb-3">
                     <label className="text-xs font-medium text-gray-600 block mb-1">
-                      Промпт для сегмента:
+                      Segment Prompt:
                     </label>
                     <div className="flex gap-2">
                       <Input
@@ -326,7 +307,7 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
                           ...prev,
                           [idx + 1]: e.target.value
                         }))}
-                        placeholder={`Опишите действие для сегмента ${idx + 1}...`}
+                        placeholder={`Describe the action for segment ${idx + 1}...`}
                         className="text-sm"
                       />
                       <Button
@@ -338,13 +319,12 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
                         )}
                         disabled={!segmentPrompts[idx + 1]?.trim()}
                       >
-                        💾 Сохранить
+                        💾 Save
                       </Button>
                     </div>
                   </div>
                   )}
 
-                  {/* Action Buttons */}
                   {segment && (
                   <div className="flex gap-2 mb-3">
                     {segment.status === 'pending' && (
@@ -354,7 +334,7 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
                         disabled={!segmentPrompts[segment.segment_number]?.trim()}
                         className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
                       >
-                        🎨 Генерировать
+                        🎨 Generate
                       </Button>
                     )}
 
@@ -369,11 +349,10 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
                         disabled={!(segmentPrompts[segment.segment_number]?.trim() || segment.segment_prompt?.trim())}
                         className="text-blue-600 border-blue-300 hover:bg-blue-50 disabled:opacity-50"
                       >
-                        🔄 Перегенерировать
+                        🔄 Regenerate
                       </Button>
                     )}
 
-                    {/* Enhanced video viewing */}
                     {segment.status === 'completed' && (
                       <Button
                         size="sm"
@@ -385,33 +364,31 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
                           }
                         }}
                         className="text-blue-600 border-blue-300 hover:bg-blue-50"
-                        title="Открыть видео в новой вкладке"
+                        title="Open video in new tab"
                       >
-                        👁️ Просмотр
+                        👁️ View
                       </Button>
                     )}
                   </div>
                   )}
 
-                  {/* Generated Video Display */}
                   {segment?.status === 'completed' && (
                     <div className="mt-3">
                       <label className="text-xs font-medium text-gray-600 block mb-2">
-                        Сгенерированное видео:
+                        Generated Video:
                       </label>
                       <VideoPreview
                         videoUrl={segment.video_url}
                         segmentNumber={segment.segment_number}
                         projectId={projectId}
                         segment={segment as any}
-                        title={`Сегмент ${segment.segment_number}`}
+                        title={`Segment ${segment.segment_number}`}
                         className="w-full max-w-md h-32"
                         onError={(error) => console.error('❌ Video error for segment:', segment.segment_number, error)}
                       />
                     </div>
                   )}
 
-                  {/* Debug Information */}
                   {process.env.NODE_ENV === 'development' && segment && (
                     <details className="mt-2">
                       <summary className="text-xs text-gray-500 cursor-pointer">Debug Info</summary>
@@ -433,17 +410,16 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
         )}
       </div>
 
-      {/* Final Video Assembly */}
       {canAssemble && (
         <Card className="p-6">
-          <h3 className="font-semibold mb-4">Финальная сборка</h3>
+          <h3 className="font-semibold mb-4">Final Assembly</h3>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">
-                Готово сегментов: {completedSegments.length} из {currentProject.total_segments}
+                Segments completed: {completedSegments.length} of {currentProject.total_segments}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                Собрать все готовые сегменты в единое видео
+                Assemble all completed segments into a final video
               </p>
             </div>
             <Button
@@ -451,20 +427,19 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
               disabled={currentProject.status === 'assembling'}
               className="bg-purple-600 hover:bg-purple-700"
             >
-              {currentProject.status === 'assembling' ? '⏳ Собирается...' : '🎬 Собрать видео'}
+              {currentProject.status === 'assembling' ? '⏳ Assembling...' : '🎬 Assemble Video'}
             </Button>
           </div>
         </Card>
       )}
 
-      {/* Final Video */}
       {currentProject.final_video_url && (
         <Card className="p-6">
-          <h3 className="font-semibold mb-4">✅ Финальное видео готово!</h3>
+          <h3 className="font-semibold mb-4">✅ Final Video Ready!</h3>
           <div className="space-y-4">
             <VideoPreview
               videoUrl={currentProject.final_video_url}
-              title="Финальное видео"
+              title="Final Video"
               className="w-full max-w-2xl"
               onError={(error) => console.error('❌ Final video error:', error)}
             />
@@ -473,7 +448,7 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
                 onClick={() => window.open(apiClient.getFinalVideoUrl(projectId), '_blank')}
                 variant="outline"
               >
-                📁 Открыть в новой вкладке
+                📁 Open in New Tab
               </Button>
               <Button
                 onClick={() => {
@@ -484,7 +459,7 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
                 }}
                 variant="outline"
               >
-                💾 Скачать
+                💾 Download
               </Button>
             </div>
           </div>
@@ -494,4 +469,4 @@ const AnimationStudio: React.FC<AnimationStudioProps> = ({ projectId }) => {
   );
 };
 
-export default AnimationStudio; 
+export default AnimationStudio;

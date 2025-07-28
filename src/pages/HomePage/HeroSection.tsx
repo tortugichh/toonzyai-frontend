@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
-// Варианты для эффекта появления слов (fade in + slide up)
+// Variants for fade-in + slide-up effect
 const wordContainer = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.3 } },
@@ -18,7 +18,7 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
 
   return (
     <section className="relative text-center py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* Декоративные элементы */}
+      {/* Decorative elements */}
       <div className="absolute top-20 left-10 w-20 h-20 bg-gradient-to-r from-orange-300/20 to-amber-300/20 rounded-full blur-xl animate-pulse" />
       <div className="absolute bottom-32 right-16 w-32 h-32 bg-gradient-to-r from-yellow-300/15 to-orange-400/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
       
@@ -43,7 +43,7 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
           >
-            Создавайте{' '}
+            Create{' '}
           </motion.span>
           <motion.span 
             className="relative inline-block"
@@ -52,16 +52,16 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
             transition={{ delay: 0.8, duration: 0.8, ease: "backOut" }}
           >
             <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">
-              потрясающие
+              stunning
             </span>
-            {/* Подсветка под словом */}
+            {/* Highlight under the word */}
             <motion.div
               className="absolute -bottom-1 sm:-bottom-2 left-0 right-0 h-0.5 sm:h-1 bg-gradient-to-r from-orange-400/30 via-orange-500/50 to-orange-600/30 rounded-full"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: 1.2, duration: 0.6 }}
             />
-            {/* Блики */}
+            {/* Shine effect */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
               animate={{ 
@@ -81,7 +81,7 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1.1, duration: 0.6 }}
           >
-            {' '}анимации с ИИ
+            {' '}AI animations
           </motion.span>
         </motion.h1>
         
@@ -89,8 +89,8 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
           className="text-base sm:text-lg md:text-xl text-gray-600 mb-4 sm:mb-6 md:mb-8 max-w-3xl mx-auto px-4"
           variants={wordVariant}
         >
-          ToonzyAI превращает ваши идеи в профессиональные анимации за считанные минуты. 
-          Никаких сложных инструментов — только магия искусственного интеллекта.
+          ToonzyAI turns your ideas into professional animations in minutes. 
+          No complicated tools — just the magic of artificial intelligence.
         </motion.p>
         
         <motion.div 
@@ -115,7 +115,7 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
               
               {/* Button content */}
               <span className="relative z-10 flex items-center justify-center gap-2">
-                Начать создавать
+                Start Creating
                 <motion.svg 
                   className="w-4 h-4 sm:w-5 sm:h-5" 
                   fill="none" 
@@ -139,18 +139,18 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
             whileTap={{ scale: 0.95 }}
             className="w-full sm:w-auto"
           >
-          <Button 
+            <Button 
               variant="outline"
-            size="lg" 
+              size="lg" 
               className="relative bg-white/80 backdrop-blur-sm border-2 border-orange-200 text-orange-600 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl hover:bg-orange-50/80 hover:border-orange-300 transition-all duration-300 overflow-hidden group w-full sm:w-auto"
-            onClick={scrollToFeatures}
-          >
+              onClick={scrollToFeatures}
+            >
               {/* Subtle glow */}
               <div className="absolute inset-0 bg-orange-100/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
               {/* Button content */}
               <span className="relative z-10 flex items-center justify-center gap-2">
-                Узнать больше
+                Learn More
                 <motion.svg 
                   className="w-4 h-4 sm:w-5 sm:h-5" 
                   fill="none" 
@@ -166,10 +166,10 @@ export const HeroSection = ({ scrollToFeatures }: HeroSectionProps) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </motion.svg>
               </span>
-          </Button>
+            </Button>
           </motion.div>
         </motion.div>
       </motion.div>
     </section>
   );
-}; 
+};

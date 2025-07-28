@@ -11,10 +11,10 @@ import logoSrc from '@/assets/logo.svg';
 import { apiClient } from '@/services/api';
 
 const resetPasswordSchema = z.object({
-  new_password: z.string().min(8, 'Пароль должен содержать минимум 8 символов'),
-  confirm_password: z.string().min(8, 'Пароль должен содержать минимум 8 символов'),
+  new_password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirm_password: z.string().min(8, 'Password must be at least 8 characters'),
 }).refine((data) => data.new_password === data.confirm_password, {
-  message: "Пароли не совпадают",
+  message: "Passwords do not match",
   path: ["confirm_password"],
 });
 
@@ -39,18 +39,18 @@ function ResetPasswordPage() {
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     if (!token) {
-      toast.error('Неверная ссылка для сброса пароля');
+      toast.error('Invalid password reset link');
       return;
     }
 
     try {
       setIsLoading(true);
       await apiClient.resetPassword(token, data.new_password);
-      toast.success('Пароль успешно изменен!');
+      toast.success('Password successfully updated!');
       navigate('/login');
     } catch (error) {
       console.error('Reset password error:', error);
-      toast.error('Ошибка при сбросе пароля. Возможно, ссылка устарела.');
+      toast.error('Error resetting password. The link may have expired.');
     } finally {
       setIsLoading(false);
     }
@@ -65,8 +65,8 @@ function ResetPasswordPage() {
               <img src={logoSrc} alt="ToonzyAI logo" className="w-10 h-10" />
               <span className="text-2xl font-bold text-neutral-900">ToonzyAI</span>
             </Link>
-            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Неверная ссылка</h1>
-            <p className="text-neutral-600">Ссылка для сброса пароля недействительна</p>
+            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Invalid Link</h1>
+            <p className="text-neutral-600">The password reset link is not valid</p>
           </div>
 
           <Card className="p-10 text-center">
@@ -76,9 +76,9 @@ function ResetPasswordPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h2 className="text-xl font-semibold text-neutral-900 mb-2">Ссылка недействительна</h2>
+              <h2 className="text-xl font-semibold text-neutral-900 mb-2">Link Expired</h2>
               <p className="text-neutral-600">
-                Возможно, ссылка устарела или была использована. Запросите новую ссылку для сброса пароля.
+                The link may have expired or already been used. Please request a new password reset link.
               </p>
             </div>
 
@@ -87,7 +87,7 @@ function ResetPasswordPage() {
               size="lg"
               className="w-full"
             >
-              Запросить новую ссылку
+              Request New Link
             </Button>
           </Card>
         </div>
@@ -103,8 +103,8 @@ function ResetPasswordPage() {
             <img src={logoSrc} alt="ToonzyAI logo" className="w-10 h-10" />
             <span className="text-2xl font-bold text-neutral-900">ToonzyAI</span>
           </Link>
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Новый пароль</h1>
-          <p className="text-neutral-600">Введите новый пароль для вашего аккаунта</p>
+          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Set a New Password</h1>
+          <p className="text-neutral-600">Enter your new password to access your account</p>
         </div>
 
         <Card className="p-10">
@@ -112,13 +112,13 @@ function ResetPasswordPage() {
             {/* New Password Field */}
             <div>
               <label htmlFor="new_password" className="block text-sm font-medium text-neutral-700 mb-2">
-                Новый пароль
+                New Password
               </label>
               <div className="relative">
                 <Input
                   id="new_password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Введите новый пароль"
+                  placeholder="Enter new password"
                   {...register('new_password')}
                   className={`w-full pr-10 ${errors.new_password ? 'border-red-500' : ''}`}
                 />
@@ -147,13 +147,13 @@ function ResetPasswordPage() {
             {/* Confirm Password Field */}
             <div>
               <label htmlFor="confirm_password" className="block text-sm font-medium text-neutral-700 mb-2">
-                Подтвердите пароль
+                Confirm Password
               </label>
               <div className="relative">
                 <Input
                   id="confirm_password"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Повторите новый пароль"
+                  placeholder="Repeat new password"
                   {...register('confirm_password')}
                   className={`w-full pr-10 ${errors.confirm_password ? 'border-red-500' : ''}`}
                 />
@@ -189,10 +189,10 @@ function ResetPasswordPage() {
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-neutral-700"></div>
-                  <span>Сохранение...</span>
+                  <span>Saving...</span>
                 </div>
               ) : (
-                'Сохранить новый пароль'
+                'Save New Password'
               )}
             </Button>
           </form>
@@ -200,12 +200,12 @@ function ResetPasswordPage() {
           {/* Back to Login */}
           <div className="mt-6 text-center">
             <p className="text-neutral-600">
-              Вспомнили пароль?{' '}
+              Remembered your password?{' '}
               <Link
                 to="/login"
                 className="text-brand hover:underline"
               >
-                Войти
+                Log In
               </Link>
             </p>
           </div>
@@ -220,7 +220,7 @@ function ResetPasswordPage() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>На главную</span>
+            <span>Back to Home</span>
           </Link>
         </div>
       </div>
@@ -228,4 +228,4 @@ function ResetPasswordPage() {
   );
 }
 
-export default ResetPasswordPage; 
+export default ResetPasswordPage;

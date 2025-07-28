@@ -21,19 +21,19 @@ import ProjectPage from '@/pages/ProjectPage';
 import { StoryGeneratorPage } from '@/pages/StoryGeneratorPage';
 import StoryDetailPage from '@/pages/StoryDetailPage';
 
-// Emergency logout function available in console
+
 if (typeof window !== 'undefined') {
   (window as any).emergencyLogout = simpleLogout;
 }
 
-// Create a client
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: QUERY_STALE_TIME,
-      gcTime: QUERY_CACHE_TIME, // В новых версиях React Query используется gcTime вместо cacheTime
+      gcTime: QUERY_CACHE_TIME, 
     },
     mutations: {
     },
@@ -48,7 +48,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Загрузка...</p>
+          <p className="text-gray-600 text-lg">Loading...</p>
         </div>
       </div>
     );

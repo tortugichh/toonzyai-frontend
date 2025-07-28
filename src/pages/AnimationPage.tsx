@@ -8,11 +8,11 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Header } from '@/components/layout/Header';
 import { AnimationSegments, VideoPreview, AvatarSelector, CompactAnimationMonitor } from '@/components/common';
-import { 
-  useCreateAnimationProject, 
-  useAnimationProjects, 
-  useDeleteAnimationProject, 
-  useAssembleVideo 
+import {
+  useCreateAnimationProject,
+  useAnimationProjects,
+  useDeleteAnimationProject,
+  useAssembleVideo
 } from '@/hooks/useAnimations';
 import { useAvatars } from '@/hooks/useAvatars';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
@@ -22,8 +22,8 @@ import { toastSuccess, toastError } from '@/utils/toast';
 import Modal from '@/components/ui/Modal';
 
 const createAnimationSchema = z.object({
-  source_avatar_id: z.string().min(1, 'Выберите аватар'),
-  animation_prompt: z.string().min(10, 'Описание должно содержать минимум 10 символов'),
+  source_avatar_id: z.string().min(1, 'Please select an avatar'),
+  animation_prompt: z.string().min(10, 'The description must be at least 10 characters long'),
   total_segments: z.number().min(1).max(20),
 });
 
@@ -33,12 +33,12 @@ function AnimationPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const preselectedAvatarId = location.state?.sourceAvatarId;
-  
+
   const [showCreateForm, setShowCreateForm] = useState(!!preselectedAvatarId);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [deleteAnimationId, setDeleteAnimationId] = useState<string | null>(null);
 
-  // Debug: отслеживаем изменения showCreateForm
+  // Debug: track changes to showCreateForm
   useEffect(() => {
     console.log('🔍 showCreateForm changed to:', showCreateForm);
     console.trace('Stack trace for showCreateForm change');
@@ -105,21 +105,21 @@ function AnimationPage() {
   };
 
   const onSubmit = async (data: any) => {
-    // Преобразуем данные формы в camelCase для API клиента
+    // Convert form data to camelCase for the API client
     const payload = {
-      name: 'Новый проект',
+      name: 'New Project',
       sourceAvatarId: data.source_avatar_id,
       totalSegments: Number(data.total_segments),
       animationPrompt: data.animation_prompt,
     };
 
-    console.log('🚀 Отправляем payload для создания анимации:', payload);
+    console.log('🚀 Sending payload for animation creation:', payload);
 
     try {
       await createAnimationMutation.mutateAsync(payload as any);
       setShowCreateForm(false);
       reset();
-      setSuccessMessage('Анимация запущена! Процесс может занять несколько минут.');
+      setSuccessMessage('Animation started! The process may take a few minutes.');
       refetch();
     } catch (error) {
       console.error('Create animation error:', error);
@@ -132,12 +132,12 @@ function AnimationPage() {
 
   const confirmDeleteAnimation = async () => {
     if (!deleteAnimationId) return;
-      try {
+    try {
       await deleteAnimationMutation.mutateAsync(deleteAnimationId);
-        setSuccessMessage('Анимация удалена');
-        refetch();
-      } catch (error) {
-        console.error('Delete animation error:', error);
+      setSuccessMessage('Animation deleted');
+      refetch();
+    } catch (error) {
+      console.error('Delete animation error:', error);
     } finally {
       setDeleteAnimationId(null);
     }
@@ -146,7 +146,7 @@ function AnimationPage() {
   const handleAssembleVideo = async (animationId: string) => {
     try {
       await assembleVideoMutation.mutateAsync(animationId);
-      setSuccessMessage('Запущена сборка финального видео!');
+      setSuccessMessage('Final video assembly has started!');
       refetch();
     } catch (error) {
       console.error('Assemble video error:', error);
@@ -157,28 +157,28 @@ function AnimationPage() {
   const availableAvatars = avatars?.avatars?.filter(
     avatar => avatar.status?.toLowerCase?.().trim() === 'completed'
   ) || [];
-  
-  // Debug: показываем все аватары для отладки
-  console.log('Все аватары:', avatars?.avatars?.map(a => ({ id: a.avatar_id, status: a.status, prompt: a.prompt.slice(0, 30) })));
-  console.log('Доступные аватары (COMPLETED):', availableAvatars.length);
-  console.log('Показать форму создания?', showCreateForm);
-  console.log('Доступен ли создатель анимации?', availableAvatars.length > 0);
 
-  // Временно: показываем аватары во всех статусах для тестирования
+  // Debug: show all avatars for debugging purposes
+  console.log('All avatars:', avatars?.avatars?.map(a => ({ id: a.avatar_id, status: a.status, prompt: a.prompt.slice(0, 30) })));
+  console.log('Available avatars (COMPLETED):', availableAvatars.length);
+  console.log('Show create form?', showCreateForm);
+  console.log('Is animation creator available?', availableAvatars.length > 0);
+
+  // Temporary: show avatars in all statuses for testing
   const allAvatarsForTesting = avatars?.avatars || [];
 
   if (avatarsLoading || animationsLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-        <Header 
-          user={user} 
-          onLogout={handleLogout} 
-          isLoggingOut={logoutMutation.isPending} 
+        <Header
+          user={user}
+          onLogout={handleLogout}
+          isLoggingOut={logoutMutation.isPending}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="text-lg text-gray-600">Загрузка...</p>
+            <p className="text-lg text-gray-600">Loading...</p>
           </div>
         </div>
       </div>
@@ -187,41 +187,41 @@ function AnimationPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
-      <Header 
-        user={user} 
-        onLogout={handleLogout} 
-        isLoggingOut={logoutMutation.isPending} 
+      <Header
+        user={user}
+        onLogout={handleLogout}
+        isLoggingOut={logoutMutation.isPending}
       />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Backend Status Check */}
-      
 
-        {/* Debug авторизации */}
+
+        {/* Auth Debug */}
         {process.env.NODE_ENV === 'development' && (
           <Card className="mb-6 p-4 bg-gray-50 border-gray-200">
-            <h3 className="font-medium mb-2">🔍 Debug информация:</h3>
+            <h3 className="font-medium mb-2">🔍 Debug Information:</h3>
             <div className="text-xs space-y-1">
-              <p><strong>Пользователь:</strong> {user ? `${user.username} (${user.email})` : 'Не авторизован'}</p>
-              <p><strong>Access Token:</strong> {localStorage.getItem('access_token') ? 'Есть' : 'Нет'}</p>
-              <p><strong>Всего аватаров:</strong> {avatars?.avatars?.length || 0}</p>
-              <p><strong>Готовых аватаров:</strong> {availableAvatars.length}</p>
-              <p><strong>Всего анимаций:</strong> {animations?.length || 0}</p>
+              <p><strong>User:</strong> {user ? `${user.username} (${user.email})` : 'Not authenticated'}</p>
+              <p><strong>Access Token:</strong> {localStorage.getItem('access_token') ? 'Present' : 'Absent'}</p>
+              <p><strong>Total avatars:</strong> {avatars?.avatars?.length || 0}</p>
+              <p><strong>Ready avatars:</strong> {availableAvatars.length}</p>
+              <p><strong>Total animations:</strong> {animations?.length || 0}</p>
             </div>
             {!user && (
-              <Button 
-                className="mt-3 text-xs" 
+              <Button
+                className="mt-3 text-xs"
                 size="sm"
                 onClick={() => navigate('/login')}
               >
-                Перейти к авторизации
+                Go to Login
               </Button>
             )}
-            
-            {/* Тестовые кнопки API */}
+
+            {/* API Test Buttons */}
             <div className="mt-3 flex gap-2">
-              <Button 
-                className="text-xs" 
+              <Button
+                className="text-xs"
                 size="sm"
                 variant="outline"
                 onClick={async () => {
@@ -233,31 +233,31 @@ function AnimationPage() {
                     });
                     const data = await response.json();
                     console.log('API Test - Avatars:', response.status, data);
-                    
-                                         // Детальная информация об аватарах
-                     if (data.avatars && data.avatars.length > 0) {
-                       data.avatars.forEach((avatar: any, index: number) => {
-                         console.log(`Аватар ${index + 1}:`, {
-                           id: avatar.avatar_id,
-                           status: avatar.status,
-                           prompt: avatar.prompt?.substring(0, 50) + '...',
-                           created: avatar.created_at
-                         });
-                       });
-                     }
-                     
-                     toastSuccess(`Аватары загружены: ${data.total}`);
+
+                    // Detailed avatar information
+                    if (data.avatars && data.avatars.length > 0) {
+                      data.avatars.forEach((avatar: any, index: number) => {
+                        console.log(`Avatar ${index + 1}:`, {
+                          id: avatar.avatar_id,
+                          status: avatar.status,
+                          prompt: avatar.prompt?.substring(0, 50) + '...',
+                          created: avatar.created_at
+                        });
+                      });
+                    }
+
+                    toastSuccess(`Avatars loaded: ${data.total}`);
                   } catch (error) {
                     console.error('API Test Error:', error);
                     toastError(error as unknown);
                   }
                 }}
               >
-                Тест API Аватары
+                Test Avatars API
               </Button>
-              
-              <Button 
-                className="text-xs" 
+
+              <Button
+                className="text-xs"
                 size="sm"
                 variant="outline"
                 onClick={async () => {
@@ -269,32 +269,32 @@ function AnimationPage() {
                     });
                     const data = await response.json();
                     console.log('API Test - Animations:', response.status, data);
-                    
-                                         // Детальная информация об анимациях
-                     if (Array.isArray(data) && data.length > 0) {
-                       data.forEach((animation: any, index: number) => {
-                         console.log(`Анимация ${index + 1}:`, {
-                           id: animation.id,
-                           status: animation.status,
-                           prompt: animation.animation_prompt?.substring(0, 50) + '...',
-                           avatar_id: animation.source_avatar_id,
-                           segments: animation.total_segments
-                         });
-                       });
-                     }
-                     
-                     toastSuccess(`Анимации загружены: ${Array.isArray(data) ? data.length : 0}`);
+
+                    // Detailed animation information
+                    if (Array.isArray(data) && data.length > 0) {
+                      data.forEach((animation: any, index: number) => {
+                        console.log(`Animation ${index + 1}:`, {
+                          id: animation.id,
+                          status: animation.status,
+                          prompt: animation.animation_prompt?.substring(0, 50) + '...',
+                          avatar_id: animation.source_avatar_id,
+                          segments: animation.total_segments
+                        });
+                      });
+                    }
+
+                    toastSuccess(`Animations loaded: ${Array.isArray(data) ? data.length : 0}`);
                   } catch (error) {
                     console.error('API Test Error:', error);
                     toastError(error as unknown);
                   }
                 }}
               >
-                Тест API Анимации
+                Test Animations API
               </Button>
-              
-              <Button 
-                className="text-xs" 
+
+              <Button
+                className="text-xs"
                 size="sm"
                 variant="outline"
                 onClick={async () => {
@@ -306,14 +306,14 @@ function AnimationPage() {
                     });
                     const data = await response.json();
                     console.log('API Test - Auth:', response.status, data);
-                    toastSuccess('Профиль загружен');
+                    toastSuccess('Profile loaded');
                   } catch (error) {
                     console.error('API Test Error:', error);
                     toastError(error as unknown);
                   }
                 }}
               >
-                Тест авторизации
+                Test Auth
               </Button>
             </div>
           </Card>
@@ -327,16 +327,16 @@ function AnimationPage() {
                 <span className="text-white text-sm">!</span>
               </div>
               <div className="flex-1">
-                <p className="text-amber-800 font-medium">Требуется авторизация</p>
+                <p className="text-amber-800 font-medium">Authentication Required</p>
                 <p className="text-amber-700 text-sm">
-                  Для создания анимаций необходимо войти в систему
+                  You need to log in to create animations
                 </p>
               </div>
-              <Button 
+              <Button
                 onClick={() => navigate('/login')}
                 className="bg-amber-600 hover:bg-amber-700 text-white"
               >
-                Войти
+                Log In
               </Button>
             </div>
           </Card>
@@ -348,20 +348,20 @@ function AnimationPage() {
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5a2 2 0 00-2 2v12a4 4 0 004 4h2V3z" />
-              </svg>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 3H5a2 2 0 00-2 2v12a4 4 0 004 4h2V3z" />
+                </svg>
               </div>
               <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                Создайте свой первый аватар
+                Create your first avatar
               </h3>
               <p className="text-blue-700 mb-4">
-                Для создания анимаций сначала нужно создать аватар из текстового описания
+                To create animations, you first need to create an avatar from a text description
               </p>
-              <Button 
+              <Button
                 onClick={() => navigate('/avatars')}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Создать аватар
+                Create Avatar
               </Button>
             </div>
           </Card>
@@ -372,22 +372,22 @@ function AnimationPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Анимации
+                Animations
               </h1>
               <p className="text-lg text-gray-600">
-                Создавайте говорящие анимации из ваших аватаров
+                Create talking animations from your avatars
               </p>
             </div>
             <Button
               onClick={() => {
-                console.log('Кнопка "Создать анимацию" нажата');
-                console.log('Доступные аватары:', availableAvatars.length);
+                console.log('Create Animation button clicked');
+                console.log('Available avatars:', availableAvatars.length);
                 setShowCreateForm(true);
               }}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3"
               disabled={availableAvatars.length === 0}
             >
-              Создать анимацию {availableAvatars.length > 0 ? `(${availableAvatars.length} готов)` : '(недоступно)'}
+              Create Animation {availableAvatars.length > 0 ? `(${availableAvatars.length} ready)` : '(unavailable)'}
             </Button>
           </div>
         </div>
@@ -402,15 +402,15 @@ function AnimationPage() {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-orange-800 font-medium mb-1">⚠️ Лимит генерации видео</h3>
+                <h3 className="text-orange-800 font-medium mb-1">⚠️ Video Generation Limit</h3>
                 <p className="text-orange-700 text-sm mb-2">
-                  Новым пользователям доступна только <strong>одна генерация видео</strong>. 
-                  Аватары и истории можно создавать без ограничений.
+                  New users are limited to only <strong>one video generation</strong>.
+                  Avatars and stories can be created without limits.
                 </p>
                 <div className="text-xs text-orange-600 space-y-1">
-                  <p>• Аватары: без ограничений</p>
-                  <p>• Истории: без ограничений</p>
-                  <p>• Видео анимации: 1 раз</p>
+                  <p>• Avatars: unlimited</p>
+                  <p>• Stories: unlimited</p>
+                  <p>• Video animations: 1 time</p>
                 </div>
               </div>
             </div>
@@ -446,7 +446,7 @@ function AnimationPage() {
                 <span className="text-white text-sm">!</span>
               </div>
               <div>
-                <p className="text-red-800 font-medium">Ошибка создания анимации</p>
+                <p className="text-red-800 font-medium">Error Creating Animation</p>
                 <p className="text-red-600 text-sm">{getErrorMessage(createAnimationMutation.error)}</p>
               </div>
             </div>
@@ -461,11 +461,11 @@ function AnimationPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L5.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <div className="flex-1">
-                <h3 className="font-medium text-yellow-800">Нет готовых аватаров</h3>
+                <h3 className="font-medium text-yellow-800">No Ready Avatars</h3>
                 {avatars?.avatars && avatars.avatars.length > 0 ? (
                   <div className="mt-2">
                     <p className="text-yellow-700 text-sm">
-                      У вас есть {avatars.avatars.length} аватаров, но они ещё не готовы:
+                      You have {avatars.avatars.length} avatars, but they are not ready yet:
                     </p>
                     <div className="mt-2 space-y-1">
                       {avatars.avatars.map((avatar: any) => (
@@ -482,29 +482,29 @@ function AnimationPage() {
                                 : 'bg-green-500'
                             }`}
                           >
-                            {avatar.status === 'generating' ? 'Генерируется' :
-                            avatar.status === 'failed' ? 'Ошибка' :
-                            avatar.status === 'pending' ? 'В очереди' : 
-                            avatar.status === 'completed' ? 'Готов' : avatar.status}
+                            {avatar.status === 'generating' ? 'Generating' :
+                            avatar.status === 'failed' ? 'Failed' :
+                            avatar.status === 'pending' ? 'Pending' :
+                            avatar.status === 'completed' ? 'Ready' : avatar.status}
                           </div>
                         </div>
                       ))}
                     </div>
                     <p className="text-yellow-700 text-sm mt-3">
-                      Дождитесь завершения генерации или создайте новый аватар.
+                      Please wait for the generation to complete or create a new avatar.
                     </p>
                   </div>
                 ) : (
                   <p className="text-yellow-700 text-sm">
-                    Для создания анимации сначала нужно создать аватар.
+                    To create an animation, you first need to create an avatar.
                   </p>
                 )}
-                <Button 
-                  variant="link" 
+                <Button
+                  variant="link"
                   onClick={() => navigate('/avatars')}
                   className="text-yellow-800 underline p-0 h-auto ml-1 mt-2"
                 >
-                  Перейти к аватарам →
+                  Go to avatars →
                 </Button>
               </div>
             </div>
@@ -517,9 +517,9 @@ function AnimationPage() {
             <div className="flex items-center space-x-3">
               <span className="text-2xl">🧪</span>
               <div>
-                <h3 className="font-medium text-blue-800">Режим отладки</h3>
+                <h3 className="font-medium text-blue-800">Debug Mode</h3>
                 <p className="text-blue-700 text-sm">
-                  Временно разрешаем выбор аватаров в любом статусе для тестирования.
+                  Temporarily allowing selection of avatars in any status for testing.
                 </p>
                 <div className="mt-3 flex gap-2">
                   <Button
@@ -527,22 +527,22 @@ function AnimationPage() {
                     variant="outline"
                     className="text-blue-600 border-blue-300"
                   >
-                    🧪 Тест создания анимации
+                    🧪 Test Animation Creation
                   </Button>
                   <Button
                     onClick={async () => {
                       try {
                         const response = await fetch('/api/v1/health');
                         const data = await response.json();
-                        toastSuccess(`Backend доступен: v${data.version}`);
-                                             } catch (error) {
-                         toastError(error as unknown);
+                        toastSuccess(`Backend is available: v${data.version}`);
+                      } catch (error) {
+                        toastError(error as unknown);
                       }
                     }}
                     variant="outline"
                     className="text-blue-600 border-blue-300"
                   >
-                    🔍 Проверить API
+                    🔍 Check API
                   </Button>
                 </div>
               </div>
@@ -550,32 +550,32 @@ function AnimationPage() {
           </Card>
         )}
 
-        {/* Debug формы создания */}
+        {/* Create Form Debug */}
         {process.env.NODE_ENV === 'development' && (
           <Card className="mb-6 p-4 bg-blue-50 border-blue-200">
-            <h3 className="font-medium mb-2">🔧 Debug формы создания:</h3>
+            <h3 className="font-medium mb-2">🔧 Create Form Debug:</h3>
             <div className="text-xs space-y-1">
-              <p><strong>Показать форму:</strong> {showCreateForm ? 'ДА' : 'НЕТ'}</p>
-              <p><strong>Загружаются аватары:</strong> {avatarsLoading ? 'ДА' : 'НЕТ'}</p>
-              <p><strong>Загружаются анимации:</strong> {animationsLoading ? 'ДА' : 'НЕТ'}</p>
-              <p><strong>Доступные аватары:</strong> {availableAvatars.length}</p>
-              <p><strong>Кнопка заблокирована:</strong> {availableAvatars.length === 0 ? 'ДА' : 'НЕТ'}</p>
+              <p><strong>Show form:</strong> {showCreateForm ? 'YES' : 'NO'}</p>
+              <p><strong>Loading avatars:</strong> {avatarsLoading ? 'YES' : 'NO'}</p>
+              <p><strong>Loading animations:</strong> {animationsLoading ? 'YES' : 'NO'}</p>
+              <p><strong>Available avatars:</strong> {availableAvatars.length}</p>
+              <p><strong>Button disabled:</strong> {availableAvatars.length === 0 ? 'YES' : 'NO'}</p>
             </div>
             <div className="mt-3 flex gap-2">
-              <Button 
+              <Button
                 size="sm"
                 onClick={() => setShowCreateForm(true)}
                 className="text-xs bg-blue-600 text-white"
               >
-                Принудительно показать форму
+                Force Show Form
               </Button>
-              <Button 
+              <Button
                 size="sm"
                 variant="outline"
                 onClick={() => setShowCreateForm(false)}
                 className="text-xs"
               >
-                Скрыть форму
+                Hide Form
               </Button>
             </div>
           </Card>
@@ -585,13 +585,13 @@ function AnimationPage() {
         {showCreateForm && (
           <Card className="p-6 mb-8 bg-white/90 backdrop-blur-sm border-0 shadow-xl">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Создать анимацию</h2>
-              <Button 
-                variant="outline" 
+              <h2 className="text-2xl font-bold text-gray-900">Create Animation</h2>
+              <Button
+                variant="outline"
                 onClick={() => setShowCreateForm(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                ✕ Закрыть
+                ✕ Close
               </Button>
             </div>
 
@@ -599,16 +599,16 @@ function AnimationPage() {
               {/* Avatar Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Выберите аватар для анимации
+                  Select an avatar for the animation
                 </label>
-                
+
                 <AvatarSelector
                   avatars={availableAvatars.length > 0 ? availableAvatars : allAvatarsForTesting}
                   selectedAvatarId={watchedAvatarId}
                   onSelect={(avatarId) => setValue('source_avatar_id', avatarId)}
                   onCreateNew={() => navigate('/avatars')}
                 />
-                
+
                 {errors.source_avatar_id && (
                   <p className="text-red-500 text-sm mt-2">{errors.source_avatar_id.message}</p>
                 )}
@@ -621,7 +621,7 @@ function AnimationPage() {
               {/* Animation Prompt */}
               <div>
                 <label htmlFor="animation_prompt" className="block text-sm font-medium text-gray-700 mb-2">
-                  Описание анимации
+                  Animation Description
                 </label>
                 <textarea
                   id="animation_prompt"
@@ -630,7 +630,7 @@ function AnimationPage() {
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none ${
                     errors.animation_prompt ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  placeholder="Опишите, что должен говорить или делать ваш аватар. Например: 'Привет! Меня зовут Анна и я хочу рассказать о нашем новом продукте...'"
+                  placeholder="Describe what your avatar should say or do. For example: 'Hello! My name is Anna and I want to tell you about our new product...'"
                 />
                 {errors.animation_prompt && (
                   <p className="text-red-500 text-sm mt-1">{errors.animation_prompt.message}</p>
@@ -640,7 +640,7 @@ function AnimationPage() {
               {/* Total Segments */}
               <div>
                 <label htmlFor="total_segments" className="block text-sm font-medium text-gray-700 mb-2">
-                  Количество сегментов (1-20)
+                  Number of segments (1-20)
                 </label>
                 <Input
                   id="total_segments"
@@ -651,7 +651,7 @@ function AnimationPage() {
                   className={errors.total_segments ? 'border-red-500' : ''}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Больше сегментов = более качественный результат, но дольше обработка
+                  More segments = higher quality result, but longer processing time
                 </p>
                 {errors.total_segments && (
                   <p className="text-red-500 text-sm mt-1">{errors.total_segments.message}</p>
@@ -666,7 +666,7 @@ function AnimationPage() {
                   onClick={() => setShowCreateForm(false)}
                   disabled={createAnimationMutation.isPending}
                 >
-                  Отменить
+                  Cancel
                 </Button>
                 <Button
                   type="submit"
@@ -676,10 +676,10 @@ function AnimationPage() {
                   {createAnimationMutation.isPending ? (
                     <div className="flex items-center space-x-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Создание...</span>
+                      <span>Creating...</span>
                     </div>
                   ) : (
-                    'Создать анимацию'
+                    'Create Animation'
                   )}
                 </Button>
               </div>
@@ -690,20 +690,20 @@ function AnimationPage() {
         {/* Delete animation modal */}
         <Modal
           open={Boolean(deleteAnimationId)}
-          title="Удалить анимацию?"
-          description="Вы уверены, что хотите удалить эту анимацию? Это действие нельзя отменить."
-          confirmText="Удалить"
-          cancelText="Отмена"
+          title="Delete Animation?"
+          description="Are you sure you want to delete this animation? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
           onConfirm={confirmDeleteAnimation}
           onClose={() => setDeleteAnimationId(null)}
         />
 
         {/* Animations List */}
-                  {animations && animations.length > 0 ? (
+        {animations && animations.length > 0 ? (
           <div className="space-y-6">
-                         {animations?.map((animation: AnimationProject) => (
-              <AnimationCard 
-                key={animation.id} 
+            {animations?.map((animation: AnimationProject) => (
+              <AnimationCard
+                key={animation.id}
                 animation={animation}
                 onDelete={handleDeleteAnimation}
                 onAssemble={handleAssembleVideo}
@@ -719,16 +719,16 @@ function AnimationPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4v16l13-8L7 4z" />
               </svg>
             </div>
-            <h3 className="text-xl font-medium text-gray-900 mb-3">Нет анимаций</h3>
+            <h3 className="text-xl font-medium text-gray-900 mb-3">No Animations</h3>
             <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              Создайте свою первую анимацию, чтобы оживить ваших аватаров
+              Create your first animation to bring your avatars to life
             </p>
             <Button
               onClick={() => setShowCreateForm(true)}
               disabled={availableAvatars.length === 0}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
             >
-              Создать анимацию
+              Create Animation
             </Button>
           </Card>
         )}
@@ -741,36 +741,36 @@ function AnimationPage() {
                 <span className="text-xl text-blue-600">📊</span>
               </div>
               <p className="text-3xl font-bold">{animations.length}</p>
-              <p className="text-gray-600">Всего анимаций</p>
+              <p className="text-gray-600">Total Animations</p>
             </Card>
 
             <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg text-center">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
               </div>
               <p className="text-3xl font-bold">
-                {animations?.filter((a: AnimationProject) => 
+                {animations?.filter((a: AnimationProject) =>
                   a.status === 'completed'
                 ).length || 0}
               </p>
-              <p className="text-gray-600">Завершено</p>
+              <p className="text-gray-600">Completed</p>
             </Card>
 
             <Card className="p-6 bg-white/80 backdrop-blur-sm border-0 shadow-lg text-center">
               <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
               </div>
               <p className="text-3xl font-bold">
                 {animations?.filter((a: AnimationProject) => {
                   return a.status === 'in_progress' || a.status === 'assembling';
                 }).length || 0}
               </p>
-              <p className="text-gray-600">В обработке</p>
+              <p className="text-gray-600">In Progress</p>
             </Card>
           </div>
         )}
@@ -779,7 +779,7 @@ function AnimationPage() {
   );
 }
 
-// Отдельный компонент для карточки анимации
+// Separate component for the animation card
 interface AnimationCardProps {
   animation: AnimationProject;
   onDelete: (id: string) => void;
@@ -790,7 +790,7 @@ interface AnimationCardProps {
 
 function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembling }: AnimationCardProps) {
   const navigate = useNavigate();
-  
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -808,19 +808,19 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
   const getStatusText = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'Завершено';
+        return 'Completed';
       case 'in_progress':
-        return 'Генерация';
+        return 'Generating';
       case 'assembling':
-        return 'Сборка видео';
+        return 'Assembling Video';
       case 'failed':
-        return 'Ошибка';
+        return 'Failed';
       default:
         return status;
     }
   };
 
-  const completedSegments = animation.segments?.filter(s => 
+  const completedSegments = animation.segments?.filter(s =>
     s.status === 'completed'
   ).length || 0;
   const progressPercentage = Math.round((completedSegments / animation.total_segments) * 100);
@@ -835,10 +835,10 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
               ? `${(animation.animation_prompt ?? '').substring(0, 100)}...`
               : (animation.animation_prompt ?? animation.name)}
           </h3>
-          
+
           <div className="flex items-center space-x-4 text-sm text-gray-500 mb-3">
             <span>ID: {animation.id}</span>
-            <span>Создано: {new Date(animation.created_at).toLocaleDateString('ru-RU')}</span>
+            <span>Created: {new Date(animation.created_at).toLocaleDateString('en-US')}</span>
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(animation.status)}`}>
               {getStatusText(animation.status)}
             </span>
@@ -847,7 +847,7 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
           {/* Progress Bar */}
           <div className="mb-4">
             <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-              <span>Прогресс: {completedSegments} / {animation.total_segments} сегментов</span>
+              <span>Progress: {completedSegments} / {animation.total_segments} segments</span>
               <span>{progressPercentage}%</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
@@ -856,21 +856,21 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
                 style={{ width: `${progressPercentage}%` }}
               ></div>
             </div>
-            
-                      {/* Progress Monitor */}
-          <CompactAnimationMonitor 
-            animation={animation}
-            onRefresh={() => window.location.reload()}
 
-          />
+            {/* Progress Monitor */}
+            <CompactAnimationMonitor
+              animation={animation}
+              onRefresh={() => window.location.reload()}
 
-          {/* Segments visualization */}
-          {animation.segments && animation.segments.length > 0 && (
-            <AnimationSegments 
-              segments={animation.segments}
-              totalSegments={animation.total_segments}
             />
-          )}
+
+            {/* Segments visualization */}
+            {animation.segments && animation.segments.length > 0 && (
+              <AnimationSegments
+                segments={animation.segments}
+                totalSegments={animation.total_segments}
+              />
+            )}
           </div>
 
           {/* Final Video Section */}
@@ -881,17 +881,17 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <div className="flex items-center space-x-3">
                       <svg className="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                      </svg>
                       <div>
-                        <h4 className="font-medium text-green-800">Анимация готова!</h4>
-                        <p className="text-green-600 text-sm">Финальное видео сформировано</p>
+                        <h4 className="font-medium text-green-800">Animation Ready!</h4>
+                        <p className="text-green-600 text-sm">Final video has been generated</p>
                       </div>
                     </div>
                   </div>
-                  <VideoPreview 
+                  <VideoPreview
                     videoUrl={animation.final_video_url}
-                    title="Финальное видео"
+                    title="Final Video"
                   />
                 </div>
               ) : animation.status === 'assembling' ? (
@@ -899,8 +899,8 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
                   <div className="flex items-center space-x-3">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-600"></div>
                     <div>
-                      <h4 className="font-medium text-yellow-800">Сборка видео...</h4>
-                      <p className="text-yellow-600 text-sm">Пожалуйста, подождите</p>
+                      <h4 className="font-medium text-yellow-800">Assembling video...</h4>
+                      <p className="text-yellow-600 text-sm">Please wait</p>
                     </div>
                   </div>
                 </div>
@@ -913,10 +913,10 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
                   {isAssembling ? (
                     <div className="flex items-center space-x-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Запуск сборки...</span>
+                      <span>Starting assembly...</span>
                     </div>
                   ) : (
-                    'Собрать финальное видео'
+                    'Assemble Final Video'
                   )}
                 </Button>
               )}
@@ -931,7 +931,7 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
             onClick={() => navigate(`/animations/${animation.id}`)}
             className="bg-purple-600 hover:bg-purple-700 text-white"
           >
-                          Студия
+            Studio
           </Button>
           <Button
             variant="outline"
@@ -940,7 +940,7 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
             disabled={isDeleting}
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
           >
-            {isDeleting ? '...' : 'Удалить'}
+            {isDeleting ? '...' : 'Delete'}
           </Button>
         </div>
       </div>
@@ -948,4 +948,4 @@ function AnimationCard({ animation, onDelete, onAssemble, isDeleting, isAssembli
   );
 }
 
-export default AnimationPage; 
+export default AnimationPage;

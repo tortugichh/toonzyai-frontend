@@ -22,8 +22,10 @@ function SuccessNotification({ onClose }: SuccessNotificationProps) {
           <span className="text-white text-sm">✓</span>
         </div>
         <div>
-          <p className="text-green-800 font-medium">Аватар успешно создан!</p>
-          <p className="text-green-600 text-sm">Генерация началась. Изображение появится через несколько минут.</p>
+          <p className="text-green-800 font-medium">Avatar successfully created!</p>
+          <p className="text-green-600 text-sm">
+            Generation has started. The image will appear in a few minutes.
+          </p>
         </div>
         <Button
           variant="outline"
@@ -72,43 +74,33 @@ function AvatarsPage() {
       setShowCreateForm(false);
       setShowSuccess(true);
       refetch();
-      // Скрываем уведомление через 5 секунд
       setTimeout(() => setShowSuccess(false), 5000);
     } catch (error: any) {
       console.error('Create avatar error:', error);
       
-      // Получаем raw detail из APIError.details или из response.data.detail
       let errorData = (error as any)?.details;
-      // Если вложенный detail
       if (errorData && typeof errorData === 'object' && 'detail' in errorData) {
         errorData = (errorData as any).detail;
       }
-      
-      // Если не найдено, пробуем path для Axios
       if (!errorData) {
         errorData = (error as any)?.response?.data?.detail;
       }
-      // Распаковываем вложенный detail, если есть
       if (errorData && typeof errorData === 'object' && 'detail' in errorData) {
         errorData = (errorData as any).detail;
       }
-      
-      // Если detail - строка, пробуем распарсить как JSON
       if (typeof errorData === 'string') {
         try {
           errorData = JSON.parse(errorData);
         } catch {
-          // остаемся с оригиналом
+          // fallback to string
         }
       }
-      
-      console.log('Parsed error data:', errorData);
       
       if (errorData?.error === 'content_policy_violation') {
         setModerationModal({
           isOpen: true,
-          reasons: Array.isArray(errorData.reasons) ? errorData.reasons : ['Неподходящий контент'],
-          suggestedFix: typeof errorData.suggested_fix === 'string' ? errorData.suggested_fix : 'Попробуйте изменить описание'
+          reasons: Array.isArray(errorData.reasons) ? errorData.reasons : ['Inappropriate content'],
+          suggestedFix: typeof errorData.suggested_fix === 'string' ? errorData.suggested_fix : 'Try changing the description'
         });
       }
     }
@@ -123,19 +115,6 @@ function AvatarsPage() {
     }
   };
 
-  // Функция для тестирования модального окна модерации
-  const handleTestModerationModal = () => {
-    setModerationModal({
-      isOpen: true,
-      reasons: [
-        'Обнаружен контент с элементами насилия',
-        'Неподходящее описание внешности',
-        'Нарушение правил сообщества'
-      ],
-      suggestedFix: 'Попробуйте описать персонажа в позитивном ключе, избегая упоминания насилия, травм или неподходящего контента. Сосредоточьтесь на внешности, одежде и позитивных эмоциях.'
-    });
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
       <Header 
@@ -148,9 +127,9 @@ function AvatarsPage() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Мои аватары</h1>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">My Avatars</h1>
             <p className="text-xl text-gray-600">
-              Создавайте и управляйте своими ИИ персонажами
+              Create and manage your AI characters
             </p>
           </div>
           <div className="flex gap-2 mt-4 sm:mt-0">
@@ -158,10 +137,8 @@ function AvatarsPage() {
               onClick={() => setShowCreateForm(true)}
               className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] hover:opacity-90 text-white px-6 py-3 transform-gpu hover:scale-105 transition"
             >
-              Создать аватар
+              Create Avatar
             </Button>
-            {/* Кнопка для тестирования модального окна модерации */}
-            
           </div>
         </div>
 
@@ -169,8 +146,6 @@ function AvatarsPage() {
         {showSuccess && (
           <SuccessNotification onClose={() => setShowSuccess(false)} />
         )}
-
-        
 
         {/* Info tip about animations */}
         {avatars?.avatars && avatars.avatars.some(a => a.status?.toLowerCase?.().trim() === 'completed') && (
@@ -182,15 +157,15 @@ function AvatarsPage() {
                 </svg>
               </div>
               <div>
-                <p className="text-blue-800 font-medium">Готовые аватары можно анимировать!</p>
+                <p className="text-blue-800 font-medium">You can animate completed avatars!</p>
                 <p className="text-blue-600 text-sm">
-                  Нажмите кнопку "Создать анимацию" на карточке готового аватара или перейдите в раздел{' '}
+                  Click the "Create Animation" button on an avatar card or go to{' '}
                   <Button
                     variant="link"
                     onClick={() => navigate('/animations')}
                     className="text-blue-700 underline p-0 h-auto font-medium"
                   >
-                    Анимации
+                    Animations
                   </Button>
                 </p>
               </div>
@@ -202,23 +177,23 @@ function AvatarsPage() {
         {avatars?.avatars && avatars.avatars.length > 0 && (
           <Card className="mb-8 p-6 bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] text-white border-0">
             <div className="text-center">
-              <h2 className="text-2xl font-bold mb-2">📊 Статистика</h2>
+              <h2 className="text-2xl font-bold mb-2">Statistics</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 <div>
                   <p className="text-3xl font-bold">{avatars.total || 0}</p>
-                  <p className="text-orange-100">Всего аватаров</p>
+                  <p className="text-orange-100">Total Avatars</p>
                 </div>
                 <div className="text-center mb-4">
                   <div className="text-3xl font-bold text-gray-800">
                     {avatars.avatars.filter(a => a.status?.toLowerCase?.().trim() === 'completed').length}
                   </div>
-                  <div className="text-sm text-gray-100">Готовых аватаров</div>
+                  <div className="text-sm text-gray-100">Completed</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-semibold text-yellow-200">
                     {avatars.avatars.filter(a => a.status?.toLowerCase?.().trim() === 'generating').length}
                   </div>
-                  <div className="text-sm text-gray-100">В процессе</div>
+                  <div className="text-sm text-gray-100">In Progress</div>
                 </div>
               </div>
             </div>
@@ -267,17 +242,17 @@ function AvatarsPage() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              У вас пока нет аватаров
+              You don’t have any avatars yet
             </h2>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Создайте своего первого ИИ персонажа! Просто опишите, как он должен выглядеть, 
-              и наш алгоритм сгенерирует уникального аватара.
+              Create your first AI character! Just describe how it should look, 
+              and our algorithm will generate a unique avatar.
             </p>
             <Button
               onClick={() => setShowCreateForm(true)}
               className="bg-gradient-to-r from-[#FFD27F] via-[#FF9A2B] to-[#C65A00] w-full sm:w-auto hover:opacity-90 text-white px-8 py-3 text-md sm:text-lg transform-gpu hover:scale-105 transition"
             >
-              Создать первого аватара
+              Create First Avatar
             </Button>
           </Card>
         )}
@@ -291,7 +266,6 @@ function AvatarsPage() {
         suggestedFix={moderationModal.suggestedFix}
         onRetry={() => {
           setModerationModal({ isOpen: false, reasons: [], suggestedFix: '' });
-          // Форма остается открытой для повторной попытки
         }}
       />
     </div>

@@ -71,15 +71,15 @@ function AnimationDetailPage() {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'completed':
-        return 'Завершено';
+        return 'Completed';
       case 'in_progress':
-        return 'Генерация';
+        return 'Generating';
       case 'assembling':
-        return 'Сборка видео';
+        return 'Assembling video';
       case 'failed':
-        return 'Ошибка';
+        return 'Error';
       case 'pending':
-        return 'Ожидание';
+        return 'Pending';
       default:
         return status;
     }
@@ -96,7 +96,7 @@ function AnimationDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p className="text-lg text-gray-600">Загрузка...</p>
+            <p className="text-lg text-gray-600">Loading...</p>
           </div>
         </div>
       </div>
@@ -116,12 +116,12 @@ function AnimationDetailPage() {
             <svg className="w-16 h-16 text-red-500 mb-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Анимация не найдена</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Animation not found</h2>
             <p className="text-gray-600 mb-6">
-              {error ? getErrorMessage(error) : 'Анимация не существует или была удалена'}
+              {error ? getErrorMessage(error) : 'This animation does not exist or has been deleted'}
             </p>
             <Button onClick={() => navigate('/animations')}>
-              ← Вернуться к анимациям
+              ← Back to animations
             </Button>
           </Card>
         </div>
@@ -150,7 +150,7 @@ function AnimationDetailPage() {
             onClick={() => navigate('/animations')}
             className="text-gray-600 hover:text-gray-800"
           >
-            ← Назад к анимациям
+            ← Back to animations
           </Button>
         </div>
 
@@ -159,10 +159,10 @@ function AnimationDetailPage() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                Студия анимации
+                Animation Studio
               </h1>
               <p className="text-gray-600 text-lg mb-4">
-                Управляйте каждым сегментом вашей анимации индивидуально
+                Manage each segment of your animation individually
               </p>
               
               <div className="flex items-center space-x-4 text-sm text-gray-500">
@@ -180,14 +180,14 @@ function AnimationDetailPage() {
                 disabled={deleteAnimationMutation.isPending}
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
               >
-                {deleteAnimationMutation.isPending ? 'Удаление...' : '🗑️ Удалить'}
+                {deleteAnimationMutation.isPending ? 'Deleting...' : '🗑️ Delete'}
               </Button>
               <Modal
                 open={isDeleteModalOpen}
-                title="Удалить анимацию?"
-                description="Вы уверены, что хотите удалить эту анимацию? Это действие нельзя отменить."
-                confirmText="Удалить"
-                cancelText="Отмена"
+                title="Delete animation?"
+                description="Are you sure you want to delete this animation? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Cancel"
                 onConfirm={confirmDelete}
                 onClose={() => setDeleteModalOpen(false)}
               />
@@ -204,11 +204,11 @@ function AnimationDetailPage() {
         {/* Final Video Section */}
         {allSegmentsCompleted && (
           <Card className="p-6 bg-white/90 backdrop-blur-sm border-0 shadow-lg mt-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">🎬 Финальное видео</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">🎬 Final Video</h2>
             
             {animation.status === 'completed' && animation.final_video_url ? (
               <div className="bg-green-50 p-6 rounded-lg border border-green-200">
-                <h3 className="text-lg font-semibold text-green-800 mb-4">Готовое видео</h3>
+                <h3 className="text-lg font-semibold text-green-800 mb-4">Ready Video</h3>
                 <video
                   src={animation.final_video_url}
                   controls
@@ -219,7 +219,7 @@ function AnimationDetailPage() {
                     onClick={() => window.open(animation.final_video_url!, '_blank')}
                     className="bg-green-600 hover:bg-green-700 text-white"
                   >
-                    🎥 Открыть в новой вкладке
+                    🎥 Open in New Tab
                   </Button>
                   <Button
                     variant="outline"
@@ -231,7 +231,7 @@ function AnimationDetailPage() {
                     }}
                     className="text-green-600 border-green-300 hover:bg-green-50"
                   >
-                    📥 Скачать
+                    📥 Download
                   </Button>
                 </div>
               </div>
@@ -240,9 +240,9 @@ function AnimationDetailPage() {
                 <div className="flex items-center space-x-3">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-600"></div>
                   <div>
-                    <h3 className="text-lg font-semibold text-yellow-800">Сборка видео...</h3>
+                    <h3 className="text-lg font-semibold text-yellow-800">Assembling video...</h3>
                     <p className="text-sm text-yellow-700">
-                      Финальное видео собирается из готовых сегментов. Это может занять несколько минут.
+                      The final video is being assembled from ready segments. This may take a few minutes.
                     </p>
                   </div>
                 </div>
@@ -250,9 +250,9 @@ function AnimationDetailPage() {
             ) : (
               <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold text-blue-800 mb-2">Готов к сборке!</h3>
+                  <h3 className="text-lg font-semibold text-blue-800 mb-2">Ready to assemble!</h3>
                   <p className="text-sm text-blue-700 mb-4">
-                    Все сегменты готовы. Теперь можно собрать финальное видео.
+                    All segments are ready. Now you can assemble the final video.
                   </p>
                   <Button
                     onClick={handleAssemble}
@@ -262,10 +262,10 @@ function AnimationDetailPage() {
                     {assembleVideoMutation.isPending ? (
                       <div className="flex items-center space-x-2">
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Запуск сборки...</span>
+                        <span>Starting assembly...</span>
                       </div>
                     ) : (
-                      '🔧 Собрать финальное видео'
+                      '🔧 Assemble Final Video'
                     )}
                   </Button>
                 </div>
@@ -278,4 +278,4 @@ function AnimationDetailPage() {
   );
 }
 
-export default AnimationDetailPage; 
+export default AnimationDetailPage;

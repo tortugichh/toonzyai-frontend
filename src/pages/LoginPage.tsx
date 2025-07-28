@@ -12,8 +12,8 @@ import { toast } from 'react-hot-toast';
 import logoSrc from '@/assets/logo.svg';
 
 const loginSchema = z.object({
-  login: z.string().min(1, 'Имя пользователя или Email обязательно'),
-  password: z.string().min(6, 'Пароль должен содержать минимум 6 символов'),
+  login: z.string().min(1, 'Username or Email is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -39,10 +39,9 @@ function LoginPage() {
     } catch (error) {
       console.error('Login error:', error);
       const errorMessage = getErrorMessage(error);
-      
-      // Check if the error is about email verification
+
       if (errorMessage.includes('verify your email')) {
-        toast.error('Пожалуйста, подтвердите ваш email перед входом. Проверьте вашу почту или запросите новое письмо с подтверждением.');
+        toast.error('Please verify your email before logging in. Check your inbox or request a new verification email.');
       } else {
         console.error('Detailed error:', errorMessage);
       }
@@ -57,8 +56,8 @@ function LoginPage() {
             <img src={logoSrc} alt="ToonzyAI logo" className="w-10 h-10" />
             <span className="text-2xl font-bold text-neutral-900">ToonzyAI</span>
           </Link>
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Вход</h1>
-          <p className="text-neutral-600">Введите данные аккаунта</p>
+          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Log In</h1>
+          <p className="text-neutral-600">Enter your account details</p>
         </div>
 
         <Card className="p-10">
@@ -66,12 +65,12 @@ function LoginPage() {
             {/* Login Field */}
             <div>
               <label htmlFor="login" className="block text-sm font-medium text-neutral-700 mb-2">
-                Имя пользователя или Email
+                Username or Email
               </label>
               <Input
                 id="login"
                 type="text"
-                placeholder="username или email"
+                placeholder="username or email"
                 {...register('login')}
                 className={errors.login ? 'border-red-500' : ''}
               />
@@ -83,13 +82,13 @@ function LoginPage() {
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-neutral-700 mb-2">
-                Пароль
+                Password
               </label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Введите пароль"
+                  placeholder="Enter your password"
                   {...register('password')}
                   className={`w-full pr-10 ${errors.password ? 'border-red-500' : ''}`}
                 />
@@ -121,7 +120,7 @@ function LoginPage() {
                 to="/forgot-password"
                 className="text-sm text-brand hover:underline"
               >
-                Забыли пароль?
+                Forgot Password?
               </Link>
             </div>
 
@@ -129,7 +128,7 @@ function LoginPage() {
             {loginMutation.error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                 <p className="text-red-700 text-sm font-medium">
-                  Ошибка входа
+                  Login Error
                 </p>
                 <p className="text-red-600 text-xs mt-1">
                   {getErrorMessage(loginMutation.error)}
@@ -147,10 +146,10 @@ function LoginPage() {
               {loginMutation.isPending ? (
                 <div className="flex items-center justify-center space-x-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-neutral-700"></div>
-                  <span>Вход...</span>
+                  <span>Logging in...</span>
                 </div>
               ) : (
-                'Войти'
+                'Log In'
               )}
             </Button>
           </form>
@@ -162,7 +161,7 @@ function LoginPage() {
                 <div className="w-full border-t border-neutral-200" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-neutral-500">или</span>
+                <span className="px-2 bg-white text-neutral-500">or</span>
               </div>
             </div>
           </div>
@@ -170,15 +169,14 @@ function LoginPage() {
           {/* Register Link */}
           <div className="mt-6 text-center">
             <p className="text-neutral-600">
-              Нет аккаунта?{' '}
+              Don’t have an account?{' '}
               <Link
                 to="/register"
                 className="text-brand hover:underline"
               >
-                Зарегистрироваться
+                Sign Up
               </Link>
             </p>
-            
           </div>
         </Card>
 
@@ -191,7 +189,7 @@ function LoginPage() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>На главную</span>
+            <span>Back to Home</span>
           </Link>
         </div>
       </div>
@@ -199,4 +197,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage; 
+export default LoginPage;

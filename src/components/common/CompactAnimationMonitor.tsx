@@ -52,9 +52,9 @@ export default function CompactAnimationMonitor({
     const diffMs = now.getTime() - date.getTime();
     const diffSeconds = Math.floor(diffMs / 1000);
     
-    if (diffSeconds < 10) return 'только что';
-    if (diffSeconds < 60) return `${diffSeconds}с назад`;
-    return `${Math.floor(diffSeconds / 60)}м назад`;
+    if (diffSeconds < 10) return 'just now';
+    if (diffSeconds < 60) return `${diffSeconds}s ago`;
+    return `${Math.floor(diffSeconds / 60)}m ago`;
   };
 
   return (
@@ -64,14 +64,14 @@ export default function CompactAnimationMonitor({
           <div className="text-xl">{getStatusIcon(animation.status)}</div>
           <div>
             <h3 className="font-medium text-gray-900">
-                            {animation.status === 'pending' ? 'Ожидание' :
-               animation.status === 'in_progress' ? 'Генерация' :
-               animation.status === 'assembling' ? 'Сборка' :
-               animation.status === 'completed' ? 'Готово' :
-               animation.status === 'failed' ? 'Ошибка' : animation.status}
+              {animation.status === 'pending' ? 'Waiting' :
+               animation.status === 'in_progress' ? 'Generating' :
+               animation.status === 'assembling' ? 'Assembling' :
+               animation.status === 'completed' ? 'Completed' :
+               animation.status === 'failed' ? 'Failed' : animation.status}
             </h3>
             <p className="text-sm text-gray-600">
-              {completedSegments} / {animation.total_segments} сегментов
+              {completedSegments} / {animation.total_segments} segments
             </p>
           </div>
         </div>
@@ -110,34 +110,34 @@ export default function CompactAnimationMonitor({
       {/* Status Messages */}
       {isProcessing && (
         <div className="text-xs text-gray-600">
-          {animation.status === 'pending' && '📋 В очереди на обработку'}
+          {animation.status === 'pending' && '📋 In queue for processing'}
           {animation.status === 'in_progress' && (
             <>
-              🤖 ИИ генерирует сегменты
-              {inProgressSegments > 0 && ` (${inProgressSegments} в работе)`}
+              🤖 AI is generating segments
+              {inProgressSegments > 0 && ` (${inProgressSegments} in progress)`}
             </>
           )}
           {animation.status === 'assembling' && (
-          <>
-            <ActionIcon action="loading" className="w-4 h-4 mr-2" animate />
-            Сборка финального видео
-          </>
-        )}
+            <>
+              <ActionIcon action="loading" className="w-4 h-4 mr-2" animate />
+              Assembling final video
+            </>
+          )}
         </div>
       )}
 
       {animation.status === 'completed' && (
         <div className="text-xs text-green-600">
-          Анимация готова к просмотру
+          Animation is ready to view
         </div>
       )}
 
       {animation.status === 'failed' && (
-        <div className="text-xs text-red-600">
-                      <StatusIcon status="failed" className="w-4 h-4 mr-2" />
-            Ошибка при обработке
+        <div className="text-xs text-red-600 flex items-center">
+          <StatusIcon status="failed" className="w-4 h-4 mr-1" />
+          Error during processing
         </div>
       )}
     </Card>
   );
-} 
+}

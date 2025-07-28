@@ -11,7 +11,7 @@ import logoSrc from '@/assets/logo.svg';
 import { apiClient } from '@/services/api';
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Введите корректный email адрес'),
+  email: z.string().email('Enter a valid email address'),
 });
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
@@ -34,10 +34,10 @@ function ForgotPasswordPage() {
       setIsLoading(true);
       await apiClient.forgotPassword(data.email);
       setIsSubmitted(true);
-      toast.success('Инструкции по сбросу пароля отправлены на ваш email');
+      toast.success('Password reset instructions have been sent to your email');
     } catch (error) {
       console.error('Forgot password error:', error);
-      toast.error('Произошла ошибка при отправке email. Попробуйте еще раз.');
+      toast.error('An error occurred while sending the email. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -52,8 +52,8 @@ function ForgotPasswordPage() {
               <img src={logoSrc} alt="ToonzyAI logo" className="w-10 h-10" />
               <span className="text-2xl font-bold text-neutral-900">ToonzyAI</span>
             </Link>
-            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Проверьте вашу почту</h1>
-            <p className="text-neutral-600">Мы отправили инструкции по сбросу пароля</p>
+            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Check Your Email</h1>
+            <p className="text-neutral-600">We’ve sent you password reset instructions</p>
           </div>
 
           <Card className="p-10 text-center">
@@ -63,10 +63,10 @@ function ForgotPasswordPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h2 className="text-xl font-semibold text-neutral-900 mb-2">Email отправлен!</h2>
+              <h2 className="text-xl font-semibold text-neutral-900 mb-2">Email Sent!</h2>
               <p className="text-neutral-600">
-                Мы отправили инструкции по сбросу пароля на ваш email адрес. 
-                Проверьте папку "Входящие" и следуйте инструкциям в письме.
+                We’ve sent password reset instructions to your email address.
+                Please check your inbox and follow the instructions in the email.
               </p>
             </div>
 
@@ -76,16 +76,16 @@ function ForgotPasswordPage() {
                 size="lg"
                 className="w-full"
               >
-                Вернуться к входу
+                Back to Login
               </Button>
               
               <p className="text-sm text-neutral-500">
-                Не получили письмо?{' '}
+                Didn’t receive the email?{' '}
                 <button
                   onClick={() => setIsSubmitted(false)}
                   className="text-brand hover:underline"
                 >
-                  Попробовать еще раз
+                  Try again
                 </button>
               </p>
             </div>
@@ -103,8 +103,8 @@ function ForgotPasswordPage() {
             <img src={logoSrc} alt="ToonzyAI logo" className="w-10 h-10" />
             <span className="text-2xl font-bold text-neutral-900">ToonzyAI</span>
           </Link>
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Забыли пароль?</h1>
-          <p className="text-neutral-600">Введите ваш email для сброса пароля</p>
+          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Forgot Password?</h1>
+          <p className="text-neutral-600">Enter your email to reset your password</p>
         </div>
 
         <Card className="p-10">
@@ -112,12 +112,12 @@ function ForgotPasswordPage() {
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-neutral-700 mb-2">
-                Email адрес
+                Email Address
               </label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Введите ваш email"
+                placeholder="Enter your email"
                 {...register('email')}
                 className={errors.email ? 'border-red-500' : ''}
               />
@@ -136,10 +136,10 @@ function ForgotPasswordPage() {
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-neutral-700"></div>
-                  <span>Отправка...</span>
+                  <span>Sending...</span>
                 </div>
               ) : (
-                'Отправить инструкции'
+                'Send Instructions'
               )}
             </Button>
           </form>
@@ -147,12 +147,12 @@ function ForgotPasswordPage() {
           {/* Back to Login */}
           <div className="mt-6 text-center">
             <p className="text-neutral-600">
-              Вспомнили пароль?{' '}
+              Remembered your password?{' '}
               <Link
                 to="/login"
                 className="text-brand hover:underline"
               >
-                Войти
+                Log In
               </Link>
             </p>
           </div>
@@ -167,7 +167,7 @@ function ForgotPasswordPage() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>На главную</span>
+            <span>Back to Home</span>
           </Link>
         </div>
       </div>
@@ -175,4 +175,4 @@ function ForgotPasswordPage() {
   );
 }
 
-export default ForgotPasswordPage; 
+export default ForgotPasswordPage;
