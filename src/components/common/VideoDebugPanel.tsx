@@ -65,12 +65,12 @@ const VideoDebugPanel: React.FC<VideoDebugPanelProps> = ({
       const totalCount = diagnosticResults.length;
       
       if (availableCount > 0) {
-        setSummary(`✅ Найдено ${availableCount} рабочих URL из ${totalCount}. Видео должно загружаться!`);
+        setSummary(`✅ Found ${availableCount} working URLs out of ${totalCount}. Video should load!`);
       } else {
-        setSummary(`❌ Все ${totalCount} URL недоступны. Проблема с авторизацией или файлы отсутствуют.`);
+        setSummary(`❌ All ${totalCount} URLs are unavailable. Authentication or file issues.`);
       }
     } catch (error) {
-      setSummary(`❌ Ошибка диагностики: ${error}`);
+      setSummary(`❌ Diagnostic error: ${error}`);
     } finally {
       setIsChecking(false);
     }
@@ -97,7 +97,7 @@ const VideoDebugPanel: React.FC<VideoDebugPanelProps> = ({
   };
 
   const formatFileSize = (bytes?: number): string => {
-    if (!bytes) return 'Неизвестно';
+    if (!bytes) return 'Unknown';
     const mb = bytes / (1024 * 1024);
     return `${mb.toFixed(1)} MB`;
   };
@@ -175,7 +175,7 @@ const VideoDebugPanel: React.FC<VideoDebugPanelProps> = ({
                     </div>
                     {result.error && (
                       <div className="text-sm mt-1 text-red-600">
-                        Ошибка: {result.error}
+                        Error: {result.error}
                       </div>
                     )}
                     {result.httpStatus && (

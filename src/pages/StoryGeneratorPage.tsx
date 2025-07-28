@@ -74,13 +74,44 @@ function Step1({ data, onUpdate, onNext }: {
   onNext: () => void;
 }) {
   const [value, setValue] = useState(data);
+  const [error, setError] = useState<string>('');
+
+  const validatePrompt = (prompt: string): string => {
+    if (!prompt.trim()) {
+      return 'Please enter a story idea';
+    }
+    if (prompt.trim().length < 10) {
+      return 'Story idea must be at least 10 characters long';
+    }
+    if (prompt.trim().length > 500) {
+      return 'Story idea is too long (maximum 500 characters)';
+    }
+    if (prompt.trim().split(/\s+/).length < 3) {
+      return 'Please provide a more detailed story idea (at least 3 words)';
+    }
+    return '';
+  };
 
   const handleNext = () => {
-    if (value.trim()) {
-      onUpdate(value);
-      onNext();
+    const validationError = validatePrompt(value);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+    setError('');
+    onUpdate(value);
+    onNext();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(e.target.value);
+    if (error) {
+      setError('');
     }
   };
+
+  const characterCount = value.length;
+  const wordCount = value.trim().split(/\s+/).filter(word => word.length > 0).length;
 
   return (
     <div className="space-y-6 px-2 sm:px-4 md:px-8">
@@ -90,23 +121,63 @@ function Step1({ data, onUpdate, onNext }: {
       </div>
 
       <div className="space-y-4">
-        <textarea
-          placeholder="For example: A boy found a magic lamp and went on an amazing journey..."
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          className="w-full p-4 border border-gray-300 rounded-lg h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          required
-        />
-
-        <div className="flex justify-end">
-          <Button
-            onClick={handleNext}
-            disabled={!value.trim()}
-            className="px-8 py-2"
-          >
-            Next →
-          </Button>
+        <div className="relative">
+          <textarea
+            placeholder="For example: A boy found a magic lamp and went on an amazing journey..."
+            value={value}
+            onChange={handleInputChange}
+            className={`w-full p-4 border rounded-lg h-32 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              error ? 'border-red-500' : characterCount > 0 ? 'border-blue-300' : 'border-gray-300'
+            }`}
+            required
+          />
+          
+          {/* Character and word count */}
+          <div className="flex justify-between items-center mt-2 text-xs">
+            <div className="flex space-x-4">
+              <span className={`${characterCount < 10 ? 'text-red-500' : characterCount >= 50 ? 'text-green-500' : 'text-gray-500'}`}>
+                {characterCount}/500 characters
+              </span>
+              <span className={`${wordCount < 3 ? 'text-red-500' : wordCount >= 10 ? 'text-green-500' : 'text-gray-500'}`}>
+                {wordCount} words
+              </span>
+            </div>
+            {characterCount > 0 && (
+              <span className={error ? 'text-red-500' : 'text-green-500'}>
+                {error ? '✗ Invalid' : '✓ Valid'}
+              </span>
+            )}
+          </div>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <p className="text-xs text-gray-500">
+          The more detailed your story idea, the better the result. Include main characters, setting, and plot points.
+        </p>
+      </div>
+
+      <div className="flex justify-center">
+        <Button
+          onClick={handleNext}
+          disabled={!value.trim() || !!error}
+          className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next →
+        </Button>
       </div>
     </div>
   );
@@ -265,6 +336,31 @@ function Step4({ data, onUpdate, onNext, onBack }: {
   onBack: () => void;
 }) {
   const [characters, setCharacters] = useState(data.length > 0 ? data : [{ name: '', description: '', role: '' }]);
+  const [errors, setErrors] = useState<Array<{ name?: string; description?: string }>>([]);
+
+  const validateCharacter = (character: { name: string; description?: string; role?: string }, index: number): { name?: string; description?: string } => {
+    const errors: { name?: string; description?: string } = {};
+    
+    if (!character.name.trim()) {
+      errors.name = 'Character name is required';
+    } else if (character.name.trim().length < 2) {
+      errors.name = 'Character name must be at least 2 characters';
+    } else if (character.name.trim().length > 50) {
+      errors.name = 'Character name is too long (maximum 50 characters)';
+    }
+    
+    if (character.description && character.description.trim().length > 200) {
+      errors.description = 'Description is too long (maximum 200 characters)';
+    }
+    
+    return errors;
+  };
+
+  const validateAllCharacters = (): boolean => {
+    const newErrors = characters.map((char, index) => validateCharacter(char, index));
+    setErrors(newErrors);
+    return newErrors.every(error => !error.name && !error.description);
+  };
 
   const handleCharacterChange = (idx: number, field: string, value: string) => {
     setCharacters((prev) => {
@@ -272,13 +368,40 @@ function Step4({ data, onUpdate, onNext, onBack }: {
       updated[idx] = { ...updated[idx], [field]: value };
       return updated;
     });
+    
+    // Clear error for this field when user starts typing
+    if (errors[idx]) {
+      setErrors(prev => {
+        const updated = [...prev];
+        updated[idx] = { ...updated[idx], [field]: undefined };
+        return updated;
+      });
+    }
   };
 
-  const addCharacter = () => setCharacters((prev) => [...prev, { name: '', description: '', role: '' }]);
-  const removeCharacter = (idx: number) => setCharacters((prev) => prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev);
+  const addCharacter = () => {
+    setCharacters((prev) => [...prev, { name: '', description: '', role: '' }]);
+    setErrors(prev => [...prev, {}]);
+  };
+  
+  const removeCharacter = (idx: number) => {
+    setCharacters((prev) => prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev);
+    setErrors(prev => prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev);
+  };
 
   const handleNext = () => {
-    onUpdate(characters.filter((c) => c.name.trim()));
+    if (!validateAllCharacters()) {
+      return;
+    }
+    
+    const validCharacters = characters.filter((c) => c.name.trim());
+    if (validCharacters.length === 0) {
+      // Show error for first character if none are valid
+      setErrors([{ name: 'At least one character is required' }]);
+      return;
+    }
+    
+    onUpdate(validCharacters);
     onNext();
   };
 
@@ -290,62 +413,102 @@ function Step4({ data, onUpdate, onNext, onBack }: {
       </div>
 
       <div className="space-y-4">
-        {characters.map((char, idx) => (
-          <div key={idx} className="border border-gray-200 rounded-lg p-4 space-y-3">
-            <div className="flex justify-between items-center">
-              <h4 className="font-medium text-gray-700">Character {idx + 1}</h4>
-              {characters.length > 1 && (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => removeCharacter(idx)}
-                >
-                  Remove
-                </Button>
-              )}
-            </div>
+        {characters.map((character, idx) => (
+          <Card key={idx} className="p-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-gray-800">Character {idx + 1}</h3>
+                {characters.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => removeCharacter(idx)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Input
-                placeholder="Character Name"
-                value={char.name}
-                onChange={(e) => handleCharacterChange(idx, 'name', e.target.value)}
-              />
-              <Input
-                placeholder="Role (main, friend...)"
-                value={char.role || ''}
-                onChange={(e) => handleCharacterChange(idx, 'role', e.target.value)}
-              />
-              <Input
-                placeholder="Description"
-                value={char.description || ''}
-                onChange={(e) => handleCharacterChange(idx, 'description', e.target.value)}
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name *
+                </label>
+                <Input
+                  placeholder="Character name"
+                  value={character.name}
+                  onChange={(e) => handleCharacterChange(idx, 'name', e.target.value)}
+                  className={`${errors[idx]?.name ? 'border-red-500 focus:border-red-500' : character.name.length > 0 ? 'border-blue-300 focus:border-blue-500' : ''}`}
+                />
+                {errors[idx]?.name && (
+                  <p className="text-red-500 text-xs mt-1">{errors[idx].name}</p>
+                )}
+                {character.name.length > 0 && !errors[idx]?.name && (
+                  <p className="text-green-500 text-xs mt-1">✓ Valid name</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Description (optional)
+                </label>
+                <textarea
+                  placeholder="Brief description of the character"
+                  value={character.description || ''}
+                  onChange={(e) => handleCharacterChange(idx, 'description', e.target.value)}
+                  className={`w-full p-2 border rounded resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors[idx]?.description ? 'border-red-500' : (character.description?.length || 0) > 0 ? 'border-blue-300' : 'border-gray-300'
+                  }`}
+                  rows={2}
+                />
+                {errors[idx]?.description && (
+                  <p className="text-red-500 text-xs mt-1">{errors[idx].description}</p>
+                )}
+                {character.description && character.description.length > 0 && !errors[idx]?.description && (
+                  <p className="text-green-500 text-xs mt-1">✓ Valid description</p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {(character.description?.length || 0)}/200 characters
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Role (optional)
+                </label>
+                <Input
+                  placeholder="e.g., Hero, Villain, Sidekick"
+                  value={character.role || ''}
+                  onChange={(e) => handleCharacterChange(idx, 'role', e.target.value)}
+                  className="border-gray-300 focus:border-blue-500"
+                />
+              </div>
             </div>
-          </div>
+          </Card>
         ))}
 
         <Button
           type="button"
           variant="outline"
           onClick={addCharacter}
-          className="w-full"
+          className="w-full py-2"
         >
-          + Add Character
+          + Add Another Character
         </Button>
+      </div>
 
-        <div className="flex justify-between">
-          <Button variant="outline" onClick={onBack}>
-            ← Back
-          </Button>
-          <Button
-            onClick={handleNext}
-            className="px-8 py-2"
-          >
-            Next →
-          </Button>
-        </div>
+      <div className="flex justify-between">
+        <Button variant="outline" onClick={onBack}>
+          ← Back
+        </Button>
+        <Button
+          onClick={handleNext}
+          disabled={characters.every(c => !c.name.trim())}
+          className="px-8 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next →
+        </Button>
       </div>
     </div>
   );

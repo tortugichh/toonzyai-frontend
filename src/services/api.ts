@@ -864,17 +864,17 @@ export const getErrorMessage = (error: unknown): string => {
   // Hide backend URLs or technical details
   const hideUrl = (msg: string) =>
     /https?:\/\/|0\.0\.0\.0|localhost|127\.0\.0\.1|\/api\//.test(msg)
-      ? 'Ошибка соединения с сервером. Попробуйте позже.'
+      ? 'Connection error. Please try again later.'
       : msg;
 
   if (error instanceof APIError) {
     switch (error.status) {
       case 401:
-        return 'Требуется авторизация. Пожалуйста, войдите в систему.';
+        return 'Authentication required. Please log in to continue.';
       case 403:
-        return 'Недостаточно прав для выполнения операции.';
+        return 'Insufficient permissions to perform this operation.';
       case 404:
-        return 'Ресурс не найден. Возможно, он был удален.';
+        return 'Resource not found. It may have been deleted.';
       case 422:
         if (typeof error.details === 'object' && error.details.field_errors) {
           return error.details.field_errors
@@ -883,9 +883,9 @@ export const getErrorMessage = (error: unknown): string => {
         }
         return hideUrl(error.message);
       case 429:
-        return 'Слишком много запросов. Попробуйте позже.';
+        return 'Too many requests. Please try again later.';
       case 500:
-        return 'Ошибка сервера. Попробуйте позже.';
+        return 'Server error. Please try again later.';
       default:
         if (typeof error.details === 'object') {
           const d = error.details as any;
@@ -894,7 +894,7 @@ export const getErrorMessage = (error: unknown): string => {
             return d.field_errors.map((fe: any) => `${fe.field}: ${fe.message}`).join(', ');
           }
         }
-        return hideUrl(error.message || 'Произошла неизвестная ошибка.');
+        return hideUrl(error.message || 'An unexpected error occurred.');
     }
   }
   if (error instanceof Error) {
@@ -904,7 +904,7 @@ export const getErrorMessage = (error: unknown): string => {
     const msg = JSON.stringify(error);
     return hideUrl(msg);
   } catch {
-    return 'Произошла неожиданная ошибка.';
+    return 'An unexpected error occurred.';
   }
 };
 

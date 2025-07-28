@@ -46,13 +46,12 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
     }
   };
 
-  const getStatusText = (status?: string) => {
-    const s = status?.toLowerCase().trim();
-    switch (s) {
-      case 'completed': return 'Готов';
-      case 'generating': return 'Обработка';
-      case 'failed': return 'Ошибка';
-      case 'pending': return 'Ожидание';
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'completed': return 'Ready';
+      case 'generating': return 'Processing';
+      case 'failed': return 'Error';
+      case 'pending': return 'Pending';
       default: return status;
     }
   };
@@ -104,7 +103,9 @@ export function AvatarCard({ avatar, onDelete, isDeleting = false }: AvatarCardP
                 ) : normalizedStatus === 'failed' ? (
                   <>
                     <ActionIcon action="delete" className="w-4 h-4 mr-2" />
-                    Ошибка генерации
+                    <div className="text-red-600 text-sm font-medium">
+                      Generation Error
+                    </div>
                   </>
                 ) : (
                   <>

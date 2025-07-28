@@ -50,7 +50,7 @@ export default function BackendStatus({ onStatusChange }: BackendStatusProps) {
       <Card className="p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-card">
         <div className="flex items-center space-x-3">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand"></div>
-          <span className="text-gray-800">Проверка подключения к серверу...</span>
+          <span className="text-gray-800">Checking server connection...</span>
         </div>
       </Card>
     );
@@ -64,7 +64,7 @@ export default function BackendStatus({ onStatusChange }: BackendStatusProps) {
             <div className="w-6 h-6 bg-brand rounded-full flex items-center justify-center">
               <span className="text-white text-xs">✓</span>
             </div>
-            <span className="text-gray-800 font-medium">Сервер доступен</span>
+            <span className="text-gray-800 font-medium">Server available</span>
           </div>
           <Button
             onClick={checkBackendStatus}
@@ -87,9 +87,9 @@ export default function BackendStatus({ onStatusChange }: BackendStatusProps) {
             <span className="text-white text-xs">!</span>
           </div>
           <div>
-            <p className="text-gray-800 font-medium">Сервер недоступен</p>
+            <p className="text-gray-800 font-medium">Server unavailable</p>
             <p className="text-gray-600 text-sm">
-              Backend сервер не отвечает: {API_BASE_URL || 'localhost:8000'}
+              Backend server is not responding: {API_BASE_URL || 'localhost:8000'}
             </p>
             {lastCheck && (
               <p className="text-gray-500 text-xs mt-1">
@@ -112,12 +112,18 @@ export default function BackendStatus({ onStatusChange }: BackendStatusProps) {
       </div>
       
       <div className="mt-3 p-3 bg-gray-100 rounded-lg text-sm">
-        <p className="text-red-800 font-medium mb-2">Возможные решения:</p>
-        <ul className="text-red-700 space-y-1 text-xs">
-          <li>• Запустите backend сервер ToonzyAI на порту 8000</li>
-          <li>• Проверьте что сервер работает: <code>curl http://localhost:8000/api/v1/health</code></li>
-          <li>• Убедитесь что нет блокировки файрволла</li>
-        </ul>
+        <h3 className="text-sm font-medium text-red-800 mb-2">Connection Issues</h3>
+        <p className="text-sm text-red-700 mb-3">
+          Backend server is not responding: {API_BASE_URL || 'localhost:8000'}
+        </p>
+        <div className="text-sm text-red-600">
+          <p className="font-medium mb-2">Troubleshooting steps:</p>
+          <ul className="list-disc list-inside space-y-1">
+            <li>• Start the ToonzyAI backend server on port 8000</li>
+            <li>• Check if the server is running: <code>curl http://localhost:8000/api/v1/health</code></li>
+            <li>• Make sure there's no firewall blocking the connection</li>
+          </ul>
+        </div>
       </div>
     </Card>
   );
