@@ -1,226 +1,232 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '../ui/button';
+import { Card } from '../ui/card';
 import { 
-  createAuthenticatedVideoUrl, 
-  findWorkingVideoUrl 
+  getSegmentVideoUrls, 
+  checkVideoAvailability,
+  getVideoInfo
 } from '../../utils/videoUtils';
 import type { AnimationSegment } from '../../services/api';
 
-interface VideoPreviewProps {
-  videoUrl?: string | null;
-  posterUrl?: string;
-  segmentNumber?: number;
-  projectId?: string;
-  segment?: AnimationSegment;
-  title?: string;
-  className?: string;
-  onError?: (error: string) => void;
+interface VideoDebugPanelProps {
+  projectId: string;
+  segment: AnimationSegment;
+  onClose?: () => void;
 }
 
-const VideoPreview: React.FC<VideoPreviewProps> = ({
-  videoUrl,
-  posterUrl,
-  segmentNumber,
+interface DiagnosticResult {
+  url: string;
+  status: 'checking' | 'available' | 'unavailable' | 'error';
+  error?: string;
+  httpStatus?: number;
+  videoInfo?: {
+    size?: number;
+    format?: string;
+  };
+}
+
+const VideoDebugPanel: React.FC<VideoDebugPanelProps> = ({
   projectId,
   segment,
-  title = 'Video',
-  className = '',
-  onError
+  onClose
 }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [currentVideoUrl, setCurrentVideoUrl] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [results, setResults] = useState<DiagnosticResult[]>([]);
+  const [isChecking, setIsChecking] = useState(false);
+  const [summary, setSummary] = useState<string>('');
 
-  useEffect(() => {
-    let mounted = true;
-    let retryTimer: NodeJS.Timeout;
-
-    const initializeVideoUrl = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        let workingUrl: string | null = null;
-
-        if (projectId && segmentNumber !== undefined && segment) {
-          console.log(`🎥 Finding video URL for segment ${segmentNumber}`);
-          const result = await findWorkingVideoUrl(projectId, segmentNumber, segment);
-          workingUrl = result.url;
-          if (!workingUrl) {
-            console.warn(`❌ No valid video URLs for segment ${segmentNumber}`);
-          }
-        } else if (videoUrl) {
-          workingUrl = createAuthenticatedVideoUrl({ baseUrl: videoUrl });
-        }
-
-        if (workingUrl) {
-          if (!mounted) return;
-          setCurrentVideoUrl(
-            workingUrl + (workingUrl.includes('?') ? '&' : '?') + `ts=${Date.now()}`
-          );
-          console.log(`✅ Using video URL: ${workingUrl}`);
-        } else {
-          throw new Error('No available video URL found');
-        }
-      } catch (err: any) {
-        console.error('❌ Error initializing video URL:', err);
-        if (!mounted) return;
-        setError(err.message || 'Failed to load video');
-        onError?.(err.message || 'Failed to load video');
-
-        retryTimer = setTimeout(initializeVideoUrl, 5000);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initializeVideoUrl();
-
-    return () => {
-      mounted = false;
-      if (retryTimer) clearTimeout(retryTimer);
-    };
-  }, [videoUrl, projectId, segmentNumber, segment, onError]);
-
-  const handleLoadStart = () => {
-    setIsLoading(true);
-    setError(null);
-  };
-
-  const handleCanPlay = () => {
-    setIsLoading(false);
-    setError(null);
-    setRetryCount(0);
-  };
-
-  const handleError = () => {
-    const errorMessage = `Failed to load video: ${title}`;
-    setError(errorMessage);
-    setIsLoading(false);
-    onError?.(errorMessage);
-
-    if (retryCount < 2 && projectId && segmentNumber !== undefined) {
-      setRetryCount(prev => prev + 1);
-      setCurrentVideoUrl(null);
-    }
-  };
-
-  const handleDownload = async () => {
-    if (!currentVideoUrl) return;
+  const runDiagnostics = async () => {
+    setIsChecking(true);
+    setResults([]);
 
     try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch(currentVideoUrl, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const urls = getSegmentVideoUrls(projectId, segment.segment_number, segment);
+      const diagnosticResults: DiagnosticResult[] = [];
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      for (const url of urls) {
+        const availability = await checkVideoAvailability(url);
+        const videoInfo = await getVideoInfo(url);
+        
+        diagnosticResults.push({
+          url,
+          status: availability.available ? 'available' : 'unavailable',
+          error: availability.error,
+          httpStatus: availability.status,
+          videoInfo: videoInfo.error ? undefined : {
+            size: videoInfo.size,
+            format: videoInfo.format
+          }
+        });
+      }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `${title.replace(/\s+/g, '_')}.mp4`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error: any) {
-      onError?.(`Download failed: ${error.message}`);
+      setResults(diagnosticResults);
+      
+      // Create summary
+      const availableCount = diagnosticResults.filter(r => r.status === 'available').length;
+      const totalCount = diagnosticResults.length;
+      
+      if (availableCount > 0) {
+        setSummary(`✅ Найдено ${availableCount} рабочих URL из ${totalCount}. Видео должно загружаться!`);
+      } else {
+        setSummary(`❌ Все ${totalCount} URL недоступны. Проблема с авторизацией или файлы отсутствуют.`);
+      }
+    } catch (error) {
+      setSummary(`❌ Ошибка диагностики: ${error}`);
+    } finally {
+      setIsChecking(false);
     }
   };
 
-  const handleOpenInNewTab = () => {
-    if (currentVideoUrl) window.open(currentVideoUrl, '_blank');
+  const getStatusIcon = (status: DiagnosticResult['status']) => {
+    switch (status) {
+      case 'checking': return '⏳';
+      case 'available': return '✅';
+      case 'unavailable': return '❌';
+      case 'error': return '🚫';
+      default: return '❓';
+    }
   };
 
-  if (error && !currentVideoUrl) {
-    return (
-      <div className={`relative rounded-lg overflow-hidden bg-red-50 border border-red-200 ${className}`}>
-        <div className="p-6 text-center">
-          <div className="text-4xl mb-2">❌</div>
-          <h4 className="font-medium text-red-800 mb-2">{title}</h4>
-          <p className="text-red-600 text-sm mb-4">{error}</p>
-          {projectId && segmentNumber !== undefined && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setError(null);
-                setRetryCount(0);
-                setCurrentVideoUrl(null);
-              }}
-              className="text-red-600 border-red-300 hover:bg-red-50"
-            >
-              🔄 Retry
-            </Button>
-          )}
-        </div>
-      </div>
-    );
-  }
+  const getStatusColor = (status: DiagnosticResult['status']) => {
+    switch (status) {
+      case 'checking': return 'text-blue-600 bg-blue-50';
+      case 'available': return 'text-green-600 bg-green-50';
+      case 'unavailable': return 'text-red-600 bg-red-50';
+      case 'error': return 'text-gray-600 bg-gray-50';
+      default: return 'text-gray-600 bg-gray-50';
+    }
+  };
+
+  const formatFileSize = (bytes?: number): string => {
+    if (!bytes) return 'Неизвестно';
+    const mb = bytes / (1024 * 1024);
+    return `${mb.toFixed(1)} MB`;
+  };
 
   return (
-    <div className={`relative rounded-lg overflow-hidden ${className}`}>
-      {isLoading && (
-        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center z-10 rounded-lg">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-600 border-t-transparent mx-auto mb-2"></div>
-            <p className="text-sm text-gray-600">Loading video...</p>
-            <p className="text-xs text-gray-500 mt-1">{title}</p>
+    <Card className="p-6 max-w-4xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold">
+          🔧 Диагностика видео - Сегмент {segment.segment_number}
+        </h3>
+        {onClose && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            className="text-gray-600"
+          >
+            ✕ Закрыть
+          </Button>
+        )}
+      </div>
+
+      {/* Информация о сегменте */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <h4 className="font-medium mb-2">Данные сегмента:</h4>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="font-medium">Статус:</span> {segment.status}
+          </div>
+          <div>
+            <span className="font-medium">video_url:</span> {segment.video_url || 'отсутствует'}
+          </div>
+          <div>
+            <span className="font-medium">generated_video_url:</span> {segment.generated_video_url || 'отсутствует'}
+          </div>
+          <div>
+            <span className="font-medium">urls.video_endpoint:</span> {segment.urls?.video_endpoint || 'отсутствует'}
+          </div>
+        </div>
+      </div>
+
+      {/* Кнопка запуска диагностики */}
+      <div className="mb-6">
+        <Button
+          onClick={runDiagnostics}
+          disabled={isChecking}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          {isChecking ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <span>Проверка...</span>
+            </div>
+          ) : (
+            '🚀 Запустить диагностику'
+          )}
+        </Button>
+      </div>
+
+      {/* Результаты диагностики */}
+      {results.length > 0 && (
+        <div className="mb-6">
+          <h4 className="font-medium mb-4">Результаты проверки URL:</h4>
+          <div className="space-y-3">
+            {results.map((result, index) => (
+              <div
+                key={index}
+                className={`p-3 rounded-lg border ${getStatusColor(result.status)}`}
+              >
+                <div className="flex items-start gap-3">
+                  <span className="text-lg">{getStatusIcon(result.status)}</span>
+                  <div className="flex-1">
+                    <div className="font-mono text-sm break-all">
+                      {result.url}
+                    </div>
+                    {result.error && (
+                      <div className="text-sm mt-1 text-red-600">
+                        Ошибка: {result.error}
+                      </div>
+                    )}
+                    {result.httpStatus && (
+                      <div className="text-sm mt-1 text-gray-600">
+                        HTTP Status: {result.httpStatus}
+                      </div>
+                    )}
+                    {result.videoInfo && (
+                      <div className="text-sm mt-1 text-green-600">
+                        Размер: {formatFileSize(result.videoInfo.size)} | 
+                        Формат: {result.videoInfo.format || 'неизвестен'}
+                      </div>
+                    )}
+                  </div>
+                  {result.status === 'available' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(result.url, '_blank')}
+                      className="text-blue-600"
+                    >
+                      🔗 Открыть
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      <video
-        ref={videoRef}
-        src={currentVideoUrl || undefined}
-        poster={posterUrl}
-        controls
-        preload="metadata"
-        onLoadStart={handleLoadStart}
-        onCanPlay={handleCanPlay}
-        onError={handleError}
-        className="w-full h-auto rounded-lg"
-        style={{ minHeight: '120px' }}
-      >
-        <source src={currentVideoUrl || undefined} type="video/mp4" />
-        <p className="text-red-600 text-sm p-4">
-          Your browser does not support video playback.
-        </p>
-      </video>
-
-      {!isLoading && !error && currentVideoUrl && (
-        <div className="mt-2 flex gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleDownload}
-            className="text-green-600 border-green-300 hover:bg-green-50"
-          >
-            📥 Download
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleOpenInNewTab}
-            className="text-blue-600 border-blue-300 hover:bg-blue-50"
-          >
-            🔗 Open
-          </Button>
+      {/* Итоговый отчет */}
+      {summary && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h4 className="font-medium mb-2">💡 Итог диагностики:</h4>
+          <p className="text-sm text-blue-800">{summary}</p>
         </div>
       )}
 
-      {error && currentVideoUrl && (
-        <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
-          ⚠️ {error} {retryCount > 0 && `(attempt ${retryCount + 1})`}
-        </div>
-      )}
-    </div>
+      {/* Рекомендации */}
+      <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <h4 className="font-medium mb-2">🛠️ Возможные решения:</h4>
+        <ul className="text-sm text-yellow-800 space-y-1">
+          <li>• Проверьте, авторизованы ли вы (access_token в localStorage)</li>
+          <li>• Убедитесь, что видео файл действительно существует в bucket</li>
+          <li>• Проверьте правильность настроек CORS для видео endpoints</li>
+          <li>• Обратитесь к разработчику если все URL недоступны</li>
+        </ul>
+      </div>
+    </Card>
   );
 };
 
-export default VideoPreview;
+export default VideoDebugPanel; 
