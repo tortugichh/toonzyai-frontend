@@ -824,6 +824,12 @@ class APIClient {
     return this.request<StoryListResponse>('/stories/');
   }
 
+  async deleteStory(storyId: string): Promise<{ message: string; story_id: string }> {
+    return this.request(`/stories/${storyId}`, {
+      method: 'DELETE',
+    });
+  }
+
   async generateSegmentById(segmentId: string, segmentPrompt: string) {
     if (!segmentPrompt) {
       throw new Error('segmentPrompt is required');

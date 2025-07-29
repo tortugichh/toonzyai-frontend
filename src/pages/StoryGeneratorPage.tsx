@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { createStory, getStoryStatus, createAnimationProject, assembleVideo } from '@/services/storyApi';
+import { createStory, getStoryStatus, createAnimationProject, assembleVideo, deleteStory } from '@/services/storyApi';
 import { apiClient } from '@/services/api';
 import type { StoryStatusResponse, StoryResult, StoryCharacter } from '@/services/api';
 import { getErrorMessage } from '@/utils/errorHandler';
@@ -16,6 +16,9 @@ import HTMLFlipBook from 'react-pageflip';
 import html2pdf from 'html2pdf.js';
 import { useStories, useStory, type StoryItem } from '@/hooks/useStories';
 import { StoryCard } from '@/components/common/StoryCard';
+import { toastError, toastSuccess } from '@/utils/toast';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { ConfirmModal } from '@/components/common/ConfirmModal';
 
 const POLLING_INTERVAL = 3000; // 3 seconds
 
@@ -1145,6 +1148,11 @@ export function StoryGeneratorPage() {
   const [selectedStory, setSelectedStory] = useState<StoryItem | null>(null);
   const [viewingExistingStory, setViewingExistingStory] = useState(false);
 
+  // States for delete confirmation
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [storyToDelete, setStoryToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Hooks for working with stories
   const { data: storiesData, isLoading: storiesLoading, refetch: refetchStories } = useStories();
   const { data: selectedStoryData } = useStory(selectedStory?.task_id || '');
@@ -1176,10 +1184,47 @@ export function StoryGeneratorPage() {
   };
 
   const handleDeleteStory = async (storyId: string) => {
-    // TODO: Add endpoint for deleting a story
-    console.log('Deleting story:', storyId);
-    // Refresh the list after deletion
-    refetchStories();
+    // Find the story to check its status
+    const storyToDelete = storiesData?.stories.find(s => s.id === storyId);
+    
+    if (storyToDelete?.status === 'in_progress' || storyToDelete?.status === 'pending') {
+      toastError('Cannot delete a story that is currently being generated. Please wait for it to complete.');
+      return;
+    }
+    
+    setStoryToDelete(storyId);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDeleteStory = async () => {
+    if (!storyToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteStory(storyToDelete);
+      toastSuccess('Story deleted successfully!');
+      refetchStories();
+      
+      // Clear any selected story if it was the one being deleted
+      if (selectedStory?.id === storyToDelete) {
+        setSelectedStory(null);
+        setViewingExistingStory(false);
+        setShowBook(false);
+      }
+      
+      setDeleteModalOpen(false);
+      setStoryToDelete(null);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err);
+      toastError(errorMessage);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const cancelDeleteStory = () => {
+    setDeleteModalOpen(false);
+    setStoryToDelete(null);
   };
 
   if (isLoading) {
@@ -1341,6 +1386,7 @@ export function StoryGeneratorPage() {
                         story={storyItem}
                         onOpen={handleOpenStory}
                         onDelete={handleDeleteStory}
+                        isDeleting={isDeleting && storyToDelete === storyItem.id}
                       />
                     ))}
                   </div>
@@ -1419,6 +1465,15 @@ export function StoryGeneratorPage() {
           </CardContent>
         </Card>
       </div>
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={cancelDeleteStory}
+        onConfirm={confirmDeleteStory}
+        title="Confirm Deletion"
+        message={`Are you sure you want to delete this story? This action cannot be undone.`}
+        confirmText="Delete Story"
+        isLoading={isDeleting}
+      />
     </>
   );
 }

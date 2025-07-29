@@ -18,6 +18,7 @@ export { ErrorBoundary, CriticalErrorFallback } from './ErrorBoundary';
 export { default as ProgressMonitor } from './ProgressMonitor';
 export { ContentModerationModal } from './ContentModerationModal';
 export { StoryCard } from './StoryCard';
+export { ConfirmModal } from './ConfirmModal';
 
 // Error handling components
 export { withErrorHandling, useErrorBoundary, ErrorBoundaryHook } from './withErrorHandling'; 

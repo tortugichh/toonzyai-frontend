@@ -27,6 +27,10 @@ export async function getStoryStatus(taskId: string): Promise<StoryStatusRespons
   return apiClient.getStoryStatus(taskId);
 }
 
+export async function deleteStory(storyId: string): Promise<{ message: string; story_id: string }> {
+  return apiClient.deleteStory(storyId);
+}
+
 export interface CreateAnimationProjectPayload {
   name: string;
   source_avatar_id: string;
