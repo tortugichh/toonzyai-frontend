@@ -1,4 +1,5 @@
 import { secureLogger, sanitizeApiError } from './secureLogging';
+import { toastError } from './toast';
 import { IS_PRODUCTION } from '@/constants';
 
 // Глобальный обработчик необработанных ошибок
@@ -8,12 +9,16 @@ export const initializeGlobalErrorHandler = () => {
     const sanitizedError = sanitizeApiError(event.reason);
     secureLogger.error('Unhandled promise rejection:', sanitizedError);
     
+    // Show toast notification for unhandled promise rejections
+    toastError(event.reason);
+    
+    // Prevent default behavior to avoid console errors
+    event.preventDefault();
+    
     // В продакшене не показываем alert с ошибкой
     if (!IS_PRODUCTION) {
       console.warn('Unhandled promise rejection:', event.reason);
     }
-    
-    // Не предотвращаем стандартное поведение, но логируем безопасно
   });
 
   // Обработка JavaScript ошибок
@@ -27,6 +32,12 @@ export const initializeGlobalErrorHandler = () => {
     };
     
     secureLogger.error('JavaScript error:', sanitizedError);
+    
+    // Show toast notification for JavaScript errors
+    toastError(new Error(event.message));
+    
+    // Prevent default behavior
+    event.preventDefault();
   });
 
   // Переопределяем console методы в продакшене
@@ -37,6 +48,17 @@ export const initializeGlobalErrorHandler = () => {
     console.error = (...args) => {
       const sanitizedArgs = args.map(arg => sanitizeApiError(arg));
       originalConsole.error(...sanitizedArgs);
+      
+      // Show toast for console.error calls
+      const errorMessage = args.map(arg => 
+        typeof arg === 'string' ? arg : 
+        arg instanceof Error ? arg.message : 
+        JSON.stringify(arg)
+      ).join(' ');
+      
+      if (errorMessage && !errorMessage.includes('[MASKED]')) {
+        toastError(new Error(errorMessage));
+      }
     };
     
     // Переопределяем console.warn
@@ -59,5 +81,40 @@ export const createSecureOnError = () => {
   return (error: unknown) => {
     const sanitizedError = sanitizeApiError(error);
     secureLogger.error('React Query error:', sanitizedError);
+    
+    // Show toast for React Query errors
+    toastError(error);
+  };
+};
+
+// Enhanced error handler for async operations
+export const withErrorHandling = <T extends any[], R>(
+  fn: (...args: T) => Promise<R>
+) => {
+  return async (...args: T): Promise<R | undefined> => {
+    try {
+      return await fn(...args);
+    } catch (error) {
+      const sanitizedError = sanitizeApiError(error);
+      secureLogger.error('Function error:', sanitizedError);
+      toastError(error);
+      return undefined;
+    }
+  };
+};
+
+// Error handler for synchronous operations
+export const withSyncErrorHandling = <T extends any[], R>(
+  fn: (...args: T) => R
+) => {
+  return (...args: T): R | undefined => {
+    try {
+      return fn(...args);
+    } catch (error) {
+      const sanitizedError = sanitizeApiError(error);
+      secureLogger.error('Sync function error:', sanitizedError);
+      toastError(error);
+      return undefined;
+    }
   };
 }; 

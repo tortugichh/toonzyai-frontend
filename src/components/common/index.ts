@@ -14,7 +14,10 @@ export { DebugTokenInfo } from './DebugTokenInfo';
 export { SegmentEditor } from './SegmentEditor';
 export { AnimationProject } from './AnimationProject';
 export { CreateProject } from './CreateProject';
-export { ErrorBoundary } from './ErrorBoundary';
+export { ErrorBoundary, CriticalErrorFallback } from './ErrorBoundary';
 export { default as ProgressMonitor } from './ProgressMonitor';
 export { ContentModerationModal } from './ContentModerationModal';
-export { StoryCard } from './StoryCard'; 
+export { StoryCard } from './StoryCard';
+
+// Error handling components
+export { withErrorHandling, useErrorBoundary, ErrorBoundaryHook } from './withErrorHandling'; 

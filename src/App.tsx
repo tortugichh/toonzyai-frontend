@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'react-hot-toast';
 import { QUERY_STALE_TIME, QUERY_CACHE_TIME, IS_DEVELOPMENT } from '@/constants';
-import { createSecureOnError } from '@/utils/globalErrorHandler';
+import { createSecureOnError, initializeGlobalErrorHandler } from '@/utils/globalErrorHandler';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useCurrentUser, simpleLogout } from '@/hooks/useAuth';
 import { ErrorBoundary } from '@/components/common';
@@ -20,12 +20,15 @@ import AnimationStudioPage from '@/pages/AnimationStudioPage';
 import ProjectPage from '@/pages/ProjectPage';
 import { StoryGeneratorPage } from '@/pages/StoryGeneratorPage';
 import StoryDetailPage from '@/pages/StoryDetailPage';
+import { useEffect } from 'react';
 
 
 if (typeof window !== 'undefined') {
   (window as any).emergencyLogout = simpleLogout;
 }
 
+// Initialize global error handler
+initializeGlobalErrorHandler();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,9 +36,10 @@ const queryClient = new QueryClient({
       retry: 1,
       refetchOnWindowFocus: false,
       staleTime: QUERY_STALE_TIME,
-      gcTime: QUERY_CACHE_TIME, 
+      gcTime: QUERY_CACHE_TIME,
     },
     mutations: {
+      onError: createSecureOnError(),
     },
   },
 });

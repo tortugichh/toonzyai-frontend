@@ -2,10 +2,11 @@
 export const IS_DEVELOPMENT = import.meta.env.DEV;
 export const IS_PRODUCTION = import.meta.env.PROD;
 
-// Базовый origin бекенда можно переопределить через VITE_API_ORIGIN,
-// иначе берём домен .me по умолчанию в продакшене.
-// Force local development - never use production API in development
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ?? '';
+// В продакшене используем относительные пути для проксирования через Vercel
+// В разработке используем полный URL для прямого обращения к бэкенду
+const API_ORIGIN = IS_PRODUCTION 
+  ? '' // Пустая строка для относительных путей в продакшене
+  : (import.meta.env.VITE_API_ORIGIN ?? 'http://localhost:8000');
 
 // Полный базовый URL всех REST-эндпоинтов
 export const API_BASE_URL = `${API_ORIGIN}/api/v1`;

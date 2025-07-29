@@ -9,10 +9,7 @@ declare global {
 export const initializeAnalytics = () => {
   const GA_ID = import.meta.env.VITE_GA_ID;
   
-  if (!GA_ID) {
-    console.log('Google Analytics ID не найден в переменных окружения');
-    return;
-  }
+ 
 
   // Создаем скрипт для загрузки Google Analytics
   const script = document.createElement('script');
@@ -30,7 +27,7 @@ export const initializeAnalytics = () => {
   window.gtag('js', new Date());
   window.gtag('config', GA_ID);
 
-  console.log(`Google Analytics инициализирован с ID: ${GA_ID}`);
+
 };
 
 // Функция для отправки событий

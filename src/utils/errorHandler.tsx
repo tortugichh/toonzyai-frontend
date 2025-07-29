@@ -28,7 +28,154 @@ interface ErrorInfo {
 export function categorizeError(error: unknown): ErrorInfo {
   const errorMessage = getErrorMessage(error).toLowerCase();
   
-  // Authentication errors
+  // Check if this is an APIError with specific details
+  if (error instanceof APIError) {
+    const details = error.details;
+    const originalMessage = typeof details === 'string' ? details : details?.detail || '';
+    const originalMessageLower = originalMessage.toLowerCase();
+    
+    // Specific authentication error patterns
+    if (originalMessageLower.includes('invalid credentials') || 
+        originalMessageLower.includes('incorrect password') ||
+        originalMessageLower.includes('wrong password') ||
+        originalMessageLower.includes('invalid username') ||
+        originalMessageLower.includes('user not found') ||
+        originalMessageLower.includes('no user found')) {
+      return {
+        type: ErrorType.AUTHENTICATION,
+        message: originalMessage,
+        userFriendly: 'Invalid username/email or password. Please check your credentials and try again.',
+        icon: '🔒',
+        duration: 4000
+      };
+    }
+    
+    // Email verification errors
+    if (originalMessageLower.includes('email not verified') || 
+        originalMessageLower.includes('verify your email') ||
+        originalMessageLower.includes('email verification')) {
+      return {
+        type: ErrorType.EMAIL_VERIFICATION,
+        message: originalMessage,
+        userFriendly: 'Please verify your email before logging in. Check your inbox or request a new verification email.',
+        icon: '📧',
+        duration: 6000
+      };
+    }
+    
+    // Account locked/suspended
+    if (originalMessageLower.includes('account locked') || 
+        originalMessageLower.includes('account suspended') ||
+        originalMessageLower.includes('account disabled')) {
+      return {
+        type: ErrorType.AUTHORIZATION,
+        message: originalMessage,
+        userFriendly: 'Your account has been temporarily suspended. Please contact support for assistance.',
+        icon: '🚫',
+        duration: 5000
+      };
+    }
+    
+    // Field-specific validation errors
+    if (typeof details === 'object' && details.field_errors) {
+      const fieldErrors = details.field_errors;
+      const authFields = ['username', 'email', 'password', 'login'];
+      const hasAuthFieldError = fieldErrors.some(fe => 
+        authFields.some(authField => fe.field.toLowerCase().includes(authField))
+      );
+      
+      if (hasAuthFieldError) {
+        return {
+          type: ErrorType.VALIDATION,
+          message: fieldErrors.map(fe => `${fe.field}: ${fe.message}`).join(', '),
+          userFriendly: 'Please check your login information and try again.',
+          icon: '✏️',
+          duration: 4000
+        };
+      }
+    }
+    
+    // HTTP status code specific handling
+    switch (error.status) {
+      case 401:
+        // Check if it's a login attempt vs session expired
+        if (originalMessageLower.includes('invalid') || 
+            originalMessageLower.includes('incorrect') ||
+            originalMessageLower.includes('wrong') ||
+            originalMessageLower.includes('not found')) {
+          return {
+            type: ErrorType.AUTHENTICATION,
+            message: originalMessage,
+            userFriendly: 'Invalid username/email or password. Please check your credentials and try again.',
+            icon: '🔒',
+            duration: 4000
+          };
+        }
+        return {
+          type: ErrorType.AUTHENTICATION,
+          message: originalMessage,
+          userFriendly: 'Your session has expired. Please log in again.',
+          icon: '🔐',
+          duration: 4000
+        };
+      
+      case 403:
+        return {
+          type: ErrorType.AUTHORIZATION,
+          message: originalMessage,
+          userFriendly: 'You do not have permission to perform this action.',
+          icon: '🚫',
+          duration: 4000
+        };
+      
+      case 404:
+        if (originalMessageLower.includes('user') || originalMessageLower.includes('account')) {
+          return {
+            type: ErrorType.NOT_FOUND,
+            message: originalMessage,
+            userFriendly: 'Account not found. Please check your username/email or create a new account.',
+            icon: '👤',
+            duration: 5000
+          };
+        }
+        return {
+          type: ErrorType.NOT_FOUND,
+          message: originalMessage,
+          userFriendly: 'Resource not found. It may have been deleted.',
+          icon: '🔍',
+          duration: 4000
+        };
+      
+      case 422:
+        return {
+          type: ErrorType.VALIDATION,
+          message: originalMessage,
+          userFriendly: 'Please check your input and try again.',
+          icon: '✏️',
+          duration: 4000
+        };
+      
+      case 429:
+        return {
+          type: ErrorType.RATE_LIMIT,
+          message: originalMessage,
+          userFriendly: 'Too many requests. Please wait a moment before trying again.',
+          icon: '⏱️',
+          duration: 4000
+        };
+      
+      case 500:
+        return {
+          type: ErrorType.SERVER,
+          message: originalMessage,
+          userFriendly: 'Server error. Please try again later.',
+          icon: '🔧',
+          duration: 5000
+        };
+    }
+  }
+  
+  // Fallback to message-based categorization
   if (errorMessage.includes('invalid') && (errorMessage.includes('password') || errorMessage.includes('credentials'))) {
     return {
       type: ErrorType.AUTHENTICATION,

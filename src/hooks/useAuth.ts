@@ -2,11 +2,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { apiClient } from '@/services/api';
 import { toastError, toastSuccess } from '@/utils/toast';
+import { useAuthErrorHandler } from '@/hooks/useErrorHandler';
 import type { LoginRequest, RegisterRequest } from '@/types/api';
 import { secureLogger, sanitizeApiError } from '@/utils/secureLogging';
 
 export function useLogin() {
   const queryClient = useQueryClient();
+  const { handleAuthError } = useAuthErrorHandler();
 
   return useMutation({
     mutationFn: (data: LoginRequest) => apiClient.login(data.login, data.password),
@@ -15,12 +17,16 @@ export function useLogin() {
       localStorage.setItem('refresh_token', response.refresh_token);
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
-    onError: (error) => toastError(error),
+    onError: (error) => {
+      // Use specific auth error handling
+      handleAuthError(error);
+    },
   });
 }
 
 export function useRegister() {
   const queryClient = useQueryClient();
+  const { handleAuthError } = useAuthErrorHandler();
 
   return useMutation({
     mutationFn: (data: RegisterRequest) => apiClient.register(data.username, data.email, data.password),
@@ -28,7 +34,10 @@ export function useRegister() {
       // После успешной регистрации пользователь должен войти в систему
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
-    onError: (error) => toastError(error),
+    onError: (error) => {
+      // Use specific auth error handling
+      handleAuthError(error);
+    },
   });
 }
 
@@ -43,6 +52,7 @@ export function useCurrentUser() {
 
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
+  const { handleAuthError } = useAuthErrorHandler();
 
   return useMutation({
     mutationFn: (data: Partial<{ username: string; email: string; password?: string }>) => 
@@ -50,14 +60,23 @@ export function useUpdateProfile() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
-    onError: (error) => toastError(error),
+    onError: (error) => {
+      // Use specific auth error handling
+      handleAuthError(error);
+    },
   });
 }
 
 export function useChangePassword() {
+  const { handleAuthError } = useAuthErrorHandler();
+
   return useMutation({
     mutationFn: ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) => 
       apiClient.changePassword(currentPassword, newPassword),
+    onError: (error) => {
+      // Use specific auth error handling
+      handleAuthError(error);
+    },
   });
 }
 
@@ -131,6 +150,7 @@ export function useVerifyToken() {
 // Хук для OAuth2 логина (для совместимости со Swagger UI)
 export function useTokenLogin() {
   const queryClient = useQueryClient();
+  const { handleAuthError } = useAuthErrorHandler();
 
   return useMutation({
     mutationFn: ({ login, password }: { login: string; password: string }) => 
@@ -140,6 +160,9 @@ export function useTokenLogin() {
       localStorage.setItem('refresh_token', response.refresh_token);
       queryClient.invalidateQueries({ queryKey: ['user'] });
     },
-    onError: (error) => toastError(error),
+    onError: (error) => {
+      // Use specific auth error handling
+      handleAuthError(error);
+    },
   });
 } 

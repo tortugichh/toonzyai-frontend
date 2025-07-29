@@ -1,9 +1,4 @@
-/**
- * ToonzyAI API Client
- * Полная реализация согласно BACKEND_API_DOCUMENTATION.md
- */
-
-import { API_BASE_URL } from '@/constants';
+import { API_BASE_URL, IS_PRODUCTION } from '@/constants';
 import { secureLogger, sanitizeApiError } from '@/utils/secureLogging';
 
 // Use original console methods to avoid recursion
@@ -13,11 +8,9 @@ const originalConsole = {
   warn: console.warn
 };
 
-// Базовый путь API – полноценный URL в продакшене, либо прокси-путь в dev
-export const API_BASE = API_BASE_URL || '/api/v1';
+export const API_BASE = API_BASE_URL;
 
-// Для медиа-ресурсов также используем тот же origin
-const MEDIA_API_BASE = API_BASE_URL || '/api/v1';
+const MEDIA_API_BASE = API_BASE_URL;
 
 // ============ TYPES ============
 export interface User {
@@ -881,38 +874,70 @@ export const getErrorMessage = (error: unknown): string => {
   };
 
   if (error instanceof APIError) {
-    switch (error.status) {
-      case 401:
-        return 'Authentication required. Please log in to continue.';
-      case 403:
-        return 'Insufficient permissions to perform this operation.';
-      case 404:
-        return 'Resource not found. It may have been deleted.';
-      case 422:
-        if (typeof error.details === 'object' && error.details.field_errors) {
-          return error.details.field_errors
-            .map(fe => `${fe.field}: ${fe.message}`)
-            .join(', ');
-        }
-        return hideUrl(error.message);
-      case 429:
-        return 'Too many requests. Please try again later.';
-      case 500:
-        return 'Server error. Please try again later.';
-      default:
-        if (typeof error.details === 'object') {
-          const d = error.details as any;
-          if (d.detail) return hideUrl(d.detail);
-          if (d.field_errors) {
-            return d.field_errors.map((fe: any) => `${fe.field}: ${fe.message}`).join(', ');
-          }
-        }
-        return hideUrl(error.message || 'An unexpected error occurred.');
+    // Extract the original error message from the API response
+    let originalMessage = '';
+    if (typeof error.details === 'object' && error.details.detail) {
+      originalMessage = error.details.detail;
+    } else if (typeof error.details === 'string') {
+      originalMessage = error.details;
     }
+
+    // For authentication errors, return the original message if it's specific
+    if (error.status === 401) {
+      const messageLower = originalMessage.toLowerCase();
+      if (messageLower.includes('invalid credentials') || 
+          messageLower.includes('incorrect password') ||
+          messageLower.includes('wrong password') ||
+          messageLower.includes('invalid username') ||
+          messageLower.includes('user not found') ||
+          messageLower.includes('no user found')) {
+        return originalMessage || 'Invalid username/email or password';
+      }
+      return originalMessage || 'Authentication required. Please log in to continue.';
+    }
+
+    if (error.status === 403) {
+      return originalMessage || 'Insufficient permissions to perform this operation.';
+    }
+
+    if (error.status === 404) {
+      const messageLower = originalMessage.toLowerCase();
+      if (messageLower.includes('user') || messageLower.includes('account')) {
+        return originalMessage || 'Account not found';
+      }
+      return originalMessage || 'Resource not found. It may have been deleted.';
+    }
+
+    if (error.status === 422) {
+      if (typeof error.details === 'object' && error.details.field_errors) {
+        return error.details.field_errors
+          .map(fe => `${fe.field}: ${fe.message}`)
+          .join(', ');
+      }
+      return originalMessage || hideUrl(error.message);
+    }
+
+    if (error.status === 429) {
+      return originalMessage || 'Too many requests. Please try again later.';
+    }
+
+    if (error.status === 500) {
+      return originalMessage || 'Server error. Please try again later.';
+    }
+
+    // For other status codes, return the original message if available
+    if (originalMessage) {
+      return originalMessage;
+    }
+
+    // Fallback to the error message
+    return hideUrl(error.message || 'An unexpected error occurred.');
   }
+
   if (error instanceof Error) {
     return hideUrl(error.message);
   }
+
   try {
     const msg = JSON.stringify(error);
     return hideUrl(msg);
