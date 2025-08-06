@@ -23,14 +23,6 @@ export const FinalCtaSection = () => {
           >
             START FOR FREE 🚀
           </Button>
-          <Button 
-            size="lg" 
-            variant="outline" 
-            className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg"
-            onClick={() => toastSuccess('This feature will be available soon!')}
-          >
-            CONTACT US
-          </Button>
         </div>
       </div>
     </section>
