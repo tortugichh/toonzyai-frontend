@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Header } from '@/components/layout/Header';
 import { useCurrentUser, useLogout } from '@/hooks/useAuth';
 import { useStory } from '@/hooks/useStories';
+import { useMobile } from '@/hooks/useMobile';
 import { getErrorMessage } from '@/utils/errorHandler';
 import type { StoryResult } from '@/services/api';
 import HTMLFlipBook from 'react-pageflip';
@@ -16,6 +17,7 @@ function StoryDetailPage() {
   const { data: user } = useCurrentUser();
   const { data: storyData, isLoading, error } = useStory(taskId!);
   const logoutMutation = useLogout();
+  const isMobile = useMobile();
   
   const [showBook, setShowBook] = useState(false);
 
@@ -158,8 +160,169 @@ function StoryDetailPage() {
         </div>
         
         {showBook && storyData.status === 'SUCCESS' && (
-          <StoryBook story={storyData} />
+          isMobile ? (
+            <MobileStoryReader story={storyData} />
+          ) : (
+            <StoryBook story={storyData} />
+          )
         )}
+      </div>
+    </div>
+  );
+}
+
+// MobileStoryReader component for mobile devices
+function MobileStoryReader({ story }: { story: StoryResult }) {
+  const script: any = (story as any).script ?? story;
+  const title = script.title ?? 'Generated Story';
+  const scenes: any[] = script.scenes ?? [];
+  const styleBlock = (story as any).style?.style ?? (story as any).style ?? null;
+  const environmentsBlock = (story as any).environments?.environments ?? (story as any).environments ?? [];
+  const charactersBlock = (story as any).characters;
+  const characterList = Array.isArray(charactersBlock)
+    ? charactersBlock
+    : charactersBlock?.characters ?? [];
+  
+  // Parse illustrations
+  const illustrationsBlock = (story as any).illustrations;
+  const illustrationsList = Array.isArray(illustrationsBlock)
+    ? illustrationsBlock
+    : illustrationsBlock?.illustrations ?? [];
+  
+  // Create illustrations map for quick lookup
+  const illustrationsMap = new Map();
+  illustrationsList.forEach((ill: any) => {
+    if (ill.scene_id && ill.image_url) {
+      illustrationsMap.set(ill.scene_id, ill.image_url);
+    }
+  });
+
+  // Calculate reading progress
+  const totalContent = characterList.length + scenes.length;
+  const [currentProgress, setCurrentProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = Math.min((scrollTop / docHeight) * 100, 100);
+      setCurrentProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 overflow-y-auto scroll-smooth">
+      {/* Reading Progress Indicator */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-sm border-b border-amber-200">
+        <div className="w-full h-1 bg-amber-100">
+          <div 
+            className="h-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-300 ease-out"
+            style={{ width: `${currentProgress}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* Mobile Story Header */}
+      <div className="text-center mb-8 p-6 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-amber-200 mt-4">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-4 tracking-wide leading-tight">
+          {title}
+        </h1>
+        <div className="text-xl sm:text-2xl text-amber-600 font-light tracking-wider mb-4">
+          ✦ ✦ ✦
+        </div>
+        <p className="text-base sm:text-lg italic text-amber-700">
+          A tale created by ToonzyAI
+        </p>
+      </div>
+
+      {/* Characters Section */}
+      {characterList.length > 0 && (
+        <div className="mb-8 p-4 sm:p-6 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-blue-200">
+          <h2 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6 text-gray-800 uppercase tracking-wide border-b border-blue-300 pb-3">
+            Characters
+          </h2>
+          <div className="space-y-4 sm:space-y-6">
+            {characterList.map((char: any, idx: number) => (
+              <div key={char.name || idx} className="border-b border-dotted border-blue-300 pb-4 last:border-b-0">
+                <div className="text-lg sm:text-xl font-bold text-gray-800">
+                  {char.name || 'Unnamed'}
+                  {char.role && <span className="text-base sm:text-lg italic text-blue-600 font-normal"> — {char.role}</span>}
+                </div>
+                {char.description && (
+                  <div className="mt-2 text-base sm:text-lg text-gray-600 italic leading-relaxed">
+                    {char.description}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Story Content */}
+      {scenes.length > 0 && (
+        <div className="space-y-4 sm:space-y-6">
+          {scenes.map((scene, index) => {
+            const sceneText = scene.description || scene.environment_description || '';
+            const imageUrl = illustrationsMap.get(scene.id);
+            
+            return (
+              <div key={scene.id} className="p-4 sm:p-6 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-green-200">
+                {/* Chapter Header */}
+                {index === 0 && (
+                  <div className="text-center mb-4 sm:mb-6 border-b border-green-300 pb-3 sm:pb-4">
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-800 uppercase tracking-wide">
+                      Chapter {Math.floor(index / 3) + 1}
+                    </h3>
+                  </div>
+                )}
+                
+                {/* Scene Image */}
+                {imageUrl && (
+                  <div className="text-center mb-4">
+                    <img 
+                      src={imageUrl} 
+                      alt={`Illustration for scene ${scene.id}`}
+                      className="w-full max-w-sm sm:max-w-md h-auto mx-auto rounded-lg border border-green-300 shadow-md object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+                
+                {/* Scene Text */}
+                <div className="prose prose-sm sm:prose-lg max-w-none">
+                  <p className="text-base sm:text-lg leading-relaxed text-gray-800 text-justify indent-4 sm:indent-6 font-serif">
+                    {sceneText}
+                  </p>
+                </div>
+                
+                {/* Scene Separator */}
+                {index < scenes.length - 1 && (
+                  <div className="text-center text-green-600 text-lg sm:text-xl tracking-widest my-4 sm:my-6">
+                    • • •
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Story End */}
+      <div className="mt-8 p-4 sm:p-6 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200 text-center">
+        <div className="border-t border-gray-300 pt-4 sm:pt-6">
+          <div className="text-2xl sm:text-3xl font-bold text-gray-800 uppercase tracking-wide mb-2 sm:mb-4">
+            The End
+          </div>
+          <div className="text-lg sm:text-xl text-gray-600 italic">
+            Thank you for reading!
+          </div>
+        </div>
       </div>
     </div>
   );
